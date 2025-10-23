@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'features/formulir_daftar_gym/views/formulir_daftar_gym_view.dart';
+import 'features/search_gym/views/search_gym_views.dart.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart' as shadcn;
 
 void main() {
   runApp(MyApp());
@@ -8,9 +10,12 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return shadcn.ShadcnApp(
+      theme: shadcn.ThemeData(colorScheme: shadcn.ColorSchemes.lightDefaultColor),
       debugShowCheckedModeBanner: false,
-      home: PendaftaranGymPage(),
+
+      //home: PendaftaranGymPage(),
+      home: GymSearchPage(),
     );
   }
 }
