@@ -377,7 +377,7 @@ packages:
     source: hosted
     version: "0.28.0"
   shadcn_flutter:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: shadcn_flutter
       sha256: af83de199b7c3a965ab24e293cfcafe2764c12b7f911f5b1a427c332029262d9
