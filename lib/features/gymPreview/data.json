@@ -1,0 +1,58 @@
+{
+  "gym": {
+    "name": "Uget Uget Gym",
+    "location": "Jl. Jenderal Sudirman No. 123, Jakarta Selatan, DKI Jakarta",
+    "operation_hours": {
+      "weekday": "08:00 - 22:00",
+      "saturday": "09:00 - 18:00"
+    },
+    "description": "Uget Uget Gym menawarkan peralatan canggih, berbagai kelas kebugaran, dan pelatih ahli untuk membantu Anda mencapai tujuan kebugaran Anda.",
+    "facilities": [
+      "Peralatan Kardio Lengkap",
+      "Area Latihan Beban",
+      "Kelas Group (Zumba, HIIT)",
+      "Pelatih Pribadi Bersertifikat",
+      "Ruang Ganti & Loker Bersih",
+      "Area Lounge Sehat"
+    ],
+    "packages": [
+      {
+        "name": "Paket Basic",
+        "price": 250000,
+        "duration": "1 Bulan",
+        "features": [
+          "Akses Gym Penuh",
+          "2x Kelas Grup per Minggu",
+          "Locker Pribadi",
+          "Konsultasi Awal"
+        ]
+      },
+      {
+        "name": "Paket Premium",
+        "price": 500000,
+        "duration": "3 Bulan",
+        "features": [
+          "Akses Gym Penuh",
+          "Kelas Grup Tanpa Batas",
+          "Pelatih Pribadi 1x/Bulan",
+          "Handuk & Air Minum",
+          "Akses Sauna & Spa"
+        ],
+        "popular": true
+      },
+      {
+        "name": "Paket Pro",
+        "price": 1000000,
+        "duration": "6 Bulan",
+        "features": [
+          "Akses Gym Prioritas",
+          "Semua Kelas Grup Premium",
+          "Pelatih Pribadi 4x/Bulan",
+          "Nutrisi & Rencana Latihan",
+          "Suplemen Pilihan",
+          "Diskon Produk Gym"
+        ]
+      }
+    ]
+  }
+}
