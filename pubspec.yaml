@@ -35,7 +35,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  
+
   shadcn_flutter: ^0.0.44
 
 dev_dependencies:
@@ -48,7 +48,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
-  
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -64,6 +64,12 @@ flutter:
     - lib/assets/gymPreview/image1_app.jpg
     - lib/assets/gymPreview/image2_app.jfif
     - lib/assets/gymPreview/image3_app.jpg
+    - lib/assets/video_panduan/
+    - lib/assets/video_panduan/video_panduan1/
+    - lib/assets/video_panduan/video_panduan2/
+    - lib/assets/video_panduan/video_panduan3/
+    - lib/assets/video_panduan/detail_video_panduan/
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:
