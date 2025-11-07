@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Import halaman fitur yang sudah kamu punya
-import 'features/video_panduan/video_panduan1.dart';
+import 'features/video_panduan/panduan_alat_gym.dart';
 import 'features/formulir_daftar_gym/views/formulir_daftar_gym_view.dart';
 //import 'features/search_gym/views/search_gym_views.dart';
 import 'features/gymPreview/page/gym_preview_page.dart';
@@ -70,7 +70,7 @@ class DashboardPage extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const VideoPanduanPage1()),
+                  MaterialPageRoute(builder: (context) => const PanduanAlatGymPage()),
                 );
               },
             ),

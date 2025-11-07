@@ -65,10 +65,6 @@ flutter:
     - lib/assets/gymPreview/image2_app.jfif
     - lib/assets/gymPreview/image3_app.jpg
     - lib/assets/video_panduan/
-    - lib/assets/video_panduan/video_panduan1/
-    - lib/assets/video_panduan/video_panduan2/
-    - lib/assets/video_panduan/video_panduan3/
-    - lib/assets/video_panduan/detail_video_panduan/
 
 
   # To add assets to your application, add an assets section, like this:
