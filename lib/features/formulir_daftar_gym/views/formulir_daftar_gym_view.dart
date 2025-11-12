@@ -1,15 +1,64 @@
+import 'package:chain_fit_app/features/formulir_daftar_gym/model/registrant.dart';
+import 'package:chain_fit_app/features/gymPreview/model/gym_model.dart';
+import 'package:chain_fit_app/features/gymPreview/page/package_page.dart';
 import 'package:flutter/material.dart';
 
-class PendaftaranGymPage extends StatelessWidget {
-  final TextEditingController namaController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController teleponController = TextEditingController();
+class PendaftaranGymPage extends StatefulWidget {
+  final Gym gym;
+  const PendaftaranGymPage({super.key, required this.gym});
+
+  @override
+  State<PendaftaranGymPage> createState() => _PendaftaranGymPageState();
+}
+
+class _PendaftaranGymPageState extends State<PendaftaranGymPage> {
+  late final TextEditingController namaController;
+  late final TextEditingController emailController;
+  late final TextEditingController teleponController;
+
+  @override
+  void initState() {
+    super.initState();
+    namaController = TextEditingController();
+    emailController = TextEditingController();
+    teleponController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    namaController.dispose();
+    emailController.dispose();
+    teleponController.dispose();
+    super.dispose();
+  }
+
+  void _goToPackages() {
+    final registrant = Registrant(
+      name: namaController.text.trim(),
+      email: emailController.text.trim(),
+      phone: teleponController.text.trim(),
+    );
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Data berhasil dikirim!')));
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PackagePage(
+          gym: widget.gym,
+          registrant: registrant, // << KIRIM KE PACKAGE PAGE
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pendaftaran Gym'),
+        title: const Text('Pendaftaran Gym'),
         centerTitle: true,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -20,8 +69,16 @@ class PendaftaranGymPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Nama Lengkap', style: TextStyle(fontWeight: FontWeight.bold)),
-            SizedBox(height: 8),
+            Text(
+              'Gym: ${widget.gym.name}',
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Nama Lengkap',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
             TextField(
               controller: namaController,
               decoration: InputDecoration(
@@ -34,9 +91,12 @@ class PendaftaranGymPage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 16),
-            Text('Alamat Email', style: TextStyle(fontWeight: FontWeight.bold)),
-            SizedBox(height: 8),
+            const SizedBox(height: 16),
+            const Text(
+              'Alamat Email',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
             TextField(
               controller: emailController,
               decoration: InputDecoration(
@@ -49,12 +109,12 @@ class PendaftaranGymPage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 16),
+            const Text(
               'Nomor Telepon',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             TextField(
               controller: teleponController,
               keyboardType: TextInputType.phone,
@@ -68,23 +128,19 @@ class PendaftaranGymPage extends StatelessWidget {
                 ),
               ),
             ),
-            Spacer(),
+            const Spacer(),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Data berhasil dikirim!')),
-                  );
-                },
+                onPressed: _goToPackages,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.indigoAccent,
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: Text(
+                child: const Text(
                   'Daftar Sekarang',
                   style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
