@@ -1,10 +1,16 @@
+import 'package:chain_fit_app/features/formulir_daftar_gym/model/registrant.dart';
 import 'package:flutter/material.dart';
 import '../model/gym_model.dart';
 import 'payment_summary_page.dart';
 
 class PaymentMethodPage extends StatefulWidget {
   final Package selectedPackage;
-  const PaymentMethodPage({super.key, required this.selectedPackage});
+  final Registrant registrant;
+  const PaymentMethodPage({
+    super.key,
+    required this.selectedPackage,
+    required this.registrant,
+  });
 
   @override
   State<PaymentMethodPage> createState() => _PaymentMethodPageState();
@@ -125,21 +131,33 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
             ),
             const SizedBox(height: 12),
 
-            // --- Gopay Option ---
-            _buildPaymentOption(
-              title: "Gopay",
-              subtitle: "Pembayaran melalui akun gopay",
-              value: "Gopay",
-              icon: Icons.account_balance_wallet_outlined,
-            ),
-            const SizedBox(height: 8),
+            RadioGroup<String>(
+              groupValue: selectedMethod,
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() => selectedMethod = val);
+                }
+              },
+              child: Column(
+                children: [
+                  // --- Gopay Option ---
+                  _buildPaymentOption(
+                    title: "Gopay",
+                    subtitle: "Pembayaran melalui akun gopay",
+                    value: "Gopay",
+                    icon: Icons.account_balance_wallet_outlined,
+                  ),
+                  const SizedBox(height: 8),
 
-            // --- Bank Transfer Option ---
-            _buildPaymentOption(
-              title: "Transfer Bank",
-              subtitle: "BCA, Mandiri, BRI & Bank Lainnya",
-              value: "Bank",
-              icon: Icons.account_balance_outlined,
+                  // --- Bank Transfer Option ---
+                  _buildPaymentOption(
+                    title: "Transfer Bank",
+                    subtitle: "BCA, Mandiri, BRI & Bank Lainnya",
+                    value: "Bank",
+                    icon: Icons.account_balance_outlined,
+                  ),
+                ],
+              ),
             ),
 
             const Spacer(),
@@ -152,8 +170,11 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) =>
-                          PaymentSummaryPage(pkg: pkg, method: selectedMethod),
+                      builder: (_) => PaymentSummaryPage(
+                        pkg: pkg,
+                        method: selectedMethod,
+                        registrant: widget.registrant,
+                      ),
                     ),
                   );
                 },
@@ -219,12 +240,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                 ],
               ),
             ),
-            Radio<String>(
-              value: value,
-              groupValue: selectedMethod,
-              onChanged: (val) => setState(() => selectedMethod = val!),
-              activeColor: Colors.black,
-            ),
+            Radio<String>(value: value, activeColor: Colors.black),
           ],
         ),
       ),

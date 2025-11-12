@@ -1,15 +1,152 @@
+import 'package:chain_fit_app/features/formulir_daftar_gym/model/registrant.dart';
 import 'package:flutter/material.dart';
 import '../model/gym_model.dart';
+
+const String kTosText = '''
+Tanggal Berlaku: 12 November 2025
+
+1. Penerimaan Syarat
+Dengan membuat akun atau menggunakan layanan, Anda menyetujui Ketentuan Layanan ini serta kebijakan terkait yang berlaku.
+
+2. Deskripsi Layanan
+Aplikasi menyediakan pendaftaran member gym, pengelolaan paket, dan pembayaran melalui mitra pembayaran pihak ketiga.
+
+3. Akun & Keamanan
+- Anda wajib memberi informasi yang akurat dan mutakhir.
+- Jaga kredensial Anda; aktivitas pada akun menjadi tanggung jawab Anda.
+- Laporkan akses tidak sah ke dukungan kami.
+
+4. Pembayaran & Biaya
+- Harga paket ditampilkan sebelum pembayaran; pajak/biaya admin dapat berlaku.
+- Transaksi diproses oleh penyedia pembayaran pihak ketiga.
+- Pembatalan/refund mengikuti kebijakan Refund (lihat poin 7).
+
+5. Penggunaan yang Dilarang
+Dilarang: penyalahgunaan, penipuan, pelanggaran hukum/hak pihak ketiga, reverse engineering, atau gangguan terhadap layanan.
+
+6. Ketersediaan & Perubahan Layanan
+Kami dapat memperbarui, membatasi, atau menghentikan fitur kapan saja dengan atau tanpa pemberitahuan, sejauh diizinkan hukum.
+
+7. Refund & Pembatalan
+- Refund hanya berlaku jika memenuhi kriteria (mis. pembayaran ganda, kegagalan layanan).
+- Permohonan refund diajukan dalam 7 hari dengan bukti pembayaran.
+
+8. Batasan Tanggung Jawab
+Layanan disediakan “sebagaimana adanya”. Kami tidak bertanggung jawab atas kerugian tidak langsung, insidental, atau konsekuensial.
+
+9. Hak Kekayaan Intelektual
+Seluruh materi (merek, logo, konten, kode) dilindungi hukum. Anda tidak memperoleh hak selain yang diizinkan tertulis.
+
+10. Hukum yang Berlaku & Sengketa
+Diatur oleh hukum Republik Indonesia. Sengketa diselesaikan terlebih dahulu secara musyawarah; bila gagal, melalui mekanisme yang berlaku.
+
+11. Kontak
+Email: support@yourcompany.com
+''';
+
+const String kPrivacyText = '''
+Tanggal Berlaku: 12 November 2025
+
+1. Ringkasan
+Kami mengumpulkan data untuk mengoperasikan layanan (pendaftaran, pembayaran, dukungan). Kami menjaga data sesuai peraturan yang berlaku.
+
+2. Data yang Dikumpulkan
+- Data Identitas: nama, email, telepon.
+- Data Transaksi: paket, harga, metode pembayaran, status.
+- Data Teknis: perangkat, log, alamat IP secara terbatas.
+- Data Komunikasi: pertanyaan/keluhan yang Anda kirimkan.
+
+3. Cara Penggunaan Data
+- Menyediakan dan meningkatkan layanan.
+- Memproses pembayaran dan mencegah kecurangan.
+- Mengirim notifikasi terkait transaksi/akun.
+- Kepatuhan hukum dan audit.
+
+4. Dasar Pemrosesan
+- Persetujuan Anda.
+- Pelaksanaan kontrak (penyediaan layanan).
+- Kepentingan sah (keamanan, peningkatan layanan).
+- Kewajiban hukum.
+
+5. Berbagi Data
+- Mitra pembayaran dan penyedia infrastruktur.
+- Pihak berwenang bila diwajibkan hukum.
+- Tidak menjual data pribadi Anda.
+
+6. Keamanan
+Kami menerapkan kontrol teknis dan organisasional yang wajar untuk melindungi data. Namun, tidak ada sistem yang 100% aman.
+
+7. Retensi
+Data disimpan selama akun aktif atau sesuai kebutuhan bisnis/ hukum. Data transaksi dapat disimpan lebih lama untuk kepatuhan.
+
+8. Hak Pengguna
+Anda dapat meminta akses, koreksi, penghapusan, pembatasan, atau portabilitas data sejauh diizinkan. Hubungi kami melalui email dukungan.
+
+9. Cookie & Pelacakan
+Kami dapat menggunakan cookie/ID perangkat untuk fungsionalitas dan analitik. Anda dapat mengelola preferensi melalui pengaturan perangkat/aplikasi.
+
+10. Transfer Internasional
+Jika data dipindahkan ke luar negeri, kami akan memastikan perlindungan yang memadai sesuai regulasi.
+
+11. Perubahan Kebijakan
+Kami dapat memperbarui kebijakan ini. Versi terbaru akan ditampilkan di aplikasi.
+
+12. Kontak
+Email: privacy@yourcompany.com
+''';
 
 class PaymentSummaryPage extends StatelessWidget {
   final Package pkg;
   final String method;
+  final Registrant registrant;
 
   const PaymentSummaryPage({
     super.key,
     required this.pkg,
     required this.method,
+    required this.registrant,
   });
+
+  Future<bool?> _showCancelConfirm(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false, // wajib pilih salah satu aksi
+      builder: (ctx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: Row(
+            children: const [
+              Icon(Icons.warning_amber_rounded),
+              SizedBox(width: 8),
+              Text("Konfirmasi"),
+            ],
+          ),
+          content: const Text(
+            "Apakah Anda yakin ingin keluar?\n"
+            "Semua langkah/isi yang sudah Anda masukkan akan hilang.",
+          ),
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                ),
+              ),
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: const Text("Ya, keluar"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text("Tidak, kembali"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,16 +292,16 @@ class PaymentSummaryPage extends StatelessWidget {
                         const SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
-                              "Udin Slebew",
+                              registrant.name,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                             ),
-                            Text("udin.welp@slebew.com"),
-                            Text("+62 812 3456 7890"),
+                            Text(registrant.email),
+                            Text(registrant.phone),
                           ],
                         ),
                       ],
@@ -177,9 +314,9 @@ class PaymentSummaryPage extends StatelessWidget {
             const SizedBox(height: 20),
 
             // ===== Expansion Panels =====
-            _buildExpansion("Ketentuan Layanan"),
+            _buildExpansion("Ketentuan Layanan", kTosText),
             const SizedBox(height: 8),
-            _buildExpansion("Kebijakan Privasi"),
+            _buildExpansion("Kebijakan Privasi", kPrivacyText),
             const SizedBox(height: 24),
 
             // ===== Tombol Batalkan =====
@@ -193,7 +330,15 @@ class PaymentSummaryPage extends StatelessWidget {
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
-                onPressed: () => Navigator.popUntil(context, (r) => r.isFirst),
+                onPressed: () async {
+                  final ok = await _showCancelConfirm(context);
+                  if (ok == true) {
+                    // lanjut keluar & reset ke halaman awal
+                    if (context.mounted) {
+                      Navigator.popUntil(context, (r) => r.isFirst);
+                    }
+                  }
+                },
                 child: const Text(
                   "Batalkan",
                   style: TextStyle(fontSize: 16, color: Colors.white),
@@ -233,7 +378,7 @@ class PaymentSummaryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildExpansion(String title) {
+  Widget _buildExpansion(String title, String content) {
     return Card(
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -247,10 +392,10 @@ class PaymentSummaryPage extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
-            child: Text(
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-              "Vivamus euismod, nisi in cursus commodo, felis urna gravida orci.",
-              style: const TextStyle(color: Colors.grey),
+            child: SelectableText(
+              // enak buat copy-paste
+              content,
+              style: const TextStyle(color: Colors.grey, height: 1.4),
             ),
           ),
         ],

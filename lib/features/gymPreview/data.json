@@ -1,12 +1,12 @@
 {
-  "gym": {
-    "name": "Uget Uget Gym",
-    "location": "Jl. Jenderal Sudirman No. 123, Jakarta Selatan, DKI Jakarta",
+  "Laqisya Gym": {
+    "name": "Laqisya Gym",
+    "location": "Jl. Sudirman No. 123, Jakarta",
     "operation_hours": {
       "weekday": "08:00 - 22:00",
       "saturday": "09:00 - 18:00"
     },
-    "description": "Uget Uget Gym menawarkan peralatan canggih, berbagai kelas kebugaran, dan pelatih ahli untuk membantu Anda mencapai tujuan kebugaran Anda.",
+    "description": "Laqisya Gym menawarkan peralatan canggih, berbagai kelas kebugaran, dan pelatih ahli untuk membantu Anda mencapai tujuan kebugaran.",
     "facilities": [
       "Peralatan Kardio Lengkap",
       "Area Latihan Beban",
@@ -51,6 +51,56 @@
           "Nutrisi & Rencana Latihan",
           "Suplemen Pilihan",
           "Diskon Produk Gym"
+        ]
+      }
+    ]
+  },
+
+  "Uget Uget Gym Boyolali": {
+    "name": "Uget Uget Gym Boyolali",
+    "location": "Jl. Aduhai No. 45, Boyolali, Jawa Tengah",
+    "operation_hours": {
+      "weekday": "07:00 - 21:00",
+      "saturday": "08:00 - 18:00"
+    },
+    "description": "Uget Uget Gym Boyolali menyediakan area beban lengkap, kelas kardio, dan pendampingan pelatih untuk semua level.",
+    "facilities": [
+      "Area Latihan Beban",
+      "Latihan Kardio",
+      "Kelas Group (Zumba, HIIT)",
+      "Pelatih Pribadi",
+      "Sauna",
+      "Ruang Ganti & Loker"
+    ],
+    "packages": [
+      {
+        "name": "Paket Harian",
+        "price": 30000,
+        "duration": "1 Hari",
+        "features": [
+          "Akses Gym Penuh",
+          "Handuk"
+        ]
+      },
+      {
+        "name": "Paket Bulanan",
+        "price": 200000,
+        "duration": "1 Bulan",
+        "features": [
+          "Akses Gym Penuh",
+          "2x Kelas Grup per Minggu",
+          "Locker Pribadi"
+        ],
+        "popular": true
+      },
+      {
+        "name": "Paket Quarterly",
+        "price": 550000,
+        "duration": "3 Bulan",
+        "features": [
+          "Akses Gym Penuh",
+          "Kelas Grup Tanpa Batas",
+          "1x Sesi PT/Bulan"
         ]
       }
     ]

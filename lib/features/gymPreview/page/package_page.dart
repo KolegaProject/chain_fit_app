@@ -1,10 +1,12 @@
+import 'package:chain_fit_app/features/formulir_daftar_gym/model/registrant.dart';
 import 'package:flutter/material.dart';
 import '../model/gym_model.dart';
 import 'payment_method_page.dart';
 
 class PackagePage extends StatelessWidget {
   final Gym gym;
-  const PackagePage({super.key, required this.gym});
+  final Registrant registrant; // << terima registrant
+  const PackagePage({super.key, required this.gym, required this.registrant});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,7 @@ class PackagePage extends StatelessWidget {
               border: Border.all(color: Colors.grey.shade300),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 6,
                   offset: const Offset(0, 3),
                 ),
@@ -137,7 +139,7 @@ class PackagePage extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (_) =>
-                                  PaymentMethodPage(selectedPackage: pkg),
+                                  PaymentMethodPage(selectedPackage: pkg, registrant: registrant), // << teruskan registrant
                             ),
                           );
                         },

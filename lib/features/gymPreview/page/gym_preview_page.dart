@@ -1,11 +1,19 @@
 import 'dart:convert';
+import 'package:chain_fit_app/features/formulir_daftar_gym/views/formulir_daftar_gym_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../model/gym_model.dart';
 import 'package_page.dart';
 
 class GymPreviewPage extends StatefulWidget {
-  const GymPreviewPage({super.key});
+  final String gymName;
+  final List<String> gymImages;
+
+  const GymPreviewPage({
+    super.key,
+    required this.gymName,
+    required this.gymImages,
+  });
 
   @override
   State<GymPreviewPage> createState() => _GymPreviewPageState();
@@ -15,16 +23,12 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
   Gym? gymData;
   int _currentPage = 0; // untuk indikator
   final PageController _pageController = PageController();
-
-  final List<String> gymImages = [
-    'lib/assets/gymPreview/image1_app.jpg',
-    'lib/assets/gymPreview/image2_app.jfif',
-    'lib/assets/gymPreview/image3_app.jpg',
-  ];
+  late List<String> gymImages;
 
   @override
   void initState() {
     super.initState();
+    gymImages = widget.gymImages;
     loadGymData();
   }
 
@@ -34,7 +38,7 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
     );
     final jsonResult = jsonDecode(data);
     setState(() {
-      gymData = Gym.fromJson(jsonResult['gym']);
+      gymData = Gym.fromJson(jsonResult[widget.gymName]);
     });
   }
 
@@ -143,7 +147,7 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
                             decoration: BoxDecoration(
                               color: _currentPage == index
                                   ? Colors.white
-                                  : Colors.white.withOpacity(0.5),
+                                  : Colors.white.withValues(alpha: 0.5),
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -205,7 +209,8 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => PackagePage(gym: gymData!),
+                      // builder: (_) => PackagePage(gym: gymData!),
+                      builder: (_) => PendaftaranGymPage(gym: gymData!),
                     ),
                   );
                 },
