@@ -5,6 +5,7 @@ class Gym {
   final double rating;
   final double distance;
   final List<String> tags;
+  final List<String> images;
 
   Gym({
     required this.name,
@@ -13,5 +14,6 @@ class Gym {
     required this.rating,
     required this.distance,
     required this.tags,
+    required this.images,
   });
 }
