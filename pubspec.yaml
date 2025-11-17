@@ -1,5 +1,5 @@
 name: chain_fit_app
-description: "A new Flutter project."
+description: "Chain Fit, aplikasi gym hub untuk tugas besar PPB."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -37,6 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   shadcn_flutter: ^0.0.44
+  flutter_local_notifications: ^19.5.0
 
 dev_dependencies:
   flutter_test:

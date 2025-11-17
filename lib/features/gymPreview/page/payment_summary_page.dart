@@ -1,6 +1,40 @@
 import 'package:chain_fit_app/features/formulir_daftar_gym/model/registrant.dart';
 import 'package:flutter/material.dart';
 import '../model/gym_model.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+Future<void> initializeNotifications() async {
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+}
+
+Future<void> showPaymentSuccessNotification() async {
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+        'payment_channel',
+        'Pembayaran',
+        channelDescription: 'Notifikasi pembayaran sukses',
+        importance: Importance.max,
+        priority: Priority.high,
+        ticker: 'ticker',
+      );
+  const NotificationDetails platformChannelSpecifics = NotificationDetails(
+    android: androidPlatformChannelSpecifics,
+  );
+  await flutterLocalNotificationsPlugin.show(
+    0,
+    'Pembayaran Berhasil',
+    'Terima kasih, pembayaran Anda telah sukses!',
+    platformChannelSpecifics,
+  );
+}
 
 const String kTosText = '''
 Tanggal Berlaku: 12 November 2025
@@ -150,6 +184,8 @@ class PaymentSummaryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Inisialisasi notifikasi saat widget pertama kali build
+    initializeNotifications();
     int discount = 50000;
     int adminFee = 10000;
     int total = pkg.price - discount + adminFee;
@@ -333,7 +369,6 @@ class PaymentSummaryPage extends StatelessWidget {
                 onPressed: () async {
                   final ok = await _showCancelConfirm(context);
                   if (ok == true) {
-                    // lanjut keluar & reset ke halaman awal
                     if (context.mounted) {
                       Navigator.popUntil(context, (r) => r.isFirst);
                     }
@@ -341,6 +376,37 @@ class PaymentSummaryPage extends StatelessWidget {
                 },
                 child: const Text(
                   "Batalkan",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+            // ===== Tombol Pembayaran Selesai =====
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                onPressed: () async {
+                  await showPaymentSuccessNotification();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Pembayaran berhasil! Notifikasi dikirim.',
+                        ),
+                      ),
+                    );
+                  }
+                },
+                child: const Text(
+                  "Pembayaran Selesai",
                   style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
