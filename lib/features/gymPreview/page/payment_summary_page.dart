@@ -15,7 +15,17 @@ Future<void> initializeNotifications() async {
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 }
 
+Future<void> requestNotificationPermission() async {
+  final plugin = FlutterLocalNotificationsPlugin();
+  final androidImplementation = plugin
+      .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin
+      >();
+  await androidImplementation?.requestNotificationsPermission();
+}
+
 Future<void> showPaymentSuccessNotification() async {
+  await requestNotificationPermission();
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
         'payment_channel',
@@ -129,7 +139,7 @@ Kami dapat memperbarui kebijakan ini. Versi terbaru akan ditampilkan di aplikasi
 Email: privacy@yourcompany.com
 ''';
 
-class PaymentSummaryPage extends StatelessWidget {
+class PaymentSummaryPage extends StatefulWidget {
   final Package pkg;
   final String method;
   final Registrant registrant;
@@ -140,6 +150,18 @@ class PaymentSummaryPage extends StatelessWidget {
     required this.method,
     required this.registrant,
   });
+
+  @override
+  State<PaymentSummaryPage> createState() => _PaymentSummaryPageState();
+}
+
+class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
+  @override
+  void initState() {
+    super.initState();
+    initializeNotifications();
+    requestNotificationPermission();
+  }
 
   Future<bool?> _showCancelConfirm(BuildContext context) {
     return showDialog<bool>(
@@ -188,7 +210,7 @@ class PaymentSummaryPage extends StatelessWidget {
     initializeNotifications();
     int discount = 50000;
     int adminFee = 10000;
-    int total = pkg.price - discount + adminFee;
+    int total = widget.pkg.price - discount + adminFee;
 
     return Scaffold(
       appBar: AppBar(
@@ -230,8 +252,8 @@ class PaymentSummaryPage extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    _buildRow("Paket", pkg.name),
-                    _buildRow("Harga", "Rp ${pkg.price}"),
+                    _buildRow("Paket", widget.pkg.name),
+                    _buildRow("Harga", "Rp ${widget.pkg.price}"),
                     _buildRow(
                       "Diskon",
                       "- Rp $discount",
@@ -246,7 +268,7 @@ class PaymentSummaryPage extends StatelessWidget {
                       fontSize: 16,
                     ),
                     const SizedBox(height: 16),
-                    _buildRow("Metode Pembayaran", method),
+                    _buildRow("Metode Pembayaran", widget.method),
                     const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -330,14 +352,14 @@ class PaymentSummaryPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              registrant.name,
+                              widget.registrant.name,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                             ),
-                            Text(registrant.email),
-                            Text(registrant.phone),
+                            Text(widget.registrant.email),
+                            Text(widget.registrant.phone),
                           ],
                         ),
                       ],
