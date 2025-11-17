@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../model/dashboard_model.dart';
+import 'package:chain_fit_app/features/video_panduan/panduan_alat_gym.dart';
+import 'package:chain_fit_app/features/search_gym/views/search_gym_views.dart.dart';
 
 class DashboardView extends StatefulWidget {
   const DashboardView({Key? key}) : super(key: key);
@@ -22,12 +24,8 @@ class _DashboardViewState extends State<DashboardView> {
   int _selectedBottomNav = 0;
 
   final List<DashboardMenuItem> menuItems = [
-    DashboardMenuItem(title: 'Jadwal', iconAsset: 'calendar_today'),
-    DashboardMenuItem(title: 'Latihan', iconAsset: 'fitness_center'),
-    DashboardMenuItem(title: 'Pelatih', iconAsset: 'groups'),
-    DashboardMenuItem(title: 'Nutrisi', iconAsset: 'restaurant'),
-    DashboardMenuItem(title: 'Statistik', iconAsset: 'show_chart'),
-    DashboardMenuItem(title: 'Tantangan', iconAsset: 'local_fire_department'),
+    DashboardMenuItem(title: 'Video Panduan', iconAsset: 'video_library'),
+    DashboardMenuItem(title: 'Cari Gym', iconAsset: 'search'),
   ];
 
   void _navigateTo(String page) {
@@ -181,7 +179,23 @@ class _DashboardViewState extends State<DashboardView> {
                     ),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(16),
-                      onTap: () => _navigateTo(item.title.toLowerCase()),
+                      onTap: () {
+                        if (item.title == 'Video Panduan') {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const PanduanAlatGymPage(),
+                            ),
+                          );
+                        } else if (item.title == 'Cari Gym') {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const GymSearchPage(),
+                            ),
+                          );
+                        }
+                      },
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -211,18 +225,10 @@ class _DashboardViewState extends State<DashboardView> {
 
   IconData _getIconData(String iconName) {
     switch (iconName) {
-      case 'calendar_today':
-        return Icons.calendar_today;
-      case 'fitness_center':
-        return Icons.fitness_center;
-      case 'groups':
-        return Icons.groups;
-      case 'restaurant':
-        return Icons.restaurant;
-      case 'show_chart':
-        return Icons.show_chart;
-      case 'local_fire_department':
-        return Icons.local_fire_department;
+      case 'video_library':
+        return Icons.video_library;
+      case 'search':
+        return Icons.search;
       default:
         return Icons.circle;
     }

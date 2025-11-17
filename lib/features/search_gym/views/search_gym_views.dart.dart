@@ -27,7 +27,8 @@ class GymSearchPage extends StatelessWidget {
       Gym(
         name: "Uget Uget Gym Boyolali",
         address: "Jl. Aduhai No. 45, Boyolali",
-        imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b",
+        imageUrl:
+            "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b",
         rating: 4.5,
         distance: 3.1,
         tags: ["Latihan Kardio", "Pelatih Pribadi", "Sauna"],
@@ -38,7 +39,6 @@ class GymSearchPage extends StatelessWidget {
         ],
       ),
     ];
-    
 
     return Scaffold(
       appBar: AppBar(centerTitle: true, title: const Text("Cari Gym")),
@@ -59,7 +59,10 @@ class GymSearchPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => GymPreviewPage(gymName: item.name, gymImages: item.images), // <-- KIRIM NAMA DAN GAMBAR
+                          builder: (_) => GymPreviewPage(
+                            gymName: item.name,
+                            gymImages: item.images,
+                          ), // <-- KIRIM NAMA DAN GAMBAR
                         ),
                       );
                     },
