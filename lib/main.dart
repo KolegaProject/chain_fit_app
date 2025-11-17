@@ -1,4 +1,6 @@
 // main.dart
+import 'package:chain_fit_app/features/daftar_akun/daftar_akun_view.dart';
+import 'package:chain_fit_app/features/login_akun/views/login_akun_view.dart';
 import 'package:flutter/material.dart' as m; // alias biar nggak bentrok
 import 'package:shadcn_flutter/shadcn_flutter.dart'; // <- penting
 import 'features/video_panduan/panduan_alat_gym.dart';
@@ -59,8 +61,14 @@ class _DashboardGrid extends StatelessWidget {
             icon: m.Icons.login,
             label: 'Login',
             onTap: () {
-              m.ScaffoldMessenger.of(context).showSnackBar(
-                const m.SnackBar(content: Text('Halaman Login belum dibuat')),
+              // m.ScaffoldMessenger.of(context).showSnackBar(
+              //   const m.SnackBar(content: Text('Halaman Login belum dibuat')),
+              // );
+              Navigator.push(
+                context,
+                m.MaterialPageRoute(
+                  builder: (context) => const LoginAkunView(),
+                ),
               );
             },
           ),
@@ -68,9 +76,15 @@ class _DashboardGrid extends StatelessWidget {
             icon: m.Icons.app_registration,
             label: 'Register',
             onTap: () {
-              m.ScaffoldMessenger.of(context).showSnackBar(
-                const m.SnackBar(
-                  content: Text('Halaman Register belum dibuat'),
+              // m.ScaffoldMessenger.of(context).showSnackBar(
+              //   const m.SnackBar(
+              //     content: Text('Halaman Register belum dibuat'),
+              //   ),
+              // );
+              Navigator.push(
+                context,
+                m.MaterialPageRoute(
+                  builder: (context) => const DaftarAkunView(),
                 ),
               );
             },
