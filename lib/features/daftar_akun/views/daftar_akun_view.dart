@@ -1,7 +1,31 @@
 import 'package:flutter/material.dart';
+import '../model/daftar_akun_model.dart';
 
-class DaftarAkunView extends StatelessWidget {
+class DaftarAkunView extends StatefulWidget {
   const DaftarAkunView({Key? key}) : super(key: key);
+
+  @override
+  State<DaftarAkunView> createState() => _DaftarAkunViewState();
+}
+
+class _DaftarAkunViewState extends State<DaftarAkunView> {
+  final TextEditingController _namaLengkapController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _nomorTeleponController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  void _onRegister() {
+    final model = DaftarAkunModel(
+      namaLengkap: _namaLengkapController.text,
+      email: _emailController.text,
+      nomorTelepon: _nomorTeleponController.text,
+      password: _passwordController.text,
+    );
+    // TODO: Implement registration logic using model
+    print(
+      'Nama: \\${model.namaLengkap}, Email: \\${model.email}, Telepon: \\${model.nomorTelepon}, Password: \\${model.password}',
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +57,7 @@ class DaftarAkunView extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             TextField(
+              controller: _namaLengkapController,
               decoration: InputDecoration(
                 hintText: 'Masukkan nama lengkap Anda',
                 filled: true,
@@ -50,6 +75,7 @@ class DaftarAkunView extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             TextField(
+              controller: _emailController,
               decoration: InputDecoration(
                 hintText: 'Masukkan alamat email Anda',
                 filled: true,
@@ -67,6 +93,7 @@ class DaftarAkunView extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             TextField(
+              controller: _nomorTeleponController,
               decoration: InputDecoration(
                 hintText: 'Masukkan nomor telepon Anda',
                 filled: true,
@@ -84,6 +111,7 @@ class DaftarAkunView extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             TextField(
+              controller: _passwordController,
               obscureText: true,
               decoration: InputDecoration(
                 hintText: 'Masukkan Password Anda',
@@ -106,7 +134,7 @@ class DaftarAkunView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed: () {},
+                onPressed: _onRegister,
                 child: const Text('Masuk', style: TextStyle(fontSize: 18)),
               ),
             ),
@@ -115,5 +143,14 @@ class DaftarAkunView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _namaLengkapController.dispose();
+    _emailController.dispose();
+    _nomorTeleponController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
