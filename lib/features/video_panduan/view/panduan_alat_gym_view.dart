@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'detail_video_panduan.dart';
+import 'package:chain_fit_app/features/video_panduan/model/panduan_alat_gym_model.dart';
+import 'package:chain_fit_app/features/video_panduan/model/detail_video_panduan_model.dart';
+import 'package:chain_fit_app/features/video_panduan/view/detail_video_panduan_view.dart';
 
 class PanduanAlatGymPage extends StatefulWidget {
   const PanduanAlatGymPage({super.key});
@@ -12,37 +14,16 @@ class _PanduanAlatGymPageState extends State<PanduanAlatGymPage> {
   final TextEditingController _searchController = TextEditingController();
   String query = '';
 
-  final List<Map<String, String>> alatGym = [
-    {
-      'name': 'Cable Crossover',
-      'image': 'lib/assets/video_panduan/satu.jpeg',
-      'description':
-      'Cable Crossover adalah alat gym yang digunakan untuk melatih otot dada, terutama bagian tengah dan luar. Gerakan ini juga melibatkan otot bahu dan trisep. Pastikan untuk menjaga postur tubuh tetap stabil dan gunakan beban yang sesuai untuk menghindari cedera.',
-    },
-    {
-      'name': 'Leg Press',
-      'image': 'lib/assets/video_panduan/dua.jpeg',
-      'description':
-      'Leg Press adalah alat yang dirancang untuk melatih otot paha depan (quadriceps), paha belakang (hamstring), dan gluteus. Posisi kaki pada platform dapat disesuaikan untuk menargetkan area tertentu. Hindari mengunci lutut saat mendorong beban untuk mencegah cedera.',
-    },
-    {
-      'name': 'Leg Curl',
-      'image': 'lib/assets/video_panduan/tiga.jpeg',
-      'description':
-      'Leg Curl digunakan untuk melatih otot hamstring (paha belakang). Gerakan ini membantu meningkatkan kekuatan dan fleksibilitas otot paha belakang. Pastikan untuk melakukan gerakan dengan kontrol penuh dan hindari menggunakan beban yang terlalu berat.',
-    },
-    {
-      'name': 'Parallel Bar',
-      'image': 'lib/assets/video_panduan/empat.jpeg',
-      'description':
-      'Parallel Bar adalah alat yang digunakan untuk latihan dips, yang melatih otot dada, trisep, dan bahu. Gerakan ini dapat dilakukan dengan mencondongkan tubuh ke depan untuk fokus pada dada atau menjaga tubuh tegak untuk fokus pada trisep.',
-    },
-  ];
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final filteredList = alatGym
-        .where((item) => item['name']!.toLowerCase().contains(query.toLowerCase()))
+    final filteredList = PanduanAlatGymModel.samples
+        .where((item) => item.name.toLowerCase().contains(query.toLowerCase()))
         .toList();
 
     return Scaffold(
@@ -89,7 +70,6 @@ class _PanduanAlatGymPageState extends State<PanduanAlatGymPage> {
               ),
             ),
             const SizedBox(height: 16),
-
             Expanded(
               child: ListView.builder(
                 itemCount: filteredList.length,
@@ -97,14 +77,15 @@ class _PanduanAlatGymPageState extends State<PanduanAlatGymPage> {
                   final item = filteredList[index];
                   return GestureDetector(
                     onTap: () {
+                      final detail = DetailAlatGymModel(
+                        title: item.name,
+                        imagePath: item.image,
+                        description: item.description,
+                      );
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => DetailAlatGymPage(
-                            title: item['name'] ?? '',
-                            imagePath: item['image'] ?? '',
-                            description: item['description'] ?? '',
-                          ),
+                          builder: (_) => DetailAlatGymPage(item: detail),
                         ),
                       );
                     },
@@ -125,14 +106,18 @@ class _PanduanAlatGymPageState extends State<PanduanAlatGymPage> {
                             ),
                             child: ClipRRect(
                               borderRadius:
-                              const BorderRadius.vertical(top: Radius.circular(12)),
+                                  const BorderRadius.vertical(top: Radius.circular(12)),
                               child: Image.asset(
-                                item['image']!,
-                                fit: BoxFit.contain, 
+                                item.image,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) => Container(
+                                  color: Colors.grey.shade200,
+                                  alignment: Alignment.center,
+                                  child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
+                                ),
                               ),
                             ),
                           ),
-
                           Container(
                             margin: const EdgeInsets.symmetric(vertical: 8),
                             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -141,7 +126,7 @@ class _PanduanAlatGymPageState extends State<PanduanAlatGymPage> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              item['name']!,
+                              item.name,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
