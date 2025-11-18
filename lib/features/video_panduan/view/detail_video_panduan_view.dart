@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
+import '../model/detail_video_panduan_model.dart';
 
 class DetailAlatGymPage extends StatelessWidget {
-  final String title;
-  final String imagePath;
-  final String description;
+  final DetailAlatGymModel item;
 
   const DetailAlatGymPage({
     super.key,
-    required this.title,
-    required this.imagePath,
-    required this.description,
+    required this.item,
   });
 
   @override
@@ -21,7 +18,7 @@ class DetailAlatGymPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          title,
+          item.title,
           style: const TextStyle(
             fontWeight: FontWeight.w600,
           ),
@@ -49,10 +46,10 @@ class DetailAlatGymPage extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Container(
-                      color: Colors.black12, 
+                      color: Colors.black12,
                       child: Image.asset(
-                        imagePath,
-                        fit: BoxFit.contain, 
+                        item.imagePath,
+                        fit: BoxFit.contain,
                         width: double.infinity,
                         height: 220,
                       ),
@@ -74,9 +71,7 @@ class DetailAlatGymPage extends StatelessWidget {
                 ],
               ),
             ),
-
             const SizedBox(height: 24),
-
             const Text(
               'Deskripsi',
               style: TextStyle(
@@ -86,7 +81,7 @@ class DetailAlatGymPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              description,
+              item.description,
               style: const TextStyle(
                 fontSize: 15,
                 color: Colors.black87,
@@ -99,3 +94,4 @@ class DetailAlatGymPage extends StatelessWidget {
     );
   }
 }
+
