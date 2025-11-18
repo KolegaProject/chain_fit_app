@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../model/dashboard_model.dart';
 import 'package:chain_fit_app/features/video_panduan/panduan_alat_gym.dart';
 import 'package:chain_fit_app/features/search_gym/views/search_gym_views.dart.dart';
+import 'package:chain_fit_app/features/list_qr/views/list_qr_view.dart';
 
 class DashboardView extends StatefulWidget {
   const DashboardView({Key? key}) : super(key: key);
@@ -249,7 +250,12 @@ class _DashboardViewState extends State<DashboardView> {
           Transform.translate(
             offset: const Offset(0, -24),
             child: FloatingActionButton(
-              onPressed: () => _navigateTo('scan'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const MenuQrPage()),
+                );
+              },
               backgroundColor: const Color(0xFF6366F1),
               child: const Icon(Icons.qr_code_scanner, color: Colors.white),
             ),
