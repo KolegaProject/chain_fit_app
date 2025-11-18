@@ -1,5 +1,5 @@
 // main.dart
-import 'package:chain_fit_app/features/daftar_akun/daftar_akun_view.dart';
+import 'package:chain_fit_app/features/daftar_akun/views/daftar_akun_view.dart';
 import 'package:chain_fit_app/features/login_akun/views/login_akun_view.dart';
 import 'package:flutter/material.dart' as m; // alias biar nggak bentrok
 import 'package:shadcn_flutter/shadcn_flutter.dart'; // <- penting
