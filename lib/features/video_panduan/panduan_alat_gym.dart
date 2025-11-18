@@ -74,7 +74,6 @@ class _PanduanAlatGymPageState extends State<PanduanAlatGymPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Column(
           children: [
-            // 🔍 Search bar
             TextField(
               controller: _searchController,
               onChanged: (value) => setState(() => query = value),
@@ -91,7 +90,6 @@ class _PanduanAlatGymPageState extends State<PanduanAlatGymPage> {
             ),
             const SizedBox(height: 16),
 
-            // 📋 List alat gym
             Expanded(
               child: ListView.builder(
                 itemCount: filteredList.length,
