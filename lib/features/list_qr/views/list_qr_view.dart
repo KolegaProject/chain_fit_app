@@ -47,7 +47,7 @@ class MenuQrPage extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  // ICON QR
+                  // icon kiri
                   Container(
                     height: 60,
                     width: 60,
@@ -64,7 +64,7 @@ class MenuQrPage extends StatelessWidget {
 
                   const SizedBox(width: 12),
 
-                  // Text Description
+                  // daleman list
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
