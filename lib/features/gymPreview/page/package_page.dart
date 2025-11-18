@@ -5,7 +5,7 @@ import 'payment_method_page.dart';
 
 class PackagePage extends StatelessWidget {
   final Gym gym;
-  final Registrant registrant; // << terima registrant
+  final Registrant registrant; // terima data registrant
   const PackagePage({super.key, required this.gym, required this.registrant});
 
   @override
@@ -121,11 +121,11 @@ class PackagePage extends StatelessWidget {
 
                   const SizedBox(height: 20),
 
-                  // Tombol pilih (tidak full width, center)
+                  // tombol
                   Align(
                     alignment: Alignment.center,
                     child: SizedBox(
-                      width: 250, // << ubah di sini untuk atur lebar tombol
+                      width: 250,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.grey.shade800,

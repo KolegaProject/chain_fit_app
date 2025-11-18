@@ -166,7 +166,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
   Future<bool?> _showCancelConfirm(BuildContext context) {
     return showDialog<bool>(
       context: context,
-      barrierDismissible: false, // wajib pilih salah satu aksi
+      barrierDismissible: false,
       builder: (ctx) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
@@ -313,7 +313,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
             const SizedBox(height: 20),
 
-            // ===== Informasi Pengguna =====
+            // informasi pengguna
             Card(
               color: Colors.white,
               shape: RoundedRectangleBorder(
@@ -371,13 +371,13 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
 
             const SizedBox(height: 20),
 
-            // ===== Expansion Panels =====
+            // expansion panels
             _buildExpansion("Ketentuan Layanan", kTosText),
             const SizedBox(height: 8),
             _buildExpansion("Kebijakan Privasi", kPrivacyText),
             const SizedBox(height: 24),
 
-            // ===== Tombol Batalkan =====
+            // tombol batalkan
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -404,7 +404,7 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
             ),
 
             const SizedBox(height: 12),
-            // ===== Tombol Pembayaran Selesai =====
+            // tombol pembayaran selesai
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

@@ -21,7 +21,7 @@ class GymPreviewPage extends StatefulWidget {
 
 class _GymPreviewPageState extends State<GymPreviewPage> {
   Gym? gymData;
-  int _currentPage = 0; // untuk indikator
+  int _currentPage = 0;// state image
   final PageController _pageController = PageController();
   late List<String> gymImages;
 
@@ -56,8 +56,7 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // === Carousel Section ===
-              // === Carousel Section ===
+              // carousel
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Stack(
@@ -82,7 +81,7 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
                       ),
                     ),
 
-                    // === Panah kiri ===
+                    // panah kiri
                     Positioned(
                       top: 0,
                       bottom: 0,
@@ -106,7 +105,7 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
                       ),
                     ),
 
-                    // === Panah kanan ===
+                    // panah kanan
                     Positioned(
                       top: 0,
                       bottom: 0,
@@ -130,7 +129,7 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
                       ),
                     ),
 
-                    // === Indikator titik di bawah ===
+                    // indikator titik di bawah
                     Positioned(
                       bottom: 8,
                       left: 0,
@@ -186,7 +185,7 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
         ),
       ),
 
-      // Tombol tetap di bawah seperti ShadCN style
+      // tombol
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

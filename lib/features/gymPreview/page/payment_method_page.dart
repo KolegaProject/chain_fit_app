@@ -138,9 +138,10 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                   setState(() => selectedMethod = val);
                 }
               },
+              // payment options
               child: Column(
                 children: [
-                  // --- Gopay Option ---
+
                   _buildPaymentOption(
                     title: "Gopay",
                     subtitle: "Pembayaran melalui akun gopay",
@@ -149,7 +150,6 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
                   ),
                   const SizedBox(height: 8),
 
-                  // --- Bank Transfer Option ---
                   _buildPaymentOption(
                     title: "Transfer Bank",
                     subtitle: "BCA, Mandiri, BRI & Bank Lainnya",
@@ -162,7 +162,7 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
 
             const Spacer(),
 
-            // --- Tombol Pilih Paket ---
+            // tombol pilih paket
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
