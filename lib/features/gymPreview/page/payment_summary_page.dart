@@ -481,7 +481,6 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
           Padding(
             padding: const EdgeInsets.all(12),
             child: SelectableText(
-              // enak buat copy-paste
               content,
               style: const TextStyle(color: Colors.grey, height: 1.4),
             ),
