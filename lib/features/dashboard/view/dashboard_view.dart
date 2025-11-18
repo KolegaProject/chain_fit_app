@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../model/dashboard_model.dart';
-import 'package:chain_fit_app/features/video_panduan/panduan_alat_gym.dart';
+import 'package:chain_fit_app/features/video_panduan/view/panduan_alat_gym_view.dart';
 import 'package:chain_fit_app/features/search_gym/views/search_gym_views.dart.dart';
 import 'package:chain_fit_app/features/list_qr/views/list_qr_view.dart';
 
@@ -9,14 +9,13 @@ class DashboardView extends StatefulWidget {
 
   @override
   State<DashboardView> createState() => _DashboardViewState();
-  // End of _DashboardViewState
 }
 
 class _DashboardViewState extends State<DashboardView> {
   final DashboardUser user = DashboardUser(
     name: 'Azriel',
     profileImageUrl:
-        'https://randomuser.me/api/portraits/men/1.jpg', // Dummy image
+        'https://randomuser.me/api/portraits/men/1.jpg',
     isPremium: true,
     premiumExpiry: '31 Desember 2030',
     notificationCount: 3,

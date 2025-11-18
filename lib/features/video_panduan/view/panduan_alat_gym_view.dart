@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../model/panduan_alat_gym_model.dart';
-import '../model/detail_video_panduan_model.dart';
-import 'detail_video_panduan_view.dart';
+import 'package:chain_fit_app/features/video_panduan/model/panduan_alat_gym_model.dart';
+import 'package:chain_fit_app/features/video_panduan/model/detail_video_panduan_model.dart';
+import 'package:chain_fit_app/features/video_panduan/view/detail_video_panduan_view.dart';
 
 class PanduanAlatGymPage extends StatefulWidget {
   const PanduanAlatGymPage({super.key});
@@ -13,6 +13,12 @@ class PanduanAlatGymPage extends StatefulWidget {
 class _PanduanAlatGymPageState extends State<PanduanAlatGymPage> {
   final TextEditingController _searchController = TextEditingController();
   String query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,6 +110,11 @@ class _PanduanAlatGymPageState extends State<PanduanAlatGymPage> {
                               child: Image.asset(
                                 item.image,
                                 fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) => Container(
+                                  color: Colors.grey.shade200,
+                                  alignment: Alignment.center,
+                                  child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
+                                ),
                               ),
                             ),
                           ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../model/detail_video_panduan_model.dart';
+import 'package:chain_fit_app/features/video_panduan/model/detail_video_panduan_model.dart';
 
 class DetailAlatGymPage extends StatelessWidget {
   final DetailAlatGymModel item;
@@ -12,7 +12,10 @@ class DetailAlatGymPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.black),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () => Navigator.pop(context),
@@ -21,6 +24,7 @@ class DetailAlatGymPage extends StatelessWidget {
           item.title,
           style: const TextStyle(
             fontWeight: FontWeight.w600,
+            color: Colors.black,
           ),
         ),
         centerTitle: true,
@@ -46,12 +50,19 @@ class DetailAlatGymPage extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Container(
-                      color: Colors.black12,
+                      color: Colors.white,
                       child: Image.asset(
                         item.imagePath,
                         fit: BoxFit.contain,
                         width: double.infinity,
                         height: 220,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          width: double.infinity,
+                          height: 220,
+                          color: Colors.grey.shade200,
+                          alignment: Alignment.center,
+                          child: const Icon(Icons.broken_image, size: 48, color: Colors.grey),
+                        ),
                       ),
                     ),
                   ),
@@ -94,4 +105,3 @@ class DetailAlatGymPage extends StatelessWidget {
     );
   }
 }
-
