@@ -48,7 +48,7 @@ class AppRouter extends StatelessWidget {
   Widget build(BuildContext context) {
     return m.MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/membership_detail',
+      initialRoute: '/login',
       routes: {
         '/membership_detail': (context) =>
             MembershipDetailPage(data: dummyMembership),

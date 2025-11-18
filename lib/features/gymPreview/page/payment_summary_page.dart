@@ -426,6 +426,9 @@ class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
                       ),
                     );
                   }
+                  if (context.mounted) {
+                    Navigator.popUntil(context, (r) => r.isFirst);
+                  }
                 },
                 child: const Text(
                   "Pembayaran Selesai",
