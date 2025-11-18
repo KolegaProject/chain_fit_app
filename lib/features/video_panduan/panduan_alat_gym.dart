@@ -118,7 +118,6 @@ class _PanduanAlatGymPageState extends State<PanduanAlatGymPage> {
                       ),
                       child: Column(
                         children: [
-                          // 🖼️ Gambar alat gym (fit contain agar tidak terpotong)
                           Container(
                             height: 160,
                             width: double.infinity,
@@ -131,12 +130,11 @@ class _PanduanAlatGymPageState extends State<PanduanAlatGymPage> {
                               const BorderRadius.vertical(top: Radius.circular(12)),
                               child: Image.asset(
                                 item['image']!,
-                                fit: BoxFit.contain, // ✅ gambar utuh tanpa crop
+                                fit: BoxFit.contain, 
                               ),
                             ),
                           ),
 
-                          // 🏷️ Nama alat gym
                           Container(
                             margin: const EdgeInsets.symmetric(vertical: 8),
                             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),

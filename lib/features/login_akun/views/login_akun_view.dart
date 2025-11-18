@@ -19,6 +19,7 @@ class _LoginAkunViewState extends State<LoginAkunView> {
     );
     // TODO: Implement login logic using model
     print('Email: \\${model.email}, Password: \\${model.password}');
+    Navigator.pushReplacementNamed(context, '/dashboard');
   }
 
   @override
@@ -80,6 +81,17 @@ class _LoginAkunViewState extends State<LoginAkunView> {
                   borderSide: BorderSide.none,
                 ),
               ),
+            ),
+            Row(
+              children: [
+                Text("Belum punya akun ?"),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/register');
+                  },
+                  child: Text("Daftar"),
+                ),
+              ],
             ),
             const Spacer(),
             SizedBox(

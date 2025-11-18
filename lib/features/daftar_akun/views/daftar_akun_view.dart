@@ -123,6 +123,17 @@ class _DaftarAkunViewState extends State<DaftarAkunView> {
                 ),
               ),
             ),
+            Row(
+              children: [
+                Text("Sudah punya akun ?"),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
+                  child: Text("Masuk"),
+                ),
+              ],
+            ),
             const Spacer(),
             SizedBox(
               width: double.infinity,

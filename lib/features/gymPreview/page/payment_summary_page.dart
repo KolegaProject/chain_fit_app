@@ -1,6 +1,50 @@
 import 'package:chain_fit_app/features/formulir_daftar_gym/model/registrant.dart';
 import 'package:flutter/material.dart';
 import '../model/gym_model.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+Future<void> initializeNotifications() async {
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+}
+
+Future<void> requestNotificationPermission() async {
+  final plugin = FlutterLocalNotificationsPlugin();
+  final androidImplementation = plugin
+      .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin
+      >();
+  await androidImplementation?.requestNotificationsPermission();
+}
+
+Future<void> showPaymentSuccessNotification() async {
+  await requestNotificationPermission();
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+        'payment_channel',
+        'Pembayaran',
+        channelDescription: 'Notifikasi pembayaran sukses',
+        importance: Importance.max,
+        priority: Priority.high,
+        ticker: 'ticker',
+      );
+  const NotificationDetails platformChannelSpecifics = NotificationDetails(
+    android: androidPlatformChannelSpecifics,
+  );
+  await flutterLocalNotificationsPlugin.show(
+    0,
+    'Pembayaran Berhasil',
+    'Terima kasih, pembayaran Anda telah sukses!',
+    platformChannelSpecifics,
+  );
+}
 
 const String kTosText = '''
 Tanggal Berlaku: 12 November 2025
@@ -95,7 +139,7 @@ Kami dapat memperbarui kebijakan ini. Versi terbaru akan ditampilkan di aplikasi
 Email: privacy@yourcompany.com
 ''';
 
-class PaymentSummaryPage extends StatelessWidget {
+class PaymentSummaryPage extends StatefulWidget {
   final Package pkg;
   final String method;
   final Registrant registrant;
@@ -106,6 +150,18 @@ class PaymentSummaryPage extends StatelessWidget {
     required this.method,
     required this.registrant,
   });
+
+  @override
+  State<PaymentSummaryPage> createState() => _PaymentSummaryPageState();
+}
+
+class _PaymentSummaryPageState extends State<PaymentSummaryPage> {
+  @override
+  void initState() {
+    super.initState();
+    initializeNotifications();
+    requestNotificationPermission();
+  }
 
   Future<bool?> _showCancelConfirm(BuildContext context) {
     return showDialog<bool>(
@@ -150,9 +206,11 @@ class PaymentSummaryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Inisialisasi notifikasi saat widget pertama kali build
+    initializeNotifications();
     int discount = 50000;
     int adminFee = 10000;
-    int total = pkg.price - discount + adminFee;
+    int total = widget.pkg.price - discount + adminFee;
 
     return Scaffold(
       appBar: AppBar(
@@ -194,8 +252,8 @@ class PaymentSummaryPage extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    _buildRow("Paket", pkg.name),
-                    _buildRow("Harga", "Rp ${pkg.price}"),
+                    _buildRow("Paket", widget.pkg.name),
+                    _buildRow("Harga", "Rp ${widget.pkg.price}"),
                     _buildRow(
                       "Diskon",
                       "- Rp $discount",
@@ -210,7 +268,7 @@ class PaymentSummaryPage extends StatelessWidget {
                       fontSize: 16,
                     ),
                     const SizedBox(height: 16),
-                    _buildRow("Metode Pembayaran", method),
+                    _buildRow("Metode Pembayaran", widget.method),
                     const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -294,14 +352,14 @@ class PaymentSummaryPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              registrant.name,
+                              widget.registrant.name,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                             ),
-                            Text(registrant.email),
-                            Text(registrant.phone),
+                            Text(widget.registrant.email),
+                            Text(widget.registrant.phone),
                           ],
                         ),
                       ],
@@ -333,7 +391,6 @@ class PaymentSummaryPage extends StatelessWidget {
                 onPressed: () async {
                   final ok = await _showCancelConfirm(context);
                   if (ok == true) {
-                    // lanjut keluar & reset ke halaman awal
                     if (context.mounted) {
                       Navigator.popUntil(context, (r) => r.isFirst);
                     }
@@ -341,6 +398,37 @@ class PaymentSummaryPage extends StatelessWidget {
                 },
                 child: const Text(
                   "Batalkan",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+            // ===== Tombol Pembayaran Selesai =====
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                onPressed: () async {
+                  await showPaymentSuccessNotification();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Pembayaran berhasil! Notifikasi dikirim.',
+                        ),
+                      ),
+                    );
+                  }
+                },
+                child: const Text(
+                  "Pembayaran Selesai",
                   style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
