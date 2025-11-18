@@ -38,7 +38,6 @@ class DetailAlatGymPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Gambar alat dengan border & icon play
             Container(
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.blueAccent),
@@ -50,10 +49,10 @@ class DetailAlatGymPage extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Container(
-                      color: Colors.black12, // Tambahkan latar belakang warna
+                      color: Colors.black12, 
                       child: Image.asset(
                         imagePath,
-                        fit: BoxFit.contain, // Ubah fit menjadi contain agar gambar tidak terpotong
+                        fit: BoxFit.contain, 
                         width: double.infinity,
                         height: 220,
                       ),
@@ -78,7 +77,6 @@ class DetailAlatGymPage extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Deskripsi
             const Text(
               'Deskripsi',
               style: TextStyle(

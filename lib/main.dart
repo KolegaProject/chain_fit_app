@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ShadcnApp(
       title: 'Chain Fit App',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: LegacyColorSchemes.lightGray(),
         radius: 0.7,
