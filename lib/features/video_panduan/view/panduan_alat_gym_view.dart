@@ -27,13 +27,15 @@ class _PanduanAlatGymPageState extends State<PanduanAlatGymPage> {
         .toList();
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
         leading: Container(
           margin: const EdgeInsets.only(left: 8),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.black.withOpacity(0.3)),
+            border: Border.all(color: Colors.black26),
           ),
           child: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new, size: 18),
@@ -41,40 +43,44 @@ class _PanduanAlatGymPageState extends State<PanduanAlatGymPage> {
           ),
         ),
         title: const Text(
-          'Panduan Alat Gym',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
+          "Panduan Alat Gym",
+          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
         ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
       ),
+
+      backgroundColor: Colors.white,
+
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            // Pencarian field
             TextField(
               controller: _searchController,
               onChanged: (value) => setState(() => query = value),
               decoration: InputDecoration(
                 hintText: 'Cari alat gym...',
                 prefixIcon: const Icon(Icons.search),
-                hintStyle: const TextStyle(color: Colors.grey),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(color: Colors.black26),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+
+            const SizedBox(height: 20),
+
+            // List
             Expanded(
               child: ListView.builder(
                 itemCount: filteredList.length,
                 itemBuilder: (context, index) {
                   final item = filteredList[index];
+
                   return GestureDetector(
                     onTap: () {
                       final detail = DetailAlatGymModel(
@@ -89,48 +95,47 @@ class _PanduanAlatGymPageState extends State<PanduanAlatGymPage> {
                         ),
                       );
                     },
+
                     child: Container(
-                      margin: const EdgeInsets.only(bottom: 16),
+                      margin: const EdgeInsets.only(bottom: 20),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.blueAccent.withOpacity(0.6)),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: const Color(0xFF6366F1),
+                          width: 2,
+                        ),
                       ),
                       child: Column(
                         children: [
-                          Container(
-                            height: 160,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                          // Image
+                          ClipRRect(
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(16),
                             ),
-                            child: ClipRRect(
-                              borderRadius:
-                                  const BorderRadius.vertical(top: Radius.circular(12)),
-                              child: Image.asset(
-                                item.image,
-                                fit: BoxFit.contain,
-                                errorBuilder: (context, error, stackTrace) => Container(
-                                  color: Colors.grey.shade200,
-                                  alignment: Alignment.center,
-                                  child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
-                                ),
-                              ),
+                            child: Image.asset(
+                              item.image,
+                              height: 200,
+                              width: double.infinity,
+                              fit: BoxFit.contain,
                             ),
                           ),
+                          // Title box
                           Container(
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                            margin: const EdgeInsets.symmetric(vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 20,
+                            ),
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade200.withOpacity(0.9),
-                              borderRadius: BorderRadius.circular(8),
+                              color: const Color(0xFF6366F1).withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
                               item.name,
                               style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                                color: Colors.black87,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: Color(0xFF6366F1),
                               ),
                             ),
                           ),

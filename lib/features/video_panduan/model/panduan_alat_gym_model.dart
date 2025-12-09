@@ -2,23 +2,27 @@ class PanduanAlatGymModel {
   final String name;
   final String image;
   final String description;
+  final String? video;
 
   const PanduanAlatGymModel({
     required this.name,
     required this.image,
     required this.description,
+    this.video,
   });
 
   factory PanduanAlatGymModel.fromMap(Map<String, String> m) => PanduanAlatGymModel(
         name: m['name'] ?? '',
         image: m['image'] ?? '',
         description: m['description'] ?? '',
+        video: m['video'], 
       );
 
   Map<String, String> toMap() => {
         'name': name,
         'image': image,
         'description': description,
+        if (video != null) 'video': video!,
       };
 
   static final List<PanduanAlatGymModel> samples = [
