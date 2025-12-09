@@ -9,7 +9,7 @@ class MenuQrPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF4F5DFF)),
           onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,

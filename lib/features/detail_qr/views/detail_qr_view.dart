@@ -11,8 +11,8 @@ class AksesGymPage extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
-          onPressed: () {},
+          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF4F5DFF)),
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           "Akses Gym",
