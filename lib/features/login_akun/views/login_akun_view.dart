@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../model/login_akun_model.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginAkunView extends StatefulWidget {
   const LoginAkunView({Key? key}) : super(key: key);
@@ -9,17 +12,52 @@ class LoginAkunView extends StatefulWidget {
 }
 
 class _LoginAkunViewState extends State<LoginAkunView> {
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _onLogin() {
+  Future<void> _onLogin() async {
     final model = LoginAkunModel(
-      email: _emailController.text,
+      username: _usernameController.text,
       password: _passwordController.text,
     );
-    // TODO: Implement login logic using model
-    print('Email: \\${model.email}, Password: \\${model.password}');
-    Navigator.pushReplacementNamed(context, '/dashboard');
+
+    final url = Uri.parse('http://localhost:8000/api/v1/auth/login');
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'username': model.username,
+          'password': model.password,
+        }),
+      );
+
+      final json = jsonDecode(response.body);
+      print(json);
+
+      if (response.statusCode == 200 && json['data'] != null) {
+        final accessToken = json['data']['access_token'];
+        final refreshToken = json['data']['refresh_token'];
+        // Simpan token ke storage jika perlu (misal: SharedPreferences)
+        // Lanjut ke dashboard
+        if (context.mounted) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('isLoggedIn', true);
+          await prefs.setString('accessToken', accessToken);
+          await prefs.setString('refreshToken', refreshToken);
+          Navigator.pushReplacementNamed(context, '/dashboard');
+        }
+      } else {
+        final errorMsg = json['errors']['message']?.toString() ?? 'Login gagal';
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMsg)));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Terjadi error: $e')));
+    }
   }
 
   @override
@@ -47,14 +85,14 @@ class _LoginAkunViewState extends State<LoginAkunView> {
           children: [
             const SizedBox(height: 16),
             const Text(
-              'Alamat Email',
+              'Username',
               style: TextStyle(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             TextField(
-              controller: _emailController,
+              controller: _usernameController,
               decoration: InputDecoration(
-                hintText: 'Masukkan alamat email Anda',
+                hintText: 'Masukkan username Anda',
                 filled: true,
                 fillColor: Colors.grey[200],
                 border: OutlineInputBorder(
@@ -117,7 +155,7 @@ class _LoginAkunViewState extends State<LoginAkunView> {
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
