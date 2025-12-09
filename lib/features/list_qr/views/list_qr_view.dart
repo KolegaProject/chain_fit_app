@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../detail_qr/views/detail_qr_view.dart'; // pastikan file ini sesuai path milikmu
 
 class MenuQrPage extends StatelessWidget {
   const MenuQrPage({super.key});
@@ -22,12 +23,11 @@ class MenuQrPage extends StatelessWidget {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text("QR item #${index + 1} ditekan"),
-                  duration: const Duration(seconds: 2),
-                  behavior: SnackBarBehavior.floating,
-                  margin: const EdgeInsets.all(16),
+              // ⬅️ pindah ke halaman AksesGymPage
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AksesGymPage(),
                 ),
               );
             },
