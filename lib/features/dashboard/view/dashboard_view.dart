@@ -3,6 +3,7 @@ import '../model/dashboard_model.dart';
 import 'package:chain_fit_app/features/video_panduan/view/panduan_alat_gym_view.dart';
 import 'package:chain_fit_app/features/search_gym/views/search_gym_views.dart.dart';
 import 'package:chain_fit_app/features/list_qr/views/list_qr_view.dart';
+import '../../../services/token_service.dart';
 
 class DashboardView extends StatefulWidget {
   const DashboardView({Key? key}) : super(key: key);
@@ -22,17 +23,30 @@ class _DashboardViewState extends State<DashboardView> {
   );
 
   int _selectedBottomNav = 0;
+  String? _accessToken;
 
   final List<DashboardMenuItem> menuItems = [
     DashboardMenuItem(title: 'Video Panduan', iconAsset: 'video_library'),
     DashboardMenuItem(title: 'Cari Gym', iconAsset: 'search'),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _getAccessToken();
+  }
+
+  Future<void> _getAccessToken() async {
+    final token = await TokenService.getAccessToken();
+    setState(() {
+      _accessToken = token;
+    });
+  }
+
   void _navigateTo(String page) {
-    // TODO: Replace with real navigation logic
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Navigasi ke: $page')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Navigasi ke: $page')),
+    );
   }
 
   @override
@@ -188,12 +202,22 @@ class _DashboardViewState extends State<DashboardView> {
                             ),
                           );
                         } else if (item.title == 'Cari Gym') {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const GymSearchPage(),
-                            ),
-                          );
+                          if (_accessToken != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => SearchGymView(
+                                  accessToken: _accessToken!,
+                                ),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Access token tidak ditemukan'),
+                              ),
+                            );
+                          }
                         }
                       },
                       child: Column(

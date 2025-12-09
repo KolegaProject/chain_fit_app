@@ -4,11 +4,11 @@ import 'package:shadcn_flutter/shadcn_flutter.dart' as shadcn;
 import '../model/search_gym_model.dart';
 import 'search_gym_widgets.dart';
 
-class GymCard extends StatelessWidget {
+class SearchGymCard extends StatelessWidget {
   final Gym gym;
   final VoidCallback? onTap; // <-- tambahkan
 
-  const GymCard({super.key, required this.gym, this.onTap});
+  const SearchGymCard({super.key, required this.gym, this.onTap});
 
   @override
   Widget build(BuildContext context) {

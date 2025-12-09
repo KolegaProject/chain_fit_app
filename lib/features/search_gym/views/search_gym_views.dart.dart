@@ -1,77 +1,104 @@
 // features/search_gym/views/search_gym_page.dart
 import 'package:flutter/material.dart';
 import '../model/search_gym_model.dart';
-import '../widgets/search_gym_input.dart';
+import '../service/gym_service.dart';
 import '../widgets/search_gym_card.dart';
-import 'package:chain_fit_app/features/gymPreview/page/gym_preview_page.dart';
+import '../widgets/search_gym_input.dart';
 
-class GymSearchPage extends StatelessWidget {
-  const GymSearchPage({super.key});
+class SearchGymView extends StatefulWidget {
+  final String accessToken;
+
+  const SearchGymView({required this.accessToken, Key? key}) : super(key: key);
+
+  @override
+  State<SearchGymView> createState() => _SearchGymViewState();
+}
+
+class _SearchGymViewState extends State<SearchGymView> {
+  final GymService _gymService = GymService();
+  final TextEditingController _searchController = TextEditingController();
+  late Future<List<Gym>> _gymsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _gymsFuture = _gymService.searchGyms(widget.accessToken);
+  }
+
+  void _onSearch(String query) {
+    setState(() {
+      _gymsFuture = _gymService.searchGyms(widget.accessToken, query: query);
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final gyms = [
-      Gym(
-        name: "Laqisya Gym",
-        address: "Jl. Sudirman No. 123, Jakarta",
-        imageUrl: "https://images.unsplash.com/photo-1554284126-aa88f22d8b74",
-        rating: 4.8,
-        distance: 2.5,
-        tags: ["Pusat Beban", "Kelas Yoga", "Kolam Renang"],
-        images: [
-          'lib/assets/gymPreview/image1_app.jpg',
-          'lib/assets/gymPreview/image2_app.jfif',
-          'lib/assets/gymPreview/image3_app.jpg',
-        ],
-      ),
-      Gym(
-        name: "Uget Uget Gym Boyolali",
-        address: "Jl. Aduhai No. 45, Boyolali",
-        imageUrl:
-            "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b",
-        rating: 4.5,
-        distance: 3.1,
-        tags: ["Latihan Kardio", "Pelatih Pribadi", "Sauna"],
-        images: [
-          'lib/assets/gymPreview/ugetUget.jpg',
-          'lib/assets/gymPreview/ugetUget1.jpg',
-          'lib/assets/gymPreview/ugetUget2.jpg',
-        ],
-      ),
-    ];
-
     return Scaffold(
-      appBar: AppBar(centerTitle: true, title: const Text("Cari Gym")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            ShadInput(hintText: "Cari gym...", prefixIcon: Icons.search),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: gyms.length,
-                itemBuilder: (context, i) {
-                  final item = gyms[i];
-                  return GymCard(
-                    gym: item,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => GymPreviewPage(
-                            gymName: item.name,
-                            gymImages: item.images,
-                          ), // <-- KIRIM NAMA DAN GAMBAR
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
+      appBar: AppBar(
+        title: const Text('Cari Gym'),
+        elevation: 0,
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SearchGymInput(
+              controller: _searchController,
+              onChanged: _onSearch,
             ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: FutureBuilder<List<Gym>>(
+              future: _gymsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error_outline, size: 50, color: Colors.red),
+                        const SizedBox(height: 16),
+                        Text('Error: ${snapshot.error}'),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _gymsFuture = _gymService.searchGyms(widget.accessToken);
+                            });
+                          },
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                    child: Text('Tidak ada gym ditemukan'),
+                  );
+                }
+
+                final gyms = snapshot.data!;
+                return ListView.builder(
+                  padding: const EdgeInsets.all(8),
+                  itemCount: gyms.length,
+                  itemBuilder: (context, index) {
+                    return SearchGymCard(gym: gyms[index]);
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
