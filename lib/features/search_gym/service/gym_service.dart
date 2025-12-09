@@ -3,7 +3,7 @@ import 'dart:convert';
 import '../model/search_gym_model.dart';
 
 class GymService {
-  static const String baseUrl = 'http://localhost:4001/api/v1';
+  static const String baseUrl = 'http://localhost:8000/api/v1';
 
   Future<List<Gym>> searchGyms(String accessToken, {String? query}) async {
     try {
@@ -21,7 +21,7 @@ class GymService {
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        
+
         // Sesuaikan dengan struktur response dari API Anda
         List<Gym> gyms = [];
         if (jsonData is Map && jsonData['data'] != null) {

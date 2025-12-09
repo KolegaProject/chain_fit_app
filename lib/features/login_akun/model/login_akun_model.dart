@@ -9,25 +9,13 @@ class LoginAkunModel {
 class LoginResponse {
   final String accessToken;
   final String refreshToken;
-  final String userId;
-  final String email;
-  final String name;
 
-  LoginResponse({
-    required this.accessToken,
-    required this.refreshToken,
-    required this.userId,
-    required this.email,
-    required this.name,
-  });
+  LoginResponse({required this.accessToken, required this.refreshToken});
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     return LoginResponse(
-      accessToken: json['data']['accessToken'] ?? '',
-      refreshToken: json['data']['refreshToken'] ?? '',
-      userId: json['data']['userId'] ?? '',
-      email: json['data']['email'] ?? '',
-      name: json['data']['name'] ?? '',
+      accessToken: json['data']['access_token'] ?? '',
+      refreshToken: json['data']['refresh_token'] ?? '',
     );
   }
 }

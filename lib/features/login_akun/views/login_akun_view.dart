@@ -12,15 +12,15 @@ class LoginAkunView extends StatefulWidget {
 }
 
 class _LoginAkunViewState extends State<LoginAkunView> {
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
 
   Future<void> _login() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
       setState(() {
-        _errorMessage = 'Email dan password tidak boleh kosong';
+        _errorMessage = 'username dan password tidak boleh kosong';
       });
       return;
     }
@@ -32,28 +32,25 @@ class _LoginAkunViewState extends State<LoginAkunView> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:4001/api/v1/auth/login'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        Uri.parse('http://localhost:8000/api/v1/auth/login'),
+        headers: {'Content-Type': 'application/json'},
         body: json.encode({
-          'email': _emailController.text,
+          'username': _usernameController.text,
           'password': _passwordController.text,
         }),
       );
 
       if (response.statusCode == 200) {
-        final loginResponse = LoginResponse.fromJson(json.decode(response.body));
+        final loginResponse = LoginResponse.fromJson(
+          json.decode(response.body),
+        );
 
         // Simpan token
         await TokenService.saveTokens(
           accessToken: loginResponse.accessToken,
           refreshToken: loginResponse.refreshToken,
-          userId: loginResponse.userId,
-          email: loginResponse.email,
-          name: loginResponse.name,
         );
-
+        print("token save successful");
         // Navigate ke Dashboard
         if (mounted) {
           Navigator.pushReplacementNamed(context, '/dashboard');
@@ -77,7 +74,7 @@ class _LoginAkunViewState extends State<LoginAkunView> {
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -105,9 +102,9 @@ class _LoginAkunViewState extends State<LoginAkunView> {
               ),
             const SizedBox(height: 20),
             TextField(
-              controller: _emailController,
+              controller: _usernameController,
               decoration: const InputDecoration(
-                labelText: 'Email',
+                labelText: 'username',
                 border: OutlineInputBorder(),
               ),
             ),
