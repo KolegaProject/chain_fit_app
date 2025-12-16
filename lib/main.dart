@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart' as m;
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:chain_fit_app/features/login_akun/views/login_akun_view.dart';
 import 'package:chain_fit_app/features/daftar_akun/views/daftar_akun_view.dart';
@@ -8,7 +10,11 @@ import 'package:chain_fit_app/features/dashboard/view/dashboard_view.dart';
 import 'package:chain_fit_app/features/status_membership/models/membership_models.dart';
 import 'package:chain_fit_app/features/status_membership/view/membership_detail_page.dart';
 
-void main() {
+import 'features/auth/viewmodels/login_viewmodel.dart';
+import 'features/auth/views/login_screen.dart';
+
+void main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -17,6 +23,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //ini apus
     final dummyMembership = Membership(
       gymName: "Uget Uget Gym",
       type: "Premium Bulanan",
@@ -25,6 +32,8 @@ class MyApp extends StatelessWidget {
       sisaHari: 30,
       isActive: true,
     );
+
+    //
 
     return ShadcnApp(
       title: 'Chain Fit App',
@@ -46,17 +55,20 @@ class AppRouter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return m.MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/login',
-      routes: {
-        '/membership_detail': (context) =>
-            MembershipDetailPage(data: dummyMembership),
+    return MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => LoginViewModel())],
+      child: m.MaterialApp(
+        debugShowCheckedModeBanner: false,
+        routes: {
+          '/': (context) => const LoginScreen(),
+          '/membership_detail': (context) =>
+              MembershipDetailPage(data: dummyMembership),
 
-        '/login': (context) => const LoginAkunView(),
-        '/register': (context) => const DaftarAkunView(),
-        '/dashboard': (context) => DashboardView(),
-      },
+          '/login': (context) => const LoginAkunView(),
+          '/register': (context) => const DaftarAkunView(),
+          '/dashboard': (context) => DashboardView(),
+        },
+      ),
     );
   }
 }

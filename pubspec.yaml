@@ -30,8 +30,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  video_player: ^2.8.2
-  chewie: ^1.7.1
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -42,7 +40,14 @@ dependencies:
   shadcn_flutter: ^0.0.44
   flutter_local_notifications: ^19.5.0
   http: ^1.6.0
-
+  video_player: ^2.8.2
+  chewie: ^1.7.1
+  
+  provider: ^6.0.5
+  dio: ^5.5.0
+  flutter_dotenv: ^5.1.0
+  flutter_secure_storage: ^8.0.0
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -65,6 +70,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
+    - .env
     - lib/features/gymPreview/data.json
     - lib/assets/gymPreview/image1_app.jpg
     - lib/assets/gymPreview/image2_app.jfif
