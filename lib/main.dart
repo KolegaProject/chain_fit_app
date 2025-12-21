@@ -1,10 +1,10 @@
+import 'package:chain_fit_app/features/auth/viewmodels/register_viewmodel.dart';
+import 'package:chain_fit_app/features/auth/views/register_screen.dart';
 import 'package:flutter/material.dart' as m;
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'package:chain_fit_app/features/login_akun/views/login_akun_view.dart';
-import 'package:chain_fit_app/features/daftar_akun/views/daftar_akun_view.dart';
 import 'package:chain_fit_app/features/dashboard/view/dashboard_view.dart';
 
 import 'package:chain_fit_app/features/status_membership/models/membership_models.dart';
@@ -56,7 +56,10 @@ class AppRouter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => LoginViewModel())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => LoginViewModel()),
+        ChangeNotifierProvider(create: (_) => RegisterViewModel()),
+      ],
       child: m.MaterialApp(
         debugShowCheckedModeBanner: false,
         routes: {
@@ -64,8 +67,8 @@ class AppRouter extends StatelessWidget {
           '/membership_detail': (context) =>
               MembershipDetailPage(data: dummyMembership),
 
-          '/login': (context) => const LoginAkunView(),
-          '/register': (context) => const DaftarAkunView(),
+          '/login': (context) => const LoginScreen(),
+          '/register': (context) => const RegisterScreen(),
           '/dashboard': (context) => DashboardView(),
         },
       ),

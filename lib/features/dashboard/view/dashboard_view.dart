@@ -1,3 +1,5 @@
+import 'package:chain_fit_app/core/services/api_service.dart';
+import 'package:chain_fit_app/core/services/storage_service.dart';
 import 'package:flutter/material.dart';
 import '../model/dashboard_model.dart';
 import 'package:chain_fit_app/features/video_panduan/view/panduan_alat_gym_view.dart';
@@ -13,10 +15,11 @@ class DashboardView extends StatefulWidget {
 }
 
 class _DashboardViewState extends State<DashboardView> {
+  final StorageService storageService = StorageService();
+
   final DashboardUser user = DashboardUser(
     name: 'Azriel',
-    profileImageUrl:
-        'https://randomuser.me/api/portraits/men/1.jpg',
+    profileImageUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
     isPremium: true,
     premiumExpiry: '31 Desember 2030',
     notificationCount: 3,
@@ -44,9 +47,9 @@ class _DashboardViewState extends State<DashboardView> {
   }
 
   void _navigateTo(String page) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Navigasi ke: $page')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Navigasi ke: $page')));
   }
 
   @override
@@ -206,9 +209,8 @@ class _DashboardViewState extends State<DashboardView> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => SearchGymView(
-                                  accessToken: _accessToken!,
-                                ),
+                                builder: (_) =>
+                                    SearchGymView(accessToken: _accessToken!),
                               ),
                             );
                           } else {

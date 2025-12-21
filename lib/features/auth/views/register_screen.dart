@@ -1,66 +1,79 @@
-import 'package:chain_fit_app/features/auth/views/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/gestures.dart';
-import '../viewmodels/login_viewmodel.dart';
+import '../viewmodels/register_viewmodel.dart';
 import '../../../core/utils/app_alerts.dart';
+import 'login_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   bool _isPasswordHidden = true;
 
   @override
   void dispose() {
+    _nameController.dispose();
     _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  void _handleLogin() async {
+  void _handleRegister() async {
+    final name = _nameController.text;
     final username = _usernameController.text;
+    final email = _emailController.text;
     final password = _passwordController.text;
 
-    if (username.isEmpty || password.isEmpty) {
-      AppAlerts.showError(context, "Username dan password tidak boleh kosong");
+    if (name.isEmpty || username.isEmpty || email.isEmpty || password.isEmpty) {
+      AppAlerts.showError(context, "Semua field harus diisi");
       return;
     }
 
-    // Panggil ViewModel
-    // listen: false karena kita memanggil fungsi, bukan mendengar perubahan UI di sini
-    final viewModel = context.read<LoginViewModel>();
-    final isSuccess = await viewModel.login(username, password);
+    final viewModel = context.read<RegisterViewModel>();
+    final isSuccess = await viewModel.register(
+      name: name,
+      username: username,
+      email: email,
+      password: password,
+    );
 
-    // Tampilkan Alert jika login gagal
     if (viewModel.errorMessage != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Menyuruh Flutter menjalankan kode SETELAH proses build & render selesai.
         AppAlerts.showError(context, viewModel.errorMessage!);
-        viewModel.clearError(); // reset agar tidak muncul berulang
+        viewModel.clearError();
       });
     }
 
     if (isSuccess && mounted) {
-      // Navigasi jika sukses
-      Navigator.pushReplacementNamed(context, '/dashboard');
+      AppAlerts.showSuccess(
+        context,
+        viewModel.successMessage ?? 'Registrasi berhasil!',
+      );
+      Future.delayed(const Duration(milliseconds: 800), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Watch ViewModel untuk update UI saat loading / error
-    final viewModel = context.watch<LoginViewModel>();
+    final viewModel = context.watch<RegisterViewModel>();
 
     return Scaffold(
-      // appBar: AppBar(title: const Text('Login MVVM')),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
@@ -69,30 +82,29 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Title
                 const Text(
-                  'Login',
+                  'Register',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-
-                // Description
                 const Text(
-                  'Anda harus masuk dahulu untuk melanjutkan',
+                  'Buat akun baru untuk melanjutkan',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
                 const SizedBox(height: 32),
-
-                // Error Message
-                // if (viewModel.errorMessage != null)
-                //   AppAlerts.showError(
-                //     context,
-                //     viewModel.errorMessage as String,
-                //   ),
-
-                // Username TextField
+                TextField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Nama Lengkap',
+                    hintText: 'John Doe',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 TextField(
                   controller: _usernameController,
                   decoration: InputDecoration(
@@ -104,15 +116,23 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // Password TextField
+                TextField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    hintText: 'john@email.com',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 TextField(
                   controller: _passwordController,
                   obscureText: _isPasswordHidden,
                   decoration: InputDecoration(
                     labelText: 'Password',
                     hintText: 'Enter your password',
-                    // suffixIcon: const Icon(Icons.visibility_off),
                     suffixIcon: IconButton(
                       splashRadius: 20,
                       tooltip: _isPasswordHidden
@@ -135,12 +155,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Login Button
                 SizedBox(
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: viewModel.isLoading ? null : _handleLogin,
+                    onPressed: viewModel.isLoading ? null : _handleRegister,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF636AE8),
                       shape: RoundedRectangleBorder(
@@ -157,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           )
                         : const Text(
-                            'Login',
+                            'Register',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -166,16 +184,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                   ),
                 ),
-
                 const SizedBox(height: 24),
                 Center(
                   child: RichText(
                     text: TextSpan(
-                      text: 'Anda belum punya akun? ',
+                      text: 'Sudah punya akun? ',
                       style: const TextStyle(color: Colors.grey, fontSize: 14),
                       children: [
                         TextSpan(
-                          text: 'Register',
+                          text: 'Login',
                           style: const TextStyle(
                             color: Colors.blue,
                             fontWeight: FontWeight.w600,
@@ -185,9 +202,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) {
-                                    return RegisterScreen();
-                                  },
+                                  builder: (context) => const LoginScreen(),
                                 ),
                               );
                             },
