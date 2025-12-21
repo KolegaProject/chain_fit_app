@@ -33,7 +33,7 @@ class LoginViewModel extends ChangeNotifier {
 
       // Panggil API menggunakan Dio client dari ApiService
       final response = await _apiService.client.post(
-        ApiConstants.loginEndpoint,
+        ApiConstants.backendUrl + ApiConstants.loginEndpoint,
         data: requestBody,
       );
 
@@ -47,10 +47,11 @@ class LoginViewModel extends ChangeNotifier {
       return true; // Login Sukses
     } on DioException catch (e) {
       // Handle Error dari Dio
-      if (e.response != null) {
-        _errorMessage = e.response?.data['message'] ?? 'Login gagal';
+      if (e.response?.data != null) {
+        final data = e.response!.data;
+        _errorMessage = data['errors']?['message'] ?? 'Login gagal';
       } else {
-        _errorMessage = 'Terjadi kesalahan koneksi';
+        _errorMessage = 'Tidak dapat terhubung ke server';
       }
       return false; // Login Gagal
     } catch (e) {
@@ -60,5 +61,9 @@ class LoginViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void clearError() {
+    _errorMessage = null;
   }
 }

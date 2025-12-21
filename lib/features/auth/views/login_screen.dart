@@ -14,6 +14,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  bool _isPasswordHidden = true;
+
   @override
   void dispose() {
     _usernameController.dispose();
@@ -33,8 +35,16 @@ class _LoginScreenState extends State<LoginScreen> {
     // Panggil ViewModel
     // listen: false karena kita memanggil fungsi, bukan mendengar perubahan UI di sini
     final viewModel = context.read<LoginViewModel>();
-
     final isSuccess = await viewModel.login(username, password);
+
+    // Tampilkan Alert jika login gagal
+    if (viewModel.errorMessage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Menyuruh Flutter menjalankan kode SETELAH proses build & render selesai.
+        AppAlerts.showError(context, viewModel.errorMessage!);
+        viewModel.clearError(); // reset agar tidak muncul berulang
+      });
+    }
 
     if (isSuccess && mounted) {
       // Navigasi jika sukses
@@ -48,62 +58,115 @@ class _LoginScreenState extends State<LoginScreen> {
     final viewModel = context.watch<LoginViewModel>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Login MVVM')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Error Message Box
-            if (viewModel.errorMessage != null)
-              Container(
-                margin: const EdgeInsets.only(bottom: 20),
-                padding: const EdgeInsets.all(12),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.red.shade100,
-                  borderRadius: BorderRadius.circular(8),
+      // appBar: AppBar(title: const Text('Login MVVM')),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Title
+                const Text(
+                  'Login',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 ),
-                child: Text(
-                  viewModel.errorMessage!,
-                  style: const TextStyle(color: Colors.red),
+                const SizedBox(height: 8),
+
+                // Description
+                const Text(
+                  'Anda harus masuk dahulu untuk melanjutkan',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
-              ),
+                const SizedBox(height: 32),
 
-            // Input Fields
-            TextField(
-              controller: _usernameController,
-              decoration: const InputDecoration(
-                labelText: 'Username',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 24),
+                // Error Message
+                // if (viewModel.errorMessage != null)
+                //   AppAlerts.showError(
+                //     context,
+                //     viewModel.errorMessage as String,
+                //   ),
 
-            // Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: viewModel.isLoading ? null : _handleLogin,
-                child: viewModel.isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Login'),
-              ),
+                // Username TextField
+                TextField(
+                  controller: _usernameController,
+                  decoration: InputDecoration(
+                    labelText: 'Username',
+                    hintText: 'johnd0e',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Password TextField
+                TextField(
+                  controller: _passwordController,
+                  obscureText: _isPasswordHidden,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    hintText: 'Enter your password',
+                    // suffixIcon: const Icon(Icons.visibility_off),
+                    suffixIcon: IconButton(
+                      splashRadius: 20,
+                      tooltip: _isPasswordHidden
+                          ? 'Show password'
+                          : 'Hide password',
+                      icon: Icon(
+                        _isPasswordHidden
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordHidden = !_isPasswordHidden;
+                        });
+                      },
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Login Button
+                SizedBox(
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: viewModel.isLoading ? null : _handleLogin,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF636AE8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: viewModel.isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Login',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
