@@ -35,7 +35,7 @@ class RegisterViewModel extends ChangeNotifier {
       ).toJson();
 
       final response = await _apiService.client.post(
-        ApiConstants.backendUrl + ApiConstants.registerEndpoint,
+        ApiConstants.registerEndpoint,
         data: requestBody,
       );
 

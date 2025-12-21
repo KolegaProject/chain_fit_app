@@ -33,7 +33,7 @@ class LoginViewModel extends ChangeNotifier {
 
       // Panggil API menggunakan Dio client dari ApiService
       final response = await _apiService.client.post(
-        ApiConstants.backendUrl + ApiConstants.loginEndpoint,
+        ApiConstants.loginEndpoint,
         data: requestBody,
       );
 
