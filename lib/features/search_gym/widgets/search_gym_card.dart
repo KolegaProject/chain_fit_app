@@ -34,7 +34,9 @@ class SearchGymCard extends StatelessWidget {
                   top: Radius.circular(12),
                 ),
                 child: Image.network(
-                  gym.imageUrl,
+                  gym.images.isNotEmpty
+                      ? gym.images.first
+                      : 'https://via.placeholder.com/300',
                   height: 160,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -62,10 +64,10 @@ class SearchGymCard extends StatelessWidget {
                               color: Colors.amber,
                               size: 18,
                             ),
-                            Text(
-                              gym.rating.toString(),
-                              style: const TextStyle(fontSize: 14),
-                            ),
+                            // Text(
+                            //   gym.rating.toString(),
+                            //   style: const TextStyle(fontSize: 14),
+                            // ),
                           ],
                         ),
                       ],
@@ -89,17 +91,17 @@ class SearchGymCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        Badge(
-                          label: Text("${gym.distance.toStringAsFixed(1)} km"),
-                        ),
+                        // Badge(
+                        //   label: Text("${gym.distance.toStringAsFixed(1)} km"),
+                        // ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: -8,
-                      children: gym.tags.map((t) => GymBadge(t)).toList(),
-                    ),
+                    // Wrap(
+                    //   spacing: 6,
+                    //   runSpacing: -8,
+                    //   children: gym.tags.map((t) => GymBadge(t)).toList(),
+                    // ),
                   ],
                 ),
               ),

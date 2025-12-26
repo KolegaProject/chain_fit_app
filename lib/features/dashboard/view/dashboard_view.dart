@@ -40,10 +40,21 @@ class _DashboardViewState extends State<DashboardView> {
   }
 
   Future<void> _getAccessToken() async {
-    final token = await TokenService.getAccessToken();
-    setState(() {
-      _accessToken = token;
-    });
+    try {
+      debugPrint('⏳ Dashboard: ambil access token...');
+      final token = await storageService.getAccessToken();
+
+      debugPrint('✅ Dashboard token: $token');
+
+      if (!mounted) return;
+
+      setState(() {
+        _accessToken = token;
+      });
+    } catch (e, s) {
+      debugPrint('❌ Error ambil token: $e');
+      debugPrintStack(stackTrace: s);
+    }
   }
 
   void _navigateTo(String page) {

@@ -2,33 +2,41 @@ class Gym {
   final int id;
   final String name;
   final String address;
-  final String imageUrl;
-  final double rating;
-  final double distance;
-  final List<String> tags;
+  final int maxCapacity;
+  final String jamOperasional;
+  final List<String> facilities;
   final List<String> images;
 
   Gym({
     required this.id,
     required this.name,
     required this.address,
-    required this.imageUrl,
-    required this.rating,
-    required this.distance,
-    required this.tags,
+    required this.maxCapacity,
+    required this.jamOperasional,
+    required this.facilities,
     required this.images,
   });
 
   factory Gym.fromJson(Map<String, dynamic> json) {
+    final List gymImages =
+        json['gymImage'] is List ? json['gymImage'] : [];
+
     return Gym(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      address: json['address'] ?? '',
-      imageUrl: json['imageUrl'] ?? '',
-      rating: (json['rating'] ?? 0).toDouble(),
-      distance: (json['distance'] ?? 0).toDouble(),
-      tags: List<String>.from(json['tags'] ?? []),
-      images: List<String>.from(json['images'] ?? []),
+      id: json['id'] is int ? json['id'] : int.tryParse('${json['id']}') ?? 0,
+      name: json['name']?.toString() ?? '',
+      address: json['address']?.toString() ?? '',
+      maxCapacity: json['maxCapacity'] is int
+          ? json['maxCapacity']
+          : int.tryParse('${json['maxCapacity']}') ?? 0,
+      jamOperasional: json['jamOperasional']?.toString() ?? '',
+      facilities: (json['facility'] as List? ?? [])
+          .map((e) => e.toString())
+          .toList(),
+      images: gymImages
+          .whereType<Map<String, dynamic>>()
+          .map((e) => e['url']?.toString() ?? '')
+          .where((url) => url.isNotEmpty)
+          .toList(),
     );
   }
 }

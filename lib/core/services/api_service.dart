@@ -24,6 +24,8 @@ class ApiService {
           if (token != null) {
             options.headers['Authorization'] = 'Bearer $token';
           }
+          print('➡️ ${options.method} ${options.uri}');
+          print('➡️ query: ${options.queryParameters}');
           return handler.next(options);
         },
         onError: (DioException e, handler) {
