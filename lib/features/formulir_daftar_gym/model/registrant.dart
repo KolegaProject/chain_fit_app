@@ -1,11 +1,21 @@
-class Registrant {
-  final String name;
-  final String email;
-  final String phone;
+import 'package:chain_fit_app/features/dashboard/model/user_model.dart';
 
-  const Registrant({
-    required this.name,
+class Registrant {
+  final int id;
+  final String username;
+  final String email;
+
+  Registrant({
+    required this.id,
+    required this.username,
     required this.email,
-    required this.phone,
   });
+
+  factory Registrant.fromAppUser(AppUser user) {
+    return Registrant(
+      id: user.id,
+      username: user.username,
+      email: user.email,
+    );
+  }
 }

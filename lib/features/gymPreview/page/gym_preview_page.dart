@@ -1,8 +1,12 @@
-import 'package:chain_fit_app/features/formulir_daftar_gym/views/formulir_daftar_gym_view.dart';
+import 'package:chain_fit_app/features/dashboard/model/user_model.dart';
+import 'package:chain_fit_app/features/dashboard/service/user_profile_service.dart';
+import 'package:chain_fit_app/features/formulir_daftar_gym/model/registrant.dart';
+import 'package:chain_fit_app/features/gymPreview/page/package_page.dart';
 import 'package:flutter/material.dart';
 
-// pakai model Gym kamu
 import '../../search_gym/model/search_gym_model.dart';
+
+// import model + service yang baru dibuat
 
 class GymPreviewPage extends StatefulWidget {
   final Gym gym;
@@ -17,20 +21,50 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
   int _currentPage = 0;
   final PageController _pageController = PageController();
 
+  late final UserProfileService _profileService;
+  late final Future<UserProfileData> _futureProfile;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _profileService = UserProfileService();
+
+    _futureProfile = _profileService.getProfile();
+  }
+
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
   }
 
+  BoxDecoration _cardDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.06),
+          blurRadius: 16,
+          offset: const Offset(0, 6),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // ✅ sesuai model: images
     final images = widget.gym.images.isNotEmpty
         ? widget.gym.images
         : ['https://via.placeholder.com/600'];
 
+    final description = (widget.gym.description.trim().isEmpty)
+        ? '-'
+        : widget.gym.description;
+
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(title: const Text("Uget Uget Gym Preview")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -38,6 +72,7 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // ====== GAMBAR (TIDAK DIUBAH) ======
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Stack(
@@ -69,7 +104,6 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
                         },
                       ),
                     ),
-
                     Positioned(
                       top: 0,
                       bottom: 0,
@@ -92,7 +126,6 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
                         ),
                       ),
                     ),
-
                     Positioned(
                       top: 0,
                       bottom: 0,
@@ -115,7 +148,6 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
                         ),
                       ),
                     ),
-
                     Positioned(
                       bottom: 8,
                       left: 0,
@@ -144,36 +176,101 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
               ),
 
               const SizedBox(height: 16),
-              Text(
-                widget.gym.name,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+
+              // ====== CONTAINER 1: NAMA + DESCRIPTION ======
+              Container(
+                width: double.infinity,
+                decoration: _cardDecoration(),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.gym.name,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 1.4,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 8),
 
-              Text("Jam Operasional: ${widget.gym.jamOperasional}"),
-              const SizedBox(height: 6),
-              Text("Kapasitas Maks: ${widget.gym.maxCapacity}"),
+              const SizedBox(height: 12),
 
-              const SizedBox(height: 16),
-              const Text(
-                "Fasilitas",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              // ====== CONTAINER 2 ======
+              Container(
+                width: double.infinity,
+                decoration: _cardDecoration(),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Fasilitas",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    if (widget.gym.facilities.isEmpty)
+                      Text(
+                        "• -",
+                        style: TextStyle(color: Colors.grey.shade700),
+                      ),
+                    ...widget.gym.facilities.map(
+                      (f) => Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Text(
+                          "• $f",
+                          style: TextStyle(color: Colors.grey.shade700),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Jam Operasional",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      widget.gym.jamOperasional,
+                      style: TextStyle(color: Colors.grey.shade700),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Kapasitas Maks: ${widget.gym.maxCapacity}",
+                      style: TextStyle(color: Colors.grey.shade700),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Alamat",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      widget.gym.address,
+                      style: TextStyle(color: Colors.grey.shade700),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 8),
-
-              // ✅ sesuai model: facilities
-              if (widget.gym.facilities.isEmpty) const Text("• -"),
-              ...widget.gym.facilities.map((f) => Text("• $f")),
-
-              const SizedBox(height: 20),
-              const Text(
-                "Alamat:",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(widget.gym.address),
 
               const SizedBox(height: 80),
             ],
@@ -181,6 +278,7 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
         ),
       ),
 
+      // ====== BUTTON (AMBIL USER DULU) ======
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -190,27 +288,68 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
             child: SizedBox(
               width: double.infinity,
               height: 48,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF636AE8),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                ),
-                onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (_) => PendaftaranGymPage(gym: widget.gym),
-                  //   ),
-                  // );
+              child: FutureBuilder<UserProfileData>(
+                future: _futureProfile,
+                builder: (context, snapshot) {
+                  final isLoading =
+                      snapshot.connectionState == ConnectionState.waiting;
+
+                  return ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF636AE8),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    onPressed: isLoading
+                        ? null
+                        : () {
+                            if (snapshot.hasError) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Gagal ambil user: ${snapshot.error}",
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
+
+                            final profile = snapshot.data;
+                            if (profile == null) return;
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => PackagePage(
+                                  gym: widget.gym,
+                                  registrant: Registrant.fromAppUser(
+                                    profile.user,
+                                  ), // <-- user dikirim
+                                ),
+                              ),
+                            );
+                          },
+                    child: isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            "Pilih Paket",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                  );
                 },
-                child: const Text(
-                  "Pilih Paket",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
               ),
             ),
           ),

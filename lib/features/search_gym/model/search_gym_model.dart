@@ -2,6 +2,7 @@ class Gym {
   final int id;
   final String name;
   final String address;
+  final String description;
   final int maxCapacity;
   final String jamOperasional;
   final List<String> facilities;
@@ -14,16 +15,17 @@ class Gym {
     required this.maxCapacity,
     required this.jamOperasional,
     required this.facilities,
+    required this.description,
     required this.images,
   });
 
   factory Gym.fromJson(Map<String, dynamic> json) {
-    final List gymImages =
-        json['gymImage'] is List ? json['gymImage'] : [];
+    final List gymImages = json['gymImage'] is List ? json['gymImage'] : [];
 
     return Gym(
       id: json['id'] is int ? json['id'] : int.tryParse('${json['id']}') ?? 0,
       name: json['name']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
       address: json['address']?.toString() ?? '',
       maxCapacity: json['maxCapacity'] is int
           ? json['maxCapacity']
