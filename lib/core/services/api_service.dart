@@ -38,13 +38,15 @@ class ApiService {
       ),
     );
 
-    _dio.interceptors.add(LogInterceptor(
-      request: true,        
-      requestBody: true,   
-      responseHeader: false,
-      responseBody: true,
-      error: true,
-    ));
+    _dio.interceptors.add(
+      LogInterceptor(
+        request: true,
+        requestBody: true,
+        responseHeader: false,
+        responseBody: true,
+        error: true,
+      ),
+    );
   }
 
   // Getter agar bisa diakses public
@@ -74,7 +76,9 @@ class ApiService {
     try {
       // Target endpoint sesuai catatanmu
       // Kita masukkan ID membership ke dalam URL path
-      final response = await _dio.post('/api/v1/attendance/$membershipId/qr/me');
+      final response = await _dio.post(
+        '/api/v1/attendance/$membershipId/qr/me',
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // Perhatikan struktur JSON: data -> token -> {token, memberId}
