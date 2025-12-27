@@ -12,7 +12,7 @@ class MenuQrPage extends StatefulWidget {
 
 class _MenuQrPageState extends State<MenuQrPage> {
   final ApiService _apiService = ApiService();
-  
+
   // State variables
   List<MembershipModel> _memberships = [];
   bool _isLoading = true;
@@ -31,9 +31,9 @@ class _MenuQrPageState extends State<MenuQrPage> {
         _isLoading = true;
         _errorMessage = null;
       });
-      
+
       final data = await _apiService.getMyMemberships();
-      
+
       setState(() {
         _memberships = data;
         _isLoading = false;
@@ -82,11 +82,14 @@ class _MenuQrPageState extends State<MenuQrPage> {
             children: [
               const Icon(Icons.error_outline, size: 48, color: Colors.red),
               const SizedBox(height: 16),
-              Text("Gagal memuat data: $_errorMessage", textAlign: TextAlign.center),
+              Text(
+                "Gagal memuat data: $_errorMessage",
+                textAlign: TextAlign.center,
+              ),
               ElevatedButton(
                 onPressed: _fetchMembershipData,
                 child: const Text("Coba Lagi"),
-              )
+              ),
             ],
           ),
         ),
@@ -104,16 +107,17 @@ class _MenuQrPageState extends State<MenuQrPage> {
       itemCount: _memberships.length,
       itemBuilder: (context, index) {
         final membership = _memberships[index];
-        
+
         return GestureDetector(
           onTap: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => AksesGymPage(membership: membership), // Kirim data di sini
-    ),
-  );
-},
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    AksesGymPage(membership: membership), // Kirim data di sini
+              ),
+            );
+          },
           child: Container(
             margin: const EdgeInsets.only(bottom: 16),
             padding: const EdgeInsets.all(12),
@@ -181,9 +185,14 @@ class _MenuQrPageState extends State<MenuQrPage> {
                       const SizedBox(height: 4),
                       // Tambahan Label Status agar lebih informatif
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
-                          color: membership.status == "AKTIF" ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                          color: membership.status == "AKTIF"
+                              ? Colors.green.withOpacity(0.1)
+                              : Colors.red.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -191,7 +200,9 @@ class _MenuQrPageState extends State<MenuQrPage> {
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: membership.status == "AKTIF" ? Colors.green : Colors.red,
+                            color: membership.status == "AKTIF"
+                                ? Colors.green
+                                : Colors.red,
                           ),
                         ),
                       ),
