@@ -35,6 +35,14 @@ class ApiService {
         },
       ),
     );
+
+    _dio.interceptors.add(LogInterceptor(
+      request: true,        
+      requestBody: true,   
+      responseHeader: false,
+      responseBody: true,
+      error: true,
+    ));
   }
 
   // Getter agar bisa diakses public
