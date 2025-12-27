@@ -1,4 +1,5 @@
 // features/search_gym/views/search_gym_page.dart
+import 'package:chain_fit_app/features/gymPreview/page/gym_preview_page.dart';
 import 'package:flutter/material.dart';
 import '../model/search_gym_model.dart';
 import '../service/gym_service.dart';
@@ -96,7 +97,15 @@ class _SearchGymViewState extends State<SearchGymView> {
                   padding: const EdgeInsets.all(8),
                   itemCount: gyms.length,
                   itemBuilder: (context, index) {
-                    return SearchGymCard(gym: gyms[index]);
+                    return SearchGymCard(
+                      gym: gyms[index],
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => GymPreviewPage(gym: gyms[index])),
+                        );
+                      },
+                    );
                   },
                 );
               },

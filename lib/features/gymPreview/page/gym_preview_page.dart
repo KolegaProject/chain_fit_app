@@ -1,52 +1,34 @@
-import 'dart:convert';
 import 'package:chain_fit_app/features/formulir_daftar_gym/views/formulir_daftar_gym_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import '../model/gym_model.dart';
-import 'package_page.dart';
+
+// pakai model Gym kamu
+import '../../search_gym/model/search_gym_model.dart';
 
 class GymPreviewPage extends StatefulWidget {
-  final String gymName;
-  final List<String> gymImages;
+  final Gym gym;
 
-  const GymPreviewPage({
-    super.key,
-    required this.gymName,
-    required this.gymImages,
-  });
+  const GymPreviewPage({super.key, required this.gym});
 
   @override
   State<GymPreviewPage> createState() => _GymPreviewPageState();
 }
 
 class _GymPreviewPageState extends State<GymPreviewPage> {
-  Gym? gymData;
-  int _currentPage = 0;// state image
+  int _currentPage = 0;
   final PageController _pageController = PageController();
-  late List<String> gymImages;
 
   @override
-  void initState() {
-    super.initState();
-    gymImages = widget.gymImages;
-    loadGymData();
-  }
-
-  Future<void> loadGymData() async {
-    final data = await rootBundle.loadString(
-      'lib/features/gymPreview/data.json',
-    );
-    final jsonResult = jsonDecode(data);
-    setState(() {
-      gymData = Gym.fromJson(jsonResult[widget.gymName]);
-    });
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (gymData == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
+    // ✅ sesuai model: images
+    final images = widget.gym.images.isNotEmpty
+        ? widget.gym.images
+        : ['https://via.placeholder.com/600'];
 
     return Scaffold(
       appBar: AppBar(title: const Text("Uget Uget Gym Preview")),
@@ -56,7 +38,6 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // carousel
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Stack(
@@ -65,23 +46,30 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
                       height: 220,
                       child: PageView.builder(
                         controller: _pageController,
-                        itemCount: gymImages.length,
+                        itemCount: images.length,
                         onPageChanged: (index) {
-                          setState(() {
-                            _currentPage = index;
-                          });
+                          setState(() => _currentPage = index);
                         },
                         itemBuilder: (context, index) {
-                          return Image.asset(
-                            gymImages[index],
+                          return Image.network(
+                            images[index],
                             fit: BoxFit.cover,
                             width: double.infinity,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            },
+                            errorBuilder: (_, __, ___) => const SizedBox(
+                              height: 220,
+                              child: Center(child: Icon(Icons.broken_image)),
+                            ),
                           );
                         },
                       ),
                     ),
 
-                    // panah kiri
                     Positioned(
                       top: 0,
                       bottom: 0,
@@ -105,7 +93,6 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
                       ),
                     ),
 
-                    // panah kanan
                     Positioned(
                       top: 0,
                       bottom: 0,
@@ -118,7 +105,7 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
                             size: 24,
                           ),
                           onPressed: () {
-                            if (_currentPage < gymImages.length - 1) {
+                            if (_currentPage < images.length - 1) {
                               _pageController.nextPage(
                                 duration: const Duration(milliseconds: 300),
                                 curve: Curves.easeInOut,
@@ -129,7 +116,6 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
                       ),
                     ),
 
-                    // indikator titik di bawah
                     Positioned(
                       bottom: 8,
                       left: 0,
@@ -137,7 +123,7 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
-                          gymImages.length,
+                          images.length,
                           (index) => AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
                             margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -146,7 +132,7 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
                             decoration: BoxDecoration(
                               color: _currentPage == index
                                   ? Colors.white
-                                  : Colors.white.withValues(alpha: 0.5),
+                                  : Colors.white.withOpacity(0.5),
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -156,36 +142,45 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
                   ],
                 ),
               ),
+
               const SizedBox(height: 16),
               Text(
-                gymData!.name,
+                widget.gym.name,
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
-              Text(gymData!.description),
+
+              Text("Jam Operasional: ${widget.gym.jamOperasional}"),
+              const SizedBox(height: 6),
+              Text("Kapasitas Maks: ${widget.gym.maxCapacity}"),
+
               const SizedBox(height: 16),
               const Text(
                 "Fasilitas",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
-              ...gymData!.facilities.map((f) => Text("• $f")),
+
+              // ✅ sesuai model: facilities
+              if (widget.gym.facilities.isEmpty) const Text("• -"),
+              ...widget.gym.facilities.map((f) => Text("• $f")),
+
               const SizedBox(height: 20),
               const Text(
                 "Alamat:",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(gymData!.location),
-              const SizedBox(height: 80), // ruang untuk tombol bawah
+              Text(widget.gym.address),
+
+              const SizedBox(height: 80),
             ],
           ),
         ),
       ),
 
-      // tombol
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -205,13 +200,12 @@ class _GymPreviewPageState extends State<GymPreviewPage> {
                   elevation: 0,
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      // builder: (_) => PackagePage(gym: gymData!),
-                      builder: (_) => PendaftaranGymPage(gym: gymData!),
-                    ),
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (_) => PendaftaranGymPage(gym: widget.gym),
+                  //   ),
+                  // );
                 },
                 child: const Text(
                   "Pilih Paket",
