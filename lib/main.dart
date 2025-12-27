@@ -1,11 +1,12 @@
 import 'package:chain_fit_app/features/auth/viewmodels/register_viewmodel.dart';
+import 'package:chain_fit_app/features/dashboard/viewmodels/dashboard_viewmodel.dart';
 import 'package:chain_fit_app/features/auth/views/register_screen.dart';
 import 'package:flutter/material.dart' as m;
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'package:chain_fit_app/features/dashboard/view/dashboard_view.dart';
+import 'package:chain_fit_app/features/dashboard/views/dashboard_screen.dart';
 
 import 'package:chain_fit_app/features/status_membership/models/membership_models.dart';
 import 'package:chain_fit_app/features/status_membership/view/membership_detail_page.dart';
@@ -59,6 +60,7 @@ class AppRouter extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
         ChangeNotifierProvider(create: (_) => RegisterViewModel()),
+        ChangeNotifierProvider(create: (_) => DashboardViewModel()),
       ],
       child: m.MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -69,7 +71,7 @@ class AppRouter extends StatelessWidget {
 
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
-          '/dashboard': (context) => DashboardView(),
+          '/dashboard': (context) => DashboardScreen(),
         },
       ),
     );
