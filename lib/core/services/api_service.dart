@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'storage_service.dart';
+import '../../features/list_qr/models/list_qr_model.dart';
 
 class ApiService {
   late Dio _dio;
@@ -39,4 +40,24 @@ class ApiService {
 
   // Getter agar bisa diakses public
   Dio get client => _dio;
+
+  Future<List<MembershipModel>> getMyMemberships() async {
+  try {
+    // Ubah path di sini menjadi /api/v1/gym/me/memberships
+    final response = await _dio.get('/api/v1/gym/me/memberships'); 
+
+    if (response.statusCode == 200) {
+      List rawData = response.data['data']; 
+      return rawData.map((json) => MembershipModel.fromJson(json)).toList();
+    } else {
+      throw Exception('Gagal memuat data membership');
+    }
+  } on DioException catch (e) {
+    // Memberikan pesan error yang lebih spesifik jika token expired (401)
+    if (e.response?.statusCode == 401) {
+      throw Exception('Sesi telah berakhir, silakan login kembali');
+    }
+    throw Exception(e.message ?? 'Terjadi kesalahan jaringan');
+  }
+}
 }

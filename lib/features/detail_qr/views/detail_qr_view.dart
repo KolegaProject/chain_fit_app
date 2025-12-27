@@ -1,7 +1,9 @@
+import 'package:chain_fit_app/features/list_qr/models/list_qr_model.dart';
 import 'package:flutter/material.dart';
 
 class AksesGymPage extends StatelessWidget {
-  const AksesGymPage({super.key});
+  final MembershipModel membership; // Tambahkan ini
+  const AksesGymPage({super.key, required this.membership}); // Dan ini
 
   @override
   Widget build(BuildContext context) {
