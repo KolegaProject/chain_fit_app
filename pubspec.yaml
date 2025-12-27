@@ -36,13 +36,13 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
-  shared_preferences: ^2.5.3
   shadcn_flutter: ^0.0.44
   flutter_local_notifications: ^19.5.0
   http: ^1.6.0
   video_player: ^2.8.2
   chewie: ^1.7.1
   
+  shared_preferences: ^2.5.3
   provider: ^6.0.5
   dio: ^5.5.0
   flutter_dotenv: ^5.1.0

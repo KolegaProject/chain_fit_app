@@ -32,6 +32,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
+  Future<void> _onRefresh() async {
+    await context.read<DashboardViewModel>().loadDashboardData(forceRefresh: true);
+  }
+
   void _onItemTapped(int index) {
     // Fokus: QR Code pakai Navigator.push
     if (index == 2) {
@@ -70,11 +74,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FE),
-      body: vm.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SafeArea(
-              child: IndexedStack(index: _selectedIndex, children: _pages),
-            ),
+      body: RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: vm.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : vm.errorMessage != null && vm.user == null
+                ? Center(child: Text(vm.errorMessage!))
+                : SafeArea(
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 0),
+                      child: Column(
+                        children: [
+                          if (vm.isRefetching)
+                            const LinearProgressIndicator(minHeight: 2),
+                            _pages[_selectedIndex],
+                        ],
+                      ),
+                    ),
+                  ),
+      ),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 8.0,
