@@ -59,7 +59,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildBody() {
-    // Supaya RefreshIndicator tetap bisa pull
     if (_isLoading) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -96,7 +95,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
     final data = _data!;
     final user = data.user;
-
     final initial = (user.initial.isNotEmpty)
         ? user.initial
         : (user.username.isNotEmpty ? user.username[0].toUpperCase() : "?");
@@ -112,14 +110,12 @@ class _ProfilePageState extends State<ProfilePage> {
           imageUrl: user.profileImage,
           initial: initial,
         ),
-
         const SizedBox(height: 14),
 
         _SectionTitle(
           title: "Gym Terdaftar",
           trailing: data.gyms.isNotEmpty ? "${data.gyms.length}" : null,
         ),
-
         const SizedBox(height: 10),
 
         if (data.gyms.isEmpty)
@@ -154,32 +150,28 @@ class _ProfilePageState extends State<ProfilePage> {
         ...data.gyms.map((g) {
           final isDefault = data.defaultGymId == g.id;
           return Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: _GymTile(name: g.name, isDefault: isDefault),
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _GymTileLarge(name: g.name, isDefault: isDefault),
           );
         }).toList(),
-
-        const SizedBox(height: 16),
       ],
     );
   }
 }
 
-// ====================== UI COMPONENTS ======================
+// ===== Styles / Widgets =====
 
-BoxDecoration _softCard() {
-  return BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(18),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withOpacity(0.05),
-        blurRadius: 18,
-        offset: const Offset(0, 10),
-      ),
-    ],
-  );
-}
+BoxDecoration _softCard() => BoxDecoration(
+  color: Colors.white,
+  borderRadius: BorderRadius.circular(18),
+  boxShadow: [
+    BoxShadow(
+      color: Colors.black.withOpacity(0.05),
+      blurRadius: 18,
+      offset: const Offset(0, 10),
+    ),
+  ],
+);
 
 class _ProfileHeaderCard extends StatelessWidget {
   final String username;
@@ -295,23 +287,20 @@ class _Avatar extends StatelessWidget {
     );
   }
 
-  Widget _fallback() {
-    return Center(
-      child: Text(
-        initial,
-        style: const TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.w900,
-          color: Colors.white,
-        ),
+  Widget _fallback() => Center(
+    child: Text(
+      initial,
+      style: const TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w900,
+        color: Colors.white,
       ),
-    );
-  }
+    ),
+  );
 }
 
 class _RolePill extends StatelessWidget {
   final String role;
-
   const _RolePill({required this.role});
 
   @override
@@ -339,7 +328,6 @@ class _RolePill extends StatelessWidget {
 class _SectionTitle extends StatelessWidget {
   final String title;
   final String? trailing;
-
   const _SectionTitle({required this.title, this.trailing});
 
   @override
@@ -357,19 +345,12 @@ class _SectionTitle extends StatelessWidget {
           ),
         ),
         if (trailing != null)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFFEFEFFE),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(
-              trailing!,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w900,
-                color: Color(0xFF636AE8),
-              ),
+          Text(
+            trailing!,
+            style: const TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w900,
+              color: Color(0xFF636AE8),
             ),
           ),
       ],
@@ -377,78 +358,66 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-class _GymTile extends StatelessWidget {
+/// ✅ lebih besar + tanpa badge DEFAULT
+class _GymTileLarge extends StatelessWidget {
   final String name;
   final bool isDefault;
 
-  const _GymTile({required this.name, required this.isDefault});
+  const _GymTileLarge({required this.name, required this.isDefault});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: isDefault ? const Color(0xFFF3F4FF) : Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDefault ? const Color(0xFF636AE8) : Colors.grey.shade200,
           width: isDefault ? 1.2 : 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 14,
-            offset: const Offset(0, 8),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 14,
+        vertical: 16,
+      ), // ✅ lebih besar
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 46,
+            height: 46, // ✅ lebih besar
             decoration: BoxDecoration(
               color: isDefault
                   ? const Color(0xFFE9EBFF)
                   : const Color(0xFFF4F5F7),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
               Icons.location_on_outlined,
-              size: 20,
+              size: 22,
               color: isDefault ? const Color(0xFF636AE8) : Colors.grey.shade600,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Text(
               name,
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 13.8,
-                fontWeight: isDefault ? FontWeight.w900 : FontWeight.w700,
+                fontSize: 14.5,
+                fontWeight: isDefault ? FontWeight.w900 : FontWeight.w800,
                 color: Colors.black87,
+                height: 1.2,
               ),
             ),
           ),
-          if (isDefault) const SizedBox(width: 10),
-          if (isDefault)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFF636AE8),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: const Text(
-                "DEFAULT",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            ),
         ],
       ),
     );
