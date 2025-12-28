@@ -260,43 +260,66 @@ class _Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasImage = imageUrl != null && imageUrl!.trim().isNotEmpty;
+    final url = (imageUrl ?? '').trim();
+    final hasImage = url.isNotEmpty;
 
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.25)),
+        borderRadius: BorderRadius.circular(22),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withOpacity(0.35),
+            Colors.white.withOpacity(0.15),
+          ],
+        ),
+        border: Border.all(color: Colors.white.withOpacity(0.35)),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: hasImage
-          ? Image.network(
-              imageUrl!,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => _fallback(),
-              loadingBuilder: (context, child, progress) {
-                if (progress == null) return child;
-                return const Center(
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                );
-              },
-            )
-          : _fallback(),
+      padding: const EdgeInsets.all(2.5),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(19),
+        child: hasImage
+            ? Image.network(
+                url,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => _fallback(),
+                loadingBuilder: (context, child, progress) {
+                  if (progress == null) return child;
+                  return Container(
+                    color: Colors.white.withOpacity(0.10),
+                    child: const Center(
+                      child: SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                  );
+                },
+              )
+            : _fallback(),
+      ),
     );
   }
 
-  Widget _fallback() => Center(
-    child: Text(
-      initial,
-      style: const TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.w900,
-        color: Colors.white,
+  Widget _fallback() {
+    return Container(
+      color: Colors.white.withOpacity(0.10),
+      child: Center(
+        child: Text(
+          initial,
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+          ),
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _RolePill extends StatelessWidget {
