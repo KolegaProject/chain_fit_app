@@ -1,5 +1,4 @@
-import 'package:chain_fit_app/features/detail_qr/views/detail_qr_view.dart';
-import 'package:chain_fit_app/features/list_qr/models/list_qr_model.dart';
+import 'package:chain_fit_app/features/list_qr/views/list_qr_view.dart'; // MenuQrPage
 import 'package:chain_fit_app/features/profile/views/profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,13 +16,11 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
 
-  // Daftar Halaman yang akan ditampilkan (untuk tab selain yang dipush)
   final List<Widget> _pages = [
-    HomeTab(), // 0: Beranda
-    const Center(child: Text("Halaman Progres")), // 1: Progres
-    const SizedBox(), // 2: Placeholder karena QR Code sekarang dipush
-    const ProfilePage(), // 3: Profil
-    // const SizedBox(), // 3: Profil
+    HomeTab(), // 0
+    Center(child: Text("Halaman Progres")), // 1
+    MenuQrPage(), // 2 (QR List)
+    ProfilePage(), // 3
   ];
 
   @override
@@ -35,35 +32,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _onItemTapped(int index) {
-    // Fokus: QR Code pakai Navigator.push
-    if (index == 2) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => AksesGymPage(
-            membership: MembershipModel(
-              id: 1,
-              startDate: '',
-              endDate: '',
-              status: '',
-              gym: GymModel(id: 1, name: 'Gym A', address: 'Jl. ABC'),
-              package: PackageModel(
-                id: 1,
-                name: 'Basic',
-                price: '',
-                durationDays: 3,
-              ),
-            ),
-          ),
-        ),
-      );
-      return;
-    }
-
-    // Tab lain tetap ganti index (IndexedStack)
-    setState(() {
-      _selectedIndex = index;
-    });
+    setState(() => _selectedIndex = index);
   }
 
   @override

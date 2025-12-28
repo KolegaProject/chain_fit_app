@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/services/api_service.dart';
-import '../models/list_qr_model.dart'; // Sesuaikan dengan lokasi file modelmu
+import '../models/list_qr_model.dart';
 import '../../detail_qr/views/detail_qr_view.dart';
 
 class MenuQrPage extends StatefulWidget {
@@ -13,7 +13,6 @@ class MenuQrPage extends StatefulWidget {
 class _MenuQrPageState extends State<MenuQrPage> {
   final ApiService _apiService = ApiService();
 
-  // State variables
   List<MembershipModel> _memberships = [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -24,7 +23,6 @@ class _MenuQrPageState extends State<MenuQrPage> {
     _fetchMembershipData();
   }
 
-  // Fungsi untuk mengambil data dari API
   Future<void> _fetchMembershipData() async {
     try {
       setState(() {
@@ -34,11 +32,13 @@ class _MenuQrPageState extends State<MenuQrPage> {
 
       final data = await _apiService.getMyMemberships();
 
+      if (!mounted) return;
       setState(() {
         _memberships = data;
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
         _errorMessage = e.toString();
@@ -48,61 +48,91 @@ class _MenuQrPageState extends State<MenuQrPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF4F5DFF)),
-          onPressed: () => Navigator.pop(context),
+    return Container(
+      color: Colors.white, // ✅ background putih
+      child: SafeArea(
+        child: Column(
+          children: [
+            // ✅ Header custom (tanpa tombol back) + title beneran center
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  const Text(
+                    "Menu QR",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: _fetchMembershipData,
+                child: _buildBody(),
+              ),
+            ),
+          ],
         ),
-        centerTitle: true,
-        title: const Text("Menu QR"),
-        elevation: 0,
-      ),
-      // Menggunakan RefreshIndicator agar user bisa tarik layar untuk refresh data
-      body: RefreshIndicator(
-        onRefresh: _fetchMembershipData,
-        child: _buildBody(),
       ),
     );
   }
 
   Widget _buildBody() {
-    // 1. Tampilan Loading
+    // Loading
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    // 2. Tampilan Error
-    if (_errorMessage != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: Colors.red),
-              const SizedBox(height: 16),
-              Text(
-                "Gagal memuat data: $_errorMessage",
-                textAlign: TextAlign.center,
-              ),
-              ElevatedButton(
-                onPressed: _fetchMembershipData,
-                child: const Text("Coba Lagi"),
-              ),
-            ],
-          ),
-        ),
+      return ListView(
+        physics: AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(height: 220),
+          Center(child: CircularProgressIndicator()),
+        ],
       );
     }
 
-    // 3. Tampilan Data Kosong
-    if (_memberships.isEmpty) {
-      return const Center(child: Text("Tidak ada membership aktif."));
+    // Error
+    if (_errorMessage != null) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(20),
+        children: [
+          const SizedBox(height: 140),
+          const Icon(Icons.error_outline, size: 48, color: Colors.red),
+          const SizedBox(height: 16),
+          Text(
+            "Gagal memuat data:\n$_errorMessage",
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          Center(
+            child: ElevatedButton(
+              onPressed: _fetchMembershipData,
+              child: const Text("Coba Lagi"),
+            ),
+          ),
+        ],
+      );
     }
 
-    // 4. Tampilan List Data
+    // Kosong
+    if (_memberships.isEmpty) {
+      return ListView(
+        physics: AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(height: 220),
+          Center(child: Text("Tidak ada membership aktif.")),
+        ],
+      );
+    }
+
+    // List
     return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       itemCount: _memberships.length,
       itemBuilder: (context, index) {
@@ -113,8 +143,7 @@ class _MenuQrPageState extends State<MenuQrPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    AksesGymPage(membership: membership), // Kirim data di sini
+                builder: (_) => AksesGymPage(membership: membership),
               ),
             );
           },
@@ -134,7 +163,6 @@ class _MenuQrPageState extends State<MenuQrPage> {
             ),
             child: Row(
               children: [
-                // Icon kiri
                 Container(
                   height: 60,
                   width: 60,
@@ -149,13 +177,12 @@ class _MenuQrPageState extends State<MenuQrPage> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                // Isi List
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        membership.gym.name, // Dari Model
+                        membership.gym.name,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -172,7 +199,7 @@ class _MenuQrPageState extends State<MenuQrPage> {
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              membership.gym.address, // Dari Model
+                              membership.gym.address,
                               style: const TextStyle(
                                 fontSize: 13,
                                 color: Colors.grey,
@@ -182,8 +209,7 @@ class _MenuQrPageState extends State<MenuQrPage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      // Tambahan Label Status agar lebih informatif
+                      const SizedBox(height: 6),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
@@ -193,7 +219,7 @@ class _MenuQrPageState extends State<MenuQrPage> {
                           color: membership.status == "AKTIF"
                               ? Colors.green.withOpacity(0.1)
                               : Colors.red.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           membership.status,
