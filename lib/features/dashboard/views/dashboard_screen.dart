@@ -1,5 +1,6 @@
 import 'package:chain_fit_app/features/detail_qr/views/detail_qr_view.dart';
 import 'package:chain_fit_app/features/list_qr/models/list_qr_model.dart';
+import 'package:chain_fit_app/features/profile/views/profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -21,7 +22,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     HomeTab(), // 0: Beranda
     const Center(child: Text("Halaman Progres")), // 1: Progres
     const SizedBox(), // 2: Placeholder karena QR Code sekarang dipush
-    const Center(child: Text("Halaman Profil")), // 3: Profil
+    const ProfilePage(), // 3: Profil
+    // const SizedBox(), // 3: Profil
   ];
 
   @override
@@ -30,10 +32,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DashboardViewModel>().loadDashboardData();
     });
-  }
-
-  Future<void> _onRefresh() async {
-    await context.read<DashboardViewModel>().loadDashboardData(forceRefresh: true);
   }
 
   void _onItemTapped(int index) {
@@ -74,26 +72,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FE),
-      body: RefreshIndicator(
-        onRefresh: _onRefresh,
-        child: vm.isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : vm.errorMessage != null && vm.user == null
-                ? Center(child: Text(vm.errorMessage!))
-                : SafeArea(
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: 0),
-                      child: Column(
-                        children: [
-                          if (vm.isRefetching)
-                            const LinearProgressIndicator(minHeight: 2),
-                            _pages[_selectedIndex],
-                        ],
-                      ),
-                    ),
-                  ),
-      ),
+      body: vm.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SafeArea(
+              child: IndexedStack(index: _selectedIndex, children: _pages),
+            ),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 8.0,
