@@ -1,4 +1,7 @@
+import 'package:chain_fit_app/core/constants/app_colors.dart';
+import 'package:chain_fit_app/core/constants/app_text_styles.dart';
 import 'package:chain_fit_app/features/search_gym/views/search_gym_screen.dart';
+import 'package:chain_fit_app/features/video_panduan/view/panduan_alat_gym_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/dashboard_viewmodel.dart';
@@ -24,7 +27,7 @@ class HomeTab extends StatelessWidget {
           const SizedBox(height: 32),
           const Text(
             "Menu Utama",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1F2937)),
+            style: AppTextStyles.sectionTitle,
           ),
           const SizedBox(height: 16),
           _buildMenuGrid(context),
@@ -40,12 +43,12 @@ class HomeTab extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 28,
-          backgroundColor: Colors.grey.shade200,
+          backgroundColor: AppColors.background,
           backgroundImage: vm.user?.profileImage != null
               ? NetworkImage(vm.user!.profileImage!)
               : null,
           child: vm.user?.profileImage == null
-              ? const Icon(Icons.person, color: Colors.grey, size: 30)
+              ? const Icon(Icons.person, color: AppColors.profileImage, size: 30)
               : null,
         ),
         const SizedBox(width: 16),
@@ -54,15 +57,11 @@ class HomeTab extends StatelessWidget {
           children: [
             Text(
               "Halo, ${vm.user?.username ?? 'Guest'}",
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1F2937),
-              ),
+              style: AppTextStyles.pageTitle,
             ),
             const Text(
               "Let's workout today!",
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              style: AppTextStyles.bodyText,
             ),
           ],
         ),
@@ -146,6 +145,9 @@ class HomeTab extends StatelessWidget {
             if (item['title'] == 'Cari Gym') {
                 // Navigator.push...
                 Navigator.push(context, MaterialPageRoute(builder: (_) => SearchGymView()));
+            } else if (item['title'] == 'Panduan') {
+                // Navigator.push...
+                Navigator.push(context, MaterialPageRoute(builder: (_) => PanduanAlatGymPage()));
             }
           },
           borderRadius: BorderRadius.circular(20),
@@ -158,7 +160,7 @@ class HomeTab extends StatelessWidget {
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.05),
                   blurRadius: 10,
-                  offset: const Offset(0, 4),
+                  offset: const Offset(0, 4), 
                 ),
               ],
             ),
@@ -218,6 +220,7 @@ class HomeTab extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
                // Navigasi ke halaman cari gym
+              //  Navigator.push(context, MaterialPageRoute(builder: (_) => SearchGymView()));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
