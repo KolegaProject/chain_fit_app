@@ -12,6 +12,7 @@ class ApiConstants {
   static const String userProfileEndpoint = '/api/v1/auth/me';
   static const String activePackageEndpoint = '/api/v1/gym/me/memberships';
   static const String searchGymEndpoint = '/api/v1/gym';
+  static const String paymentEndpoint = '/api/v1/transaction/create-snap';
 
   static String gymDetailEndpoint(int gymId) => '/api/v1/gym/$gymId';
   static String gymPackageEndpoint(int gymId) => '/api/v1/gym/$gymId/paket-member';

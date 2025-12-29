@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../domain/payment_result.dart';
+import '../domain/payment_redirect_handler.dart';
+
 class PaymentWebViewPage extends StatefulWidget {
   final String url;
+
   const PaymentWebViewPage({super.key, required this.url});
 
   @override
@@ -11,32 +15,16 @@ class PaymentWebViewPage extends StatefulWidget {
 
 class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
   late final WebViewController _controller;
+  final _redirectHandler = const PaymentRedirectHandler();
+
   bool _loading = true;
-  bool _alreadyHandled = false;
+  bool _handled = false;
 
-  bool _isSuccessUrl(String url) {
-    final uri = Uri.tryParse(url);
-    final status = uri?.queryParameters['transaction_status']?.toLowerCase();
-    final code = uri?.queryParameters['status_code'];
+  void _handleResult(PaymentResult result) {
+    if (_handled) return;
+    _handled = true;
 
-    // Midtrans sukses biasanya settlement/capture
-    if (status == 'settlement' || status == 'capture') return true;
-
-    // beberapa callback/redirect pakai status_code=200
-    if (code == '200') return true;
-
-    // fallback: halaman finish
-    if (url.toLowerCase().contains('/finish')) return true;
-
-    return false;
-  }
-
-  void _handleSuccess(String url) {
-    if (_alreadyHandled) return;
-    _alreadyHandled = true;
-
-    // balikin result "true" (sukses) ke halaman sebelumnya
-    Navigator.pop(context, true);
+    Navigator.pop(context, result);
   }
 
   @override
@@ -47,19 +35,24 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
-          onPageStarted: (_) => setState(() => _loading = true),
+          onPageStarted: (_) {
+            if (mounted) setState(() => _loading = true);
+          },
+          onPageFinished: (url) {
+            if (mounted) setState(() => _loading = false);
+
+            final result = _redirectHandler.resolve(url);
+            if (result != null) {
+              _handleResult(result);
+            }
+          },
           onNavigationRequest: (request) {
-            if (_isSuccessUrl(request.url)) {
-              _handleSuccess(request.url);
+            final result = _redirectHandler.resolve(request.url);
+            if (result != null) {
+              _handleResult(result);
               return NavigationDecision.prevent;
             }
             return NavigationDecision.navigate;
-          },
-          onPageFinished: (url) {
-            setState(() => _loading = false);
-            if (_isSuccessUrl(url)) {
-              _handleSuccess(url);
-            }
           },
         ),
       )
