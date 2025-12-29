@@ -54,6 +54,7 @@ class ProfileData {
 class AppUser {
   final int id;
   final String username;
+  final String name;
   final String email;
   final String role;
   final String? profileImage;
@@ -62,6 +63,7 @@ class AppUser {
     required this.id,
     required this.username,
     required this.email,
+    required this.name,
     required this.role,
     required this.profileImage,
   });
@@ -76,6 +78,7 @@ class AppUser {
     return AppUser(
       id: json['id'] ?? 0,
       username: json['username'] ?? '',
+      name: json['name'] ?? '',
       email: json['email'] ?? '',
       role: json['role'] ?? 'MEMBER',
       profileImage: json['profileImage'],

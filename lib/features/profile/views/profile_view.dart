@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
 import '../model/profile_model.dart';
 import '../service/profile_service.dart';
 
@@ -11,6 +15,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final ProfileService _service = ProfileService();
+  final ImagePicker _picker = ImagePicker();
 
   ProfileData? _data;
   bool _isLoading = true;
@@ -43,6 +48,211 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Widget _photoFallback(String initial, {double size = 64}) {
+    return Container(
+      width: size,
+      height: size,
+      color: Colors.grey.shade200,
+      child: Center(
+        child: Text(
+          initial,
+          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openEditProfileSheet() async {
+    if (_data == null) return;
+    final user = _data!.user;
+
+    TextEditingController? usernameC;
+    TextEditingController? nameC;
+
+    File? selectedImage;
+    bool saving = false;
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        // ✅ controller dibuat DI DALAM lifecycle bottomsheet
+        usernameC ??= TextEditingController(text: user.username);
+        nameC ??= TextEditingController(
+          // kalau AppUser kamu punya field name, ganti ke: text: user.name
+          text: user.name,
+        );
+
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
+            Future<void> pickImage() async {
+              final x = await _picker.pickImage(
+                source: ImageSource.gallery,
+                imageQuality: 85,
+              );
+              if (x == null) return;
+
+              // ✅ FIX: bottomsheet bisa saja sudah ketutup karena swipe/back
+              if (!ctx.mounted) return;
+              if (!Navigator.of(ctx).canPop()) return;
+
+              setModalState(() => selectedImage = File(x.path));
+            }
+
+            Future<void> save() async {
+              if (saving) return;
+              setModalState(() => saving = true);
+              try {
+                await _service.updateProfile(
+                  username: usernameC!.text,
+                  name: nameC!.text,
+                  imageFile: selectedImage,
+                );
+
+                // ✅ tutup modal dengan aman
+                if (ctx.mounted && Navigator.of(ctx).canPop()) {
+                  Navigator.pop(ctx);
+                }
+
+                await _fetchProfile();
+
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Profil berhasil diperbarui")),
+                );
+              } catch (e) {
+                if (ctx.mounted) setModalState(() => saving = false);
+                if (!mounted) return;
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(e.toString())));
+              }
+            }
+
+            final bottomInset = MediaQuery.of(ctx).viewInsets.bottom;
+            final photoUrl = (user.profileImage ?? '').trim();
+
+            return Padding(
+              padding: EdgeInsets.only(bottom: bottomInset),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                margin: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.black12,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Center(
+                      child: Text(
+                        "Edit Profil",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: selectedImage != null
+                              ? Image.file(
+                                  selectedImage!,
+                                  width: 64,
+                                  height: 64,
+                                  fit: BoxFit.cover,
+                                )
+                              : (photoUrl.isNotEmpty
+                                    ? Image.network(
+                                        photoUrl,
+                                        width: 64,
+                                        height: 64,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) =>
+                                            _photoFallback(user.initial),
+                                      )
+                                    : _photoFallback(user.initial)),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: saving ? null : pickImage,
+                            icon: const Icon(Icons.photo),
+                            label: const Text("Ganti Foto"),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    TextField(
+                      controller: usernameC,
+                      enabled: !saving,
+                      decoration: const InputDecoration(
+                        labelText: "Username",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    TextField(
+                      controller: nameC,
+                      enabled: !saving,
+                      decoration: const InputDecoration(
+                        labelText: "Name",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 46,
+                      child: ElevatedButton(
+                        onPressed: saving ? null : save,
+                        child: saving
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text("Simpan"),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    ).whenComplete(() {
+      // ✅ dispose controller tepat waktu saat bottomsheet benar2 selesai (swipe/close)
+      usernameC?.dispose();
+      nameC?.dispose();
+      usernameC = null;
+      nameC = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,6 +263,12 @@ class _ProfilePageState extends State<ProfilePage> {
         elevation: 0,
         backgroundColor: const Color(0xFFF5F6FA),
         foregroundColor: Colors.black,
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.edit),
+        //     onPressed: _data == null ? null : _openEditProfileSheet,
+        //   ),
+        // ],
       ),
       body: RefreshIndicator(onRefresh: _fetchProfile, child: _buildBody()),
     );
@@ -104,11 +320,12 @@ class _ProfilePageState extends State<ProfilePage> {
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
       children: [
         _ProfileHeaderCard(
-          username: user.username,
+          title: user.name.isNotEmpty ? user.name : user.username,
           email: user.email,
           role: user.role,
           imageUrl: user.profileImage,
           initial: initial,
+          onEdit: _openEditProfileSheet,
         ),
         const SizedBox(height: 14),
 
@@ -174,75 +391,103 @@ BoxDecoration _softCard() => BoxDecoration(
 );
 
 class _ProfileHeaderCard extends StatelessWidget {
-  final String username;
+  final String title;
   final String email;
   final String role;
   final String? imageUrl;
   final String initial;
+  final VoidCallback onEdit; // ✅ tambah
 
   const _ProfileHeaderCard({
-    required this.username,
+    required this.title,
     required this.email,
     required this.role,
     required this.imageUrl,
     required this.initial,
+    required this.onEdit, // ✅ tambah
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF636AE8), Color(0xFF7C5CFF)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF636AE8).withOpacity(0.25),
-            blurRadius: 22,
-            offset: const Offset(0, 12),
+    return Stack(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(22),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF636AE8), Color(0xFF7C5CFF)],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF636AE8).withOpacity(0.25),
+                blurRadius: 22,
+                offset: const Offset(0, 12),
+              ),
+            ],
           ),
-        ],
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          _Avatar(imageUrl: imageUrl, initial: initial, size: 64),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  username,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                  ),
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              _Avatar(imageUrl: imageUrl, initial: initial, size: 64),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      email,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.white.withOpacity(0.9),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _RolePill(role: role),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  email,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.white.withOpacity(0.9),
-                    fontWeight: FontWeight.w600,
-                  ),
+              ),
+            ],
+          ),
+        ),
+
+        // ✅ tombol edit di dalam card (pojok kanan atas)
+        Positioned(
+          top: 10,
+          right: 10,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onEdit,
+              borderRadius: BorderRadius.circular(999),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.18),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: Colors.white.withOpacity(0.22)),
                 ),
-                const SizedBox(height: 10),
-                _RolePill(role: role),
-              ],
+                child: const Icon(Icons.edit, size: 18, color: Colors.white),
+              ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -406,15 +651,12 @@ class _GymTileLarge extends StatelessWidget {
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 14,
-        vertical: 16,
-      ), // ✅ lebih besar
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
       child: Row(
         children: [
           Container(
             width: 46,
-            height: 46, // ✅ lebih besar
+            height: 46,
             decoration: BoxDecoration(
               color: isDefault
                   ? const Color(0xFFE9EBFF)
