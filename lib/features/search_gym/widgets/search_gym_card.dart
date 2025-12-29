@@ -1,78 +1,87 @@
-// features/search_gym/widgets/gym_card.dart
+import 'package:chain_fit_app/features/search_gym/models/gym_search_model.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart' as shadcn;
-import '../model/search_gym_model.dart';
-import 'search_gym_widgets.dart';
 
 class SearchGymCard extends StatelessWidget {
-  final Gym gym;
-  final VoidCallback? onTap; // <-- tambahkan
+  final GymSearchItem gym;
+  final VoidCallback? onTap;
 
-  const SearchGymCard({super.key, required this.gym, this.onTap});
+  const SearchGymCard({
+    super.key,
+    required this.gym,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap, // <-- panggil saat ditekan
+    final imageUrl = gym.images.isNotEmpty
+        ? gym.images.first
+        : 'https://via.placeholder.com/600x400?text=Gym';
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
         child: shadcn.Card(
+          padding: EdgeInsets.zero,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // ===== IMAGE =====
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
+                  top: Radius.circular(14),
                 ),
-                child: Image.network(
-                  gym.images.isNotEmpty
-                      ? gym.images.first
-                      : 'https://via.placeholder.com/300',
-                  height: 160,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+                child: AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) {
+                      return Container(
+                        color: Colors.grey.shade200,
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.image_not_supported_outlined,
+                          size: 48,
+                          color: Colors.grey,
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
+
+              // ===== CONTENT =====
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          gym.name,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.star,
-                              color: Colors.amber,
-                              size: 18,
-                            ),
-                            // Text(
-                            //   gym.rating.toString(),
-                            //   style: const TextStyle(fontSize: 14),
-                            // ),
-                          ],
-                        ),
-                      ],
+                    // Nama Gym
+                    Text(
+                      gym.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
+
                     const SizedBox(height: 6),
+
+                    // Alamat
                     Row(
                       children: [
                         const Icon(
@@ -84,30 +93,86 @@ class SearchGymCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             gym.address,
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 13,
-                            ),
+                            maxLines: 1,
                             overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey,
+                            ),
                           ),
                         ),
-                        // Badge(
-                        //   label: Text("${gym.distance.toStringAsFixed(1)} km"),
-                        // ),
                       ],
                     ),
+
                     const SizedBox(height: 8),
-                    // Wrap(
-                    //   spacing: 6,
-                    //   runSpacing: -8,
-                    //   children: gym.tags.map((t) => GymBadge(t)).toList(),
-                    // ),
+
+                    // Jam Operasional
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.access_time,
+                          size: 16,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            gym.jamOperasional,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // Facilities (max 3)
+                    if (gym.facilities.isNotEmpty)
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: -6,
+                        children: gym.facilities
+                            .take(3)
+                            .map(
+                              (f) => _FacilityChip(label: f),
+                            )
+                            .toList(),
+                      ),
                   ],
                 ),
               ),
             ],
           ),
-        ).intrinsic(),
+        ),
+      ),
+    );
+  }
+}
+
+class _FacilityChip extends StatelessWidget {
+  final String label;
+
+  const _FacilityChip({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 12,
+          color: Colors.blue,
+        ),
       ),
     );
   }

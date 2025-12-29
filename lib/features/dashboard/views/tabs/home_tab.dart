@@ -1,4 +1,4 @@
-import 'package:chain_fit_app/features/search_gym/views/search_gym_views.dart.dart';
+import 'package:chain_fit_app/features/search_gym/views/search_gym_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/dashboard_viewmodel.dart';
@@ -145,7 +145,7 @@ class HomeTab extends StatelessWidget {
             // Logic navigasi manual disini jika diperlukan
             if (item['title'] == 'Cari Gym') {
                 // Navigator.push...
-                Navigator.push(context, MaterialPageRoute(builder: (_) => SearchGymView(accessToken: '<ACCESS_TOKEN>',)));
+                Navigator.push(context, MaterialPageRoute(builder: (_) => SearchGymView()));
             }
           },
           borderRadius: BorderRadius.circular(20),

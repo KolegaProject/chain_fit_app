@@ -1,6 +1,8 @@
 import 'package:chain_fit_app/features/auth/viewmodels/register_viewmodel.dart';
 import 'package:chain_fit_app/features/dashboard/viewmodels/dashboard_viewmodel.dart';
 import 'package:chain_fit_app/features/auth/views/register_screen.dart';
+import 'package:chain_fit_app/features/gym_preview/viewmodels/gym_preview_viewmodel.dart';
+import 'package:chain_fit_app/features/search_gym/viewmodels/search_gym_viewmodel.dart';
 import 'package:flutter/material.dart' as m;
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:provider/provider.dart';
@@ -61,6 +63,8 @@ class AppRouter extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
         ChangeNotifierProvider(create: (_) => RegisterViewModel()),
         ChangeNotifierProvider(create: (_) => DashboardViewModel()),
+        ChangeNotifierProvider(create: (_) => SearchGymViewModel()),
+        ChangeNotifierProvider(create: (_) => GymPreviewViewModel()),
       ],
       child: m.MaterialApp(
         debugShowCheckedModeBanner: false,

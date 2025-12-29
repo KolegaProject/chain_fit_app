@@ -75,7 +75,6 @@ flutter:
   uses-material-design: true
   assets:
     - .env
-    - lib/features/gymPreview/data.json
     - lib/assets/gymPreview/image1_app.jpg
     - lib/assets/gymPreview/image2_app.jfif
     - lib/assets/gymPreview/image3_app.jpg
