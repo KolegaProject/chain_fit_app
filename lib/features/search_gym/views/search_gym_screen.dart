@@ -75,6 +75,7 @@ class _SearchGymViewState extends State<SearchGymView> {
             final gym = vm.gyms[index];
             return SearchGymCard(
               gym: gym,
+              userPosition: vm.userLocation,
               onTap: () {
                 Navigator.push(
                   context,

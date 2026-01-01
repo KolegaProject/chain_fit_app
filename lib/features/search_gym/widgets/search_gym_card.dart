@@ -1,14 +1,17 @@
 import 'package:chain_fit_app/features/search_gym/models/gym_search_model.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart' as shadcn;
+import 'package:geolocator/geolocator.dart';
 
 class SearchGymCard extends StatelessWidget {
   final GymSearchItem gym;
+  final Position? userPosition; // Add this
   final VoidCallback? onTap;
 
   const SearchGymCard({
     super.key,
     required this.gym,
+    this.userPosition, // Add this
     this.onTap,
   });
 
@@ -17,6 +20,23 @@ class SearchGymCard extends StatelessWidget {
     final imageUrl = gym.images.isNotEmpty
         ? gym.images.first
         : 'https://via.placeholder.com/600x400?text=Gym';
+
+    // Calculate distance logic
+    String? distanceText;
+    if (userPosition != null && gym.latitude != 0 && gym.longitude != 0) {
+      final distanceInMeters = Geolocator.distanceBetween(
+        userPosition!.latitude,
+        userPosition!.longitude,
+        gym.latitude,
+        gym.longitude,
+      );
+
+      if (distanceInMeters < 1000) {
+        distanceText = '${distanceInMeters.toStringAsFixed(0)} m';
+      } else {
+        distanceText = '${(distanceInMeters / 1000).toStringAsFixed(1)} km';
+      }
+    }
 
     return InkWell(
       onTap: onTap,
@@ -69,6 +89,7 @@ class SearchGymCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Nama Gym
+                    // Nama Gym
                     Text(
                       gym.name,
                       maxLines: 1,
@@ -78,6 +99,28 @@ class SearchGymCard extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
+
+                    if (distanceText != null) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.directions_walk,
+                            size: 14,
+                            color: Colors.blue,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            "$distanceText dari lokasi anda",
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.blue,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
 
                     const SizedBox(height: 6),
 
@@ -138,9 +181,7 @@ class SearchGymCard extends StatelessWidget {
                         runSpacing: -6,
                         children: gym.facilities
                             .take(3)
-                            .map(
-                              (f) => _FacilityChip(label: f),
-                            )
+                            .map((f) => _FacilityChip(label: f))
                             .toList(),
                       ),
                   ],
@@ -169,10 +210,7 @@ class _FacilityChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: const TextStyle(
-          fontSize: 12,
-          color: Colors.blue,
-        ),
+        style: const TextStyle(fontSize: 12, color: Colors.blue),
       ),
     );
   }

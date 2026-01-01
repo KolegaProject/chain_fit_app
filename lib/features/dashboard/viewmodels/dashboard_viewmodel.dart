@@ -1,5 +1,7 @@
 import 'package:chain_fit_app/core/constants/api_constants.dart';
 import 'package:chain_fit_app/core/services/cache_service.dart';
+import 'package:chain_fit_app/core/services/location_service.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import '../../../core/services/api_service.dart';
@@ -9,6 +11,7 @@ import '../models/active_package_model.dart';
 class DashboardViewModel extends ChangeNotifier {
   final ApiService _apiService = ApiService();
   final CacheService _cacheService = CacheService();
+  final LocationService _locationService = LocationService();
 
   // State
   bool _isLoading = true;
@@ -17,6 +20,7 @@ class DashboardViewModel extends ChangeNotifier {
 
   UserProfileModel? _userProfile;
   List<ActivePackageModel> _activePackages = [];
+  Position? _currentPosition;
 
   // Getters
   bool get isLoading => _isLoading;
@@ -24,6 +28,7 @@ class DashboardViewModel extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   UserProfileModel? get user => _userProfile;
   List<ActivePackageModel> get packages => _activePackages;
+  Position? get currentPosition => _currentPosition;
 
   // Logic: User dianggap premium jika ada paket aktif
   bool get isPremium => _activePackages.isNotEmpty;
@@ -34,6 +39,9 @@ class DashboardViewModel extends ChangeNotifier {
     if (!forceRefresh) {
       await _loadFromCache();
 
+      // Load location in background if using cache
+      _getLocation();
+
       if (_userProfile != null) {
         _isLoading = false;
         notifyListeners();
@@ -42,6 +50,9 @@ class DashboardViewModel extends ChangeNotifier {
     } else {
       _isLoading = true;
       notifyListeners();
+
+      // Refresh location as well
+      await _getLocation();
     }
 
     try {
@@ -85,6 +96,9 @@ class DashboardViewModel extends ChangeNotifier {
       final packageCache = await _cacheService.getCache(
         ApiConstants.packageCacheKey,
       );
+      final locationCache = await _cacheService.getCache(
+        ApiConstants.userLocationCacheKey,
+      );
 
       if (profileCache != null) {
         _userProfile = UserProfileModel.fromJson(profileCache['data']);
@@ -96,8 +110,50 @@ class DashboardViewModel extends ChangeNotifier {
             .map((item) => ActivePackageModel.fromJson(item))
             .toList();
       }
+
+      if (locationCache != null && locationCache['data'] != null) {
+        _currentPosition = Position(
+          longitude: locationCache['data']['longitude'],
+          latitude: locationCache['data']['latitude'],
+          timestamp: DateTime.parse(locationCache['data']['timestamp']),
+          accuracy: locationCache['data']['accuracy'],
+          altitude: locationCache['data']['altitude'],
+          heading: locationCache['data']['heading'],
+          speed: locationCache['data']['speed'],
+          speedAccuracy: locationCache['data']['speedAccuracy'],
+          altitudeAccuracy: 0.0,
+          headingAccuracy: 0.0,
+        );
+      }
     } catch (e) {
       debugPrint("Cache rusak/error: $e");
+    }
+  }
+
+  Future<void> _getLocation() async {
+    try {
+      final hasPermission = await _locationService.requestPermission();
+      if (hasPermission) {
+        final position = await _locationService.getCurrentPosition();
+        if (position != null) {
+          _currentPosition = position;
+
+          _cacheService.saveCache(ApiConstants.userLocationCacheKey, {
+            'latitude': position.latitude,
+            'longitude': position.longitude,
+            'timestamp': position.timestamp.toIso8601String(),
+            'accuracy': position.accuracy,
+            'altitude': position.altitude,
+            'heading': position.heading,
+            'speed': position.speed,
+            'speedAccuracy': position.speedAccuracy,
+          });
+
+          if (!_isLoading) notifyListeners();
+        }
+      }
+    } catch (e) {
+      debugPrint("Error getting location: $e");
     }
   }
 }

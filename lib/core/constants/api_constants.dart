@@ -2,7 +2,8 @@ class ApiConstants {
   // Ini key untuk cache lokal
   static const String profileCacheKey = 'CACHE_PROFILE';
   static const String packageCacheKey = 'CACHE_PACKAGES';
-  
+  static const String userLocationCacheKey = 'CACHE_USER_LOCATION';
+
   static String gymDetailCacheKey(int gymId) => 'CACHE_GYM_DETAIL_$gymId';
   static String gymPackageCacheKey(int gymId) => 'CACHE_GYM_PACKAGE_$gymId';
 
@@ -15,5 +16,6 @@ class ApiConstants {
   static const String paymentEndpoint = '/api/v1/transaction/create-snap';
 
   static String gymDetailEndpoint(int gymId) => '/api/v1/gym/$gymId';
-  static String gymPackageEndpoint(int gymId) => '/api/v1/gym/$gymId/paket-member';
+  static String gymPackageEndpoint(int gymId) =>
+      '/api/v1/gym/$gymId/paket-member';
 }

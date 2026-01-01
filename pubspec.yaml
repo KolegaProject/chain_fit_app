@@ -53,6 +53,8 @@ dependencies:
   webview_flutter_android: ^4.10.11
   webview_flutter_wkwebview: ^3.23.5
   image_picker: ^1.2.1
+  geolocator: ^13.0.2
+  permission_handler: ^11.3.1
   
 dev_dependencies:
   flutter_test:
