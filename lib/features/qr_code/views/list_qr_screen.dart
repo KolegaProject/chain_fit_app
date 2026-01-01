@@ -1,7 +1,7 @@
+import 'package:chain_fit_app/features/qr_code/viewmodels/list_qr_viewmodel.dart';
+import 'package:chain_fit_app/features/qr_code/views/detail_qr_screen.dart';
 import 'package:flutter/material.dart';
-import '../../../core/services/api_service.dart';
-import '../models/list_qr_model.dart';
-import '../../detail_qr/views/detail_qr_view.dart';
+import 'package:provider/provider.dart';
 
 class MenuQrPage extends StatefulWidget {
   const MenuQrPage({super.key});
@@ -11,49 +11,21 @@ class MenuQrPage extends StatefulWidget {
 }
 
 class _MenuQrPageState extends State<MenuQrPage> {
-  final ApiService _apiService = ApiService();
-
-  List<MembershipModel> _memberships = [];
-  bool _isLoading = true;
-  String? _errorMessage;
-
   @override
   void initState() {
     super.initState();
-    _fetchMembershipData();
-  }
-
-  Future<void> _fetchMembershipData() async {
-    try {
-      setState(() {
-        _isLoading = true;
-        _errorMessage = null;
-      });
-
-      final data = await _apiService.getMyMemberships();
-
-      if (!mounted) return;
-      setState(() {
-        _memberships = data;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-        _errorMessage = e.toString();
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ListQrViewModel>().loadMemberships();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white, // ✅ background putih
+      color: Colors.white,
       child: SafeArea(
         child: Column(
           children: [
-            // ✅ Header custom (tanpa tombol back) + title beneran center
             Container(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
               child: Stack(
@@ -72,9 +44,13 @@ class _MenuQrPageState extends State<MenuQrPage> {
             ),
 
             Expanded(
-              child: RefreshIndicator(
-                onRefresh: _fetchMembershipData,
-                child: _buildBody(),
+              child: Consumer<ListQrViewModel>(
+                builder: (context, vm, child) {
+                  return RefreshIndicator(
+                    onRefresh: () => vm.loadMemberships(forceRefresh: true),
+                    child: _buildBody(vm),
+                  );
+                },
               ),
             ),
           ],
@@ -83,9 +59,9 @@ class _MenuQrPageState extends State<MenuQrPage> {
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(ListQrViewModel vm) {
     // Loading
-    if (_isLoading) {
+    if (vm.showFullScreenLoader) {
       return ListView(
         physics: AlwaysScrollableScrollPhysics(),
         children: [
@@ -96,7 +72,7 @@ class _MenuQrPageState extends State<MenuQrPage> {
     }
 
     // Error
-    if (_errorMessage != null) {
+    if (vm.showFullScreenError) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(20),
@@ -105,13 +81,13 @@ class _MenuQrPageState extends State<MenuQrPage> {
           const Icon(Icons.error_outline, size: 48, color: Colors.red),
           const SizedBox(height: 16),
           Text(
-            "Gagal memuat data:\n$_errorMessage",
+            "Gagal memuat data:\n${vm.showFullScreenError}",
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
           Center(
             child: ElevatedButton(
-              onPressed: _fetchMembershipData,
+              onPressed: () => vm.loadMemberships(forceRefresh: true),
               child: const Text("Coba Lagi"),
             ),
           ),
@@ -120,7 +96,7 @@ class _MenuQrPageState extends State<MenuQrPage> {
     }
 
     // Kosong
-    if (_memberships.isEmpty) {
+    if (vm.memberships.isEmpty) {
       return ListView(
         physics: AlwaysScrollableScrollPhysics(),
         children: [
@@ -134,9 +110,11 @@ class _MenuQrPageState extends State<MenuQrPage> {
     return ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
-      itemCount: _memberships.length,
+      itemCount: vm.memberships.length,
       itemBuilder: (context, index) {
-        final membership = _memberships[index];
+        final membership = vm.memberships[index];
+        print("tesssssssssssssssssssss");
+        print(vm.memberships[index]);
 
         return GestureDetector(
           onTap: () {

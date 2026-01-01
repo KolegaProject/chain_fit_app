@@ -18,7 +18,7 @@ class MembershipModel {
   // Fungsi untuk memetakan JSON ke Object Dart
   factory MembershipModel.fromJson(Map<String, dynamic> json) {
     return MembershipModel(
-      id: json['id'],
+      id: int.tryParse(json['id'].toString()) ?? 0,
       startDate: json['startDate'],
       endDate: json['endDate'],
       status: json['status'],
@@ -37,7 +37,7 @@ class GymModel {
 
   factory GymModel.fromJson(Map<String, dynamic> json) {
     return GymModel(
-      id: json['id'],
+      id: int.tryParse(json['id'].toString()) ?? 0,
       name: json['name'] ?? '',
       address: json['address'] ?? '',
     );
@@ -59,7 +59,7 @@ class PackageModel {
 
   factory PackageModel.fromJson(Map<String, dynamic> json) {
     return PackageModel(
-      id: json['id'],
+      id: int.tryParse(json['id'].toString()) ?? 0,
       name: json['name'] ?? '',
       price: json['price'] ?? '0',
       durationDays: json['durationDays'] ?? 0,

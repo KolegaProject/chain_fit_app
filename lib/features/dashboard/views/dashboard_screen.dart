@@ -1,4 +1,4 @@
-import 'package:chain_fit_app/features/list_qr/views/list_qr_view.dart'; // MenuQrPage
+import 'package:chain_fit_app/features/qr_code/views/list_qr_screen.dart';
 import 'package:chain_fit_app/features/profile/views/profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
