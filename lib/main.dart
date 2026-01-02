@@ -102,7 +102,7 @@ import 'package:chain_fit_app/features/dashboard/viewmodels/dashboard_viewmodel.
 // Asumsi path import untuk sisanya (sesuaikan jika merah):
 import 'package:chain_fit_app/features/search_gym/viewmodels/search_gym_viewmodel.dart';
 import 'package:chain_fit_app/features/gym_preview/viewmodels/gym_preview_viewmodel.dart';
-import 'package:chain_fit_app/features/onboarding/view/onboarding.dart';
+import 'package:chain_fit_app/features/qr_code/viewmodels/list_qr_viewmodel.dart';
 import 'package:chain_fit_app/features/qr_code/viewmodels/detail_qr_viewmodel.dart';
 
 void main() async {
@@ -138,16 +138,14 @@ class GymBroApp extends StatelessWidget {
       child: MaterialApp(
         title: 'GymBro',
         debugShowCheckedModeBanner: false,
-        routes: {
-          // '/': (context) => const LoginScreen(),
-          '/': (context) => const OnboardingScreen(),
-          '/membership_detail': (context) =>
-              MembershipDetailPage(data: dummyMembership),
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          scaffoldBackgroundColor: Colors.white,
+          fontFamily: 'SF Pro',
+        ),
 
-          '/login': (context) => const LoginScreen(),
-          '/register': (context) => const RegisterScreen(),
-          '/dashboard': (context) => DashboardScreen(),
-        },
+        // Ganti Home ke Halaman Kamu buat Testing
+        home: const LoginScreen(),
       ),
     );
   }
