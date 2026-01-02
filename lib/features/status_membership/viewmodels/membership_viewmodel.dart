@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:chain_fit_app/core/services/api_service.dart';
 
 class MembershipViewModel extends ChangeNotifier {
-<<<<<<< HEAD
-=======
   // Inject ApiService
->>>>>>> 87dcd510fbe4fa49c82be5453e673e0dd064a1ed
   final ApiService _apiService = ApiService();
 
   Membership? _membership;
