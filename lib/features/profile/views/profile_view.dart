@@ -1,5 +1,9 @@
 import 'dart:io';
 
+import 'package:chain_fit_app/core/constants/api_constants.dart';
+import 'package:chain_fit_app/core/services/cache_service.dart';
+import 'package:chain_fit_app/core/services/storage_service.dart';
+import 'package:chain_fit_app/features/profile/service/logout_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -253,6 +257,34 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
+  Future<void> _logout() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Logout"),
+        content: const Text("Yakin ingin keluar dari akun ini?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text("Batal"),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text("Logout"),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    await AuthLogout().logout();
+
+    if (!mounted) return;
+
+    Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -263,12 +295,13 @@ class _ProfilePageState extends State<ProfilePage> {
         elevation: 0,
         backgroundColor: const Color(0xFFF5F6FA),
         foregroundColor: Colors.black,
-        // actions: [
-        //   IconButton(
-        //     icon: const Icon(Icons.edit),
-        //     onPressed: _data == null ? null : _openEditProfileSheet,
-        //   ),
-        // ],
+        actions: [
+          IconButton(
+            tooltip: "Logout",
+            icon: const Icon(Icons.logout_rounded),
+            onPressed: _logout,
+          ),
+        ],
       ),
       body: RefreshIndicator(onRefresh: _fetchProfile, child: _buildBody()),
     );

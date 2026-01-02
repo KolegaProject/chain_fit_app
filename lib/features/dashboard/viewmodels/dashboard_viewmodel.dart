@@ -55,32 +55,66 @@ class DashboardViewModel extends ChangeNotifier {
       await _getLocation();
     }
 
+    // try {
+    //   final responses = await Future.wait([
+    //     _apiService.client.get(ApiConstants.userProfileEndpoint),
+    //     _apiService.client.get(ApiConstants.activePackageEndpoint),
+    //   ]);
+
+    //   final profileData = responses[0].data;
+    //   final packageData = responses[1].data;
+
+    //   _userProfile = UserProfileModel.fromJson(profileData);
+
+    //   final List rawList = packageData['data'] ?? [];
+    //   _activePackages = rawList
+    //       .map((item) => ActivePackageModel.fromJson(item))
+    //       .toList();
+
+    //   _cacheService.saveCache(ApiConstants.profileCacheKey, profileData);
+    //   _cacheService.saveCache(ApiConstants.packageCacheKey, packageData);
+    // } on DioException catch (e) {
+    //   if (_userProfile == null) {
+    //     _errorMessage = e.response?.data['message'] ?? "Gagal memuat data";
+    //   } else {
+    //     debugPrint("Gagal update background: ${e.message}");
+    //   }
+    // } catch (e) {
+    //   if (_userProfile == null) _errorMessage = "Terjadi kesalahan sistem";
+    // } finally {
+    //   _isLoading = false;
+    //   _isRefetching = false;
+    //   notifyListeners();
+    // }
     try {
-      final responses = await Future.wait([
-        _apiService.client.get(ApiConstants.userProfileEndpoint),
-        _apiService.client.get(ApiConstants.activePackageEndpoint),
-      ]);
-
-      final profileData = responses[0].data;
-      final packageData = responses[1].data;
-
+      // 1) Profile WAJIB berhasil
+      final profileRes = await _apiService.client.get(
+        ApiConstants.userProfileEndpoint,
+      );
+      final profileData = profileRes.data;
       _userProfile = UserProfileModel.fromJson(profileData);
-
-      final List rawList = packageData['data'] ?? [];
-      _activePackages = rawList
-          .map((item) => ActivePackageModel.fromJson(item))
-          .toList();
-
       _cacheService.saveCache(ApiConstants.profileCacheKey, profileData);
-      _cacheService.saveCache(ApiConstants.packageCacheKey, packageData);
-    } on DioException catch (e) {
-      if (_userProfile == null) {
-        _errorMessage = e.response?.data['message'] ?? "Gagal memuat data";
-      } else {
-        debugPrint("Gagal update background: ${e.message}");
+
+      try {
+        final packageRes = await _apiService.client.get(
+          ApiConstants.activePackageEndpoint,
+        );
+        final packageData = packageRes.data;
+
+        final List rawList = (packageData['data'] ?? []) as List;
+        _activePackages = rawList
+            .map((item) => ActivePackageModel.fromJson(item))
+            .toList();
+
+        _cacheService.saveCache(ApiConstants.packageCacheKey, packageData);
+      } on DioException catch (e) {
+        debugPrint("Package endpoint error: ${e.response?.statusCode}");
+        _activePackages = []; // ✅ aman
       }
+    } on DioException catch (e) {
+      _errorMessage = e.response?.data['message'] ?? "Gagal memuat data";
     } catch (e) {
-      if (_userProfile == null) _errorMessage = "Terjadi kesalahan sistem";
+      _errorMessage = "Terjadi kesalahan sistem";
     } finally {
       _isLoading = false;
       _isRefetching = false;
