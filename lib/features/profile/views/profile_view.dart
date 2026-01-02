@@ -1,8 +1,11 @@
 import 'dart:io';
 
+
+import 'package:chain_fit_app/features/dashboard/viewmodels/dashboard_viewmodel.dart';
 import 'package:chain_fit_app/features/profile/service/logout_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 import '../model/profile_model.dart';
 import '../service/profile_service.dart';
@@ -16,6 +19,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final ProfileService _service = ProfileService();
+  // final cache = CacheService();
   final ImagePicker _picker = ImagePicker();
 
   ProfileData? _data;
@@ -117,6 +121,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 }
 
                 await _fetchProfile();
+
+                // await cache.removeCache(ApiConstants.profileCacheKey);
+
+                if (mounted) {
+                  context.read<DashboardViewModel>().loadDashboardData(
+                    forceRefresh: true,
+                  );
+                }
 
                 if (!mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
