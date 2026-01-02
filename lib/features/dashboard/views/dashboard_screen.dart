@@ -1,5 +1,6 @@
 import 'package:chain_fit_app/features/qr_code/views/list_qr_screen.dart';
 import 'package:chain_fit_app/features/profile/views/profile_view.dart';
+import 'package:chain_fit_app/features/status_membership/views/membership_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -18,7 +19,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   final List<Widget> _pages = [
     HomeTab(), // 0
-    Center(child: Text("Halaman Progres")), // 1
+    MembershipDetailPage(), // 1
     MenuQrPage(), // 2 (QR List)
     ProfilePage(), // 3
   ];

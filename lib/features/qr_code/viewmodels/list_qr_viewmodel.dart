@@ -14,6 +14,7 @@ class ListQrViewModel extends ChangeNotifier {
   String? _errorMessage;
 
   List<MembershipModel> get memberships => _memberships;
+  bool get isRefetching => _isRefetching;
   bool get showFullScreenLoader => _isLoading && _memberships.isEmpty;
   bool get showFullScreenError => _errorMessage != null && _memberships.isEmpty;
 

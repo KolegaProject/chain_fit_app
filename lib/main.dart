@@ -5,16 +5,13 @@ import 'package:chain_fit_app/features/gym_preview/viewmodels/gym_preview_viewmo
 import 'package:chain_fit_app/features/qr_code/viewmodels/detail_qr_viewmodel.dart';
 import 'package:chain_fit_app/features/search_gym/viewmodels/search_gym_viewmodel.dart';
 import 'package:chain_fit_app/features/qr_code/viewmodels/list_qr_viewmodel.dart';
+import 'package:chain_fit_app/features/status_membership/viewmodels/membership_viewmodel.dart';
 import 'package:flutter/material.dart' as m;
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:chain_fit_app/features/dashboard/views/dashboard_screen.dart';
-
-import 'package:chain_fit_app/features/status_membership/models/membership_models.dart';
-import 'package:chain_fit_app/features/status_membership/view/membership_detail_page.dart';
-
 import 'features/auth/viewmodels/login_viewmodel.dart';
 import 'features/auth/views/login_screen.dart';
 
@@ -28,18 +25,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //ini apus
-    final dummyMembership = Membership(
-      gymName: "Uget Uget Gym",
-      type: "Premium Bulanan",
-      startDate: DateTime(2025, 1, 10),
-      endDate: DateTime(2026, 2, 10),
-      sisaHari: 30,
-      isActive: true,
-    );
-
-    //
-
     return ShadcnApp(
       title: 'Chain Fit App',
       debugShowCheckedModeBanner: false,
@@ -47,16 +32,14 @@ class MyApp extends StatelessWidget {
         colorScheme: LegacyColorSchemes.lightGray(),
         radius: 0.7,
       ),
-      home: AppRouter(dummyMembership: dummyMembership),
+      home: const AppRouter(),
     );
   }
 }
 
 // TAMBAHKAN INI
 class AppRouter extends StatelessWidget {
-  final Membership dummyMembership;
-
-  const AppRouter({super.key, required this.dummyMembership});
+  const AppRouter({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -69,14 +52,12 @@ class AppRouter extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => GymPreviewViewModel()),
         ChangeNotifierProvider(create: (_) => ListQrViewModel()),
         ChangeNotifierProvider(create: (_) => DetailQrViewModel()),
+        ChangeNotifierProvider(create: (_) => MembershipViewModel()),
       ],
       child: m.MaterialApp(
         debugShowCheckedModeBanner: false,
         routes: {
           '/': (context) => const LoginScreen(),
-          '/membership_detail': (context) =>
-              MembershipDetailPage(data: dummyMembership),
-
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
           '/dashboard': (context) => DashboardScreen(),
