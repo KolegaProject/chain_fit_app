@@ -1,10 +1,6 @@
 import 'package:chain_fit_app/features/qr_code/views/list_qr_screen.dart';
 import 'package:chain_fit_app/features/profile/views/profile_view.dart';
-<<<<<<< HEAD
-import 'package:chain_fit_app/features/status_membership/views/membership_list_page.dart';
-=======
 import 'package:chain_fit_app/features/status_membership/views/membership_detail_screen.dart';
->>>>>>> 87dcd510fbe4fa49c82be5453e673e0dd064a1ed
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -23,11 +19,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   final List<Widget> _pages = [
     HomeTab(), // 0
-<<<<<<< HEAD
-    MembershipListPage(), // 1
-=======
     MembershipDetailPage(), // 1
->>>>>>> 87dcd510fbe4fa49c82be5453e673e0dd064a1ed
     MenuQrPage(), // 2 (QR List)
     ProfilePage(), // 3
   ];
