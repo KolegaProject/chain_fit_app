@@ -1,3 +1,4 @@
+import 'package:chain_fit_app/core/services/cache_service.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import '../../../core/constants/api_constants.dart';
@@ -9,6 +10,7 @@ class LoginViewModel extends ChangeNotifier {
   // Dependency
   final ApiService _apiService = ApiService();
   final StorageService _storageService = StorageService();
+  final CacheService _cacheService = CacheService();
 
   // State
   bool _isLoading = false;
@@ -43,6 +45,10 @@ class LoginViewModel extends ChangeNotifier {
         accessToken: loginResponse.accessToken,
         refreshToken: loginResponse.refreshToken,
       );
+
+      await _cacheService.removeCache(ApiConstants.profileCacheKey);
+      await _cacheService.removeCache(ApiConstants.packageCacheKey);
+      await _cacheService.removeCache(ApiConstants.userLocationCacheKey);
 
       return true; // Login Sukses
     } on DioException catch (e) {

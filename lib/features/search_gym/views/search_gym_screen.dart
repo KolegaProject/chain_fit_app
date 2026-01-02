@@ -35,7 +35,21 @@ class _SearchGymViewState extends State<SearchGymView> {
     final vm = context.watch<SearchGymViewModel>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Cari Gym')),
+      appBar: AppBar(
+        title: const Text('Cari Gym'),
+        leading: Navigator.canPop(context)
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+                onPressed: () {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/dashboard',
+                    (_) => false,
+                  );
+                },
+              ),
+      ),
       body: Column(
         children: [
           Padding(

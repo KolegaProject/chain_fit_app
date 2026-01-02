@@ -81,7 +81,8 @@ class _MenuQrPageState extends State<MenuQrPage> {
           const Icon(Icons.error_outline, size: 48, color: Colors.red),
           const SizedBox(height: 16),
           Text(
-            "Gagal memuat data:\n${vm.showFullScreenError}",
+            // "Gagal memuat data:\n${vm.showFullScreenError}",
+            "Gagal memuat data:\n${vm.errorMessage ?? '-'}",
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
