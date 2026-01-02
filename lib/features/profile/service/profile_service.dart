@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:chain_fit_app/core/constants/api_constants.dart';
 import 'package:dio/dio.dart';
 import '../../../core/services/api_service.dart';
 import '../model/profile_model.dart';
@@ -18,6 +19,7 @@ class ProfileService {
           'API error: code=${parsed.code}, status=${parsed.status}',
         );
       }
+
       return parsed.data;
     } on DioException catch (e) {
       final msg =
