@@ -3,8 +3,10 @@ import 'package:chain_fit_app/features/dashboard/viewmodels/dashboard_viewmodel.
 import 'package:chain_fit_app/features/auth/views/register_screen.dart';
 import 'package:chain_fit_app/features/gym_preview/viewmodels/gym_preview_viewmodel.dart';
 import 'package:chain_fit_app/features/qr_code/viewmodels/detail_qr_viewmodel.dart';
+import 'package:chain_fit_app/features/screen/onboarding/onboarding_1_screen.dart';
 import 'package:chain_fit_app/features/search_gym/viewmodels/search_gym_viewmodel.dart';
 import 'package:chain_fit_app/features/qr_code/viewmodels/list_qr_viewmodel.dart';
+import 'package:chain_fit_app/features/status_membership/viewmodels/membership_list_viewmodel.dart';
 import 'package:chain_fit_app/features/status_membership/viewmodels/membership_viewmodel.dart';
 import 'package:flutter/material.dart' as m;
 import 'package:shadcn_flutter/shadcn_flutter.dart';
@@ -53,11 +55,13 @@ class AppRouter extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ListQrViewModel()),
         ChangeNotifierProvider(create: (_) => DetailQrViewModel()),
         ChangeNotifierProvider(create: (_) => MembershipViewModel()),
+        ChangeNotifierProvider(create: (_) => MembershipListViewModel()),
       ],
       child: m.MaterialApp(
         debugShowCheckedModeBanner: false,
         routes: {
-          '/': (context) => const LoginScreen(),
+          // '/': (context) => const LoginScreen(),
+          '/': (context) => const Onboarding1Screen(),
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
           '/dashboard': (context) => DashboardScreen(),

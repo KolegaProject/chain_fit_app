@@ -52,7 +52,7 @@ class PaymentMethodPage extends StatelessWidget {
     if (confirm != true) return;
 
     final success = await vm.createPayment(
-      gymId: selectedPackage.id,
+      gymId: gymId,
       packageId: selectedPackage.id,
     );
 
@@ -72,22 +72,19 @@ class PaymentMethodPage extends StatelessWidget {
       ),
     );
 
+    if (!context.mounted) return;
+
+    // result bisa null (user keluar dari webview tanpa selesai)
     if (result == PaymentResult.success) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Pembayaran berhasil ✅")));
+
+      Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (_) => false);
     } else if (result == PaymentResult.failed) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Pembayaran gagal ❌")));
-    }
-
-    if (result == true && context.mounted) {
-      Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (_) => false);
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Pembayaran berhasil ✅")));
     }
   }
 

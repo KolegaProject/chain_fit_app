@@ -35,10 +35,8 @@ class _MembershipListPageState extends State<MembershipListPage> {
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false,
+        leading: const SizedBox.shrink(),
       ),
       body: Consumer<MembershipListViewModel>(
         builder: (context, vm, child) {
@@ -61,8 +59,7 @@ class _MembershipListPageState extends State<MembershipListPage> {
           }
 
           return RefreshIndicator(
-            onRefresh: () =>
-                vm.fetchMembershipList(), 
+            onRefresh: () => vm.fetchMembershipList(),
             child: ListView.separated(
               padding: const EdgeInsets.all(20),
               itemCount: vm.membershipList.length,
@@ -144,14 +141,13 @@ class _MembershipListPageState extends State<MembershipListPage> {
   }
 
   Widget _buildStatusBadge(String statusRaw) {
-    final status = statusRaw
-        .toLowerCase(); 
+    final status = statusRaw.toLowerCase();
 
     Color bgColor = Colors.transparent;
     Color textColor = Colors.black87;
     FontWeight fontWeight = FontWeight.normal;
     EdgeInsets padding = EdgeInsets.zero;
-    String textToShow = statusRaw; 
+    String textToShow = statusRaw;
 
     if (status == 'pending') {
       bgColor = Colors.orange;

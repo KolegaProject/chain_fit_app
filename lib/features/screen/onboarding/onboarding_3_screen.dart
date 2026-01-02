@@ -1,3 +1,4 @@
+import 'package:chain_fit_app/features/onboarding/view/onboarding.dart';
 import 'package:flutter/material.dart';
 import 'onboarding_4_screen.dart';
 
@@ -67,7 +68,7 @@ class Onboarding3Screen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const Onboarding4Screen(),
+                          builder: (_) => const OnboardingScreen(),
                         ),
                       );
                     },

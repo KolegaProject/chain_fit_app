@@ -259,6 +259,8 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
         title: const Text("Profil"),
+        automaticallyImplyLeading: false,
+        leading: const SizedBox.shrink(),
         centerTitle: true,
         elevation: 0,
         backgroundColor: const Color(0xFFF5F6FA),
