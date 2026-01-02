@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:chain_fit_app/core/services/api_service.dart';
 
 class MembershipViewModel extends ChangeNotifier {
+<<<<<<< HEAD
+=======
+  // Inject ApiService
+>>>>>>> 87dcd510fbe4fa49c82be5453e673e0dd064a1ed
   final ApiService _apiService = ApiService();
 
   Membership? _membership;
@@ -21,8 +25,21 @@ class MembershipViewModel extends ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
+        debugPrint("Membership API Response: ${response.data}");
         final data = response.data['data'];
-        _membership = Membership.fromJson(data);
+
+        if (data != null && data is List && data.isNotEmpty) {
+          // Ambil data pertama dari list
+          _membership = Membership.fromJson(data[0]);
+        } else if (data is Map<String, dynamic>) {
+          _membership = Membership.fromJson(data);
+        } else {
+          debugPrint("Membership data format invalid or empty");
+        }
+      } else {
+        debugPrint(
+          "Membership API Error: ${response.statusCode} - ${response.statusMessage}",
+        );
       }
     } catch (e) {
       debugPrint("Error fetching membership: $e");

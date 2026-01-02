@@ -12,9 +12,14 @@ class ListQrViewModel extends ChangeNotifier {
   bool _isRefetching = false;
   String? _errorMessage;
 
+<<<<<<< HEAD
   List<MembershipModel> _memberships = [];
 
   // Getters (dipakai UI)
+=======
+  List<MembershipModel> get memberships => _memberships;
+  bool get isRefetching => _isRefetching;
+>>>>>>> 87dcd510fbe4fa49c82be5453e673e0dd064a1ed
   bool get showFullScreenLoader => _isLoading && _memberships.isEmpty;
   bool get showRefetchingIndicator => _isRefetching;
   bool get showFullScreenError => _errorMessage != null && _memberships.isEmpty;
