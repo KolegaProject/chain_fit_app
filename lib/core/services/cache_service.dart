@@ -26,9 +26,4 @@ class CacheService {
     final diff = DateTime.now().difference(savedTime);
     return diff.inMinutes < expirationInMinutes;
   }
-
-  Future<void> removeCache(String key) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(key);
-  }
 }

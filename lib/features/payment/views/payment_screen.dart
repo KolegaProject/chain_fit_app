@@ -52,7 +52,7 @@ class PaymentMethodPage extends StatelessWidget {
     if (confirm != true) return;
 
     final success = await vm.createPayment(
-      gymId: gymId, // ✅ FIX: pakai gymId dari page
+      gymId: selectedPackage.id,
       packageId: selectedPackage.id,
     );
 
@@ -72,18 +72,22 @@ class PaymentMethodPage extends StatelessWidget {
       ),
     );
 
-    if (!context.mounted) return;
-
     if (result == PaymentResult.success) {
-      // ✅ Redirect ke homepage/dashboard
-      Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (_) => false);
-
-      // Kalau kamu mau snackbar tetap tampil setelah pindah halaman,
-      // idealnya tampilkan snackbar di halaman dashboard-nya.
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Pembayaran berhasil ✅")));
     } else if (result == PaymentResult.failed) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Pembayaran gagal ❌")));
+    }
+
+    if (result == true && context.mounted) {
+      Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (_) => false);
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Pembayaran berhasil ✅")));
     }
   }
 

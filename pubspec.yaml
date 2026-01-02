@@ -80,13 +80,6 @@ flutter:
   assets:
     - .env
     - lib/assets/video_panduan/
-<<<<<<< HEAD
-    - lib/assets/gymPreview/ugetUget.jpg
-    - lib/assets/gymPreview/ugetUget1.jpg
-    - lib/assets/gymPreview/ugetUget2.jpg
-    - lib/assets/image/gym_screen.png
-=======
->>>>>>> 87dcd510fbe4fa49c82be5453e673e0dd064a1ed
 
 
   # To add assets to your application, add an assets section, like this:

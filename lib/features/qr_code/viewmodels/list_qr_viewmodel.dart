@@ -1,86 +1,65 @@
-import 'package:dio/dio.dart';
+import 'package:chain_fit_app/core/constants/api_constants.dart';
+import 'package:chain_fit_app/core/services/api_service.dart';
+import 'package:chain_fit_app/core/services/cache_service.dart';
+import 'package:chain_fit_app/features/qr_code/models/list_qr_model.dart';
 import 'package:flutter/material.dart';
-
-import '../../../core/constants/api_constants.dart';
-import '../../../core/services/api_service.dart';
-import '../models/list_qr_model.dart';
 
 class ListQrViewModel extends ChangeNotifier {
   final ApiService _apiService = ApiService();
+  final CacheService _cacheService = CacheService();
 
-  bool _isLoading = false;
+  List<MembershipModel> _memberships = [];
+  bool _isLoading = true;
   bool _isRefetching = false;
   String? _errorMessage;
 
-  List<MembershipModel> _memberships = [];
-
-  // Getters (dipakai UI)
   List<MembershipModel> get memberships => _memberships;
   bool get isRefetching => _isRefetching;
   bool get showFullScreenLoader => _isLoading && _memberships.isEmpty;
-  bool get showRefetchingIndicator => _isRefetching;
   bool get showFullScreenError => _errorMessage != null && _memberships.isEmpty;
-
-  String? get errorMessage => _errorMessage;
 
   Future<void> loadMemberships({bool forceRefresh = false}) async {
     _errorMessage = null;
 
-    if (forceRefresh) {
-      _isRefetching = true;
+    if (!forceRefresh) {
+      await _loadFromDashboardCache();
+
+      if (_memberships.isNotEmpty) {
+        _isLoading = false;
+        _isRefetching = true;
+        notifyListeners();
+      }
     } else {
       _isLoading = true;
+      notifyListeners();
     }
-    notifyListeners();
 
     try {
-      // ✅ PAKAI API CONSTANT KAMU YANG LAMA DI SINI
-      final res = await _apiService.client.get(
+      final response = await _apiService.client.get(
         ApiConstants.activePackageEndpoint,
       );
 
-      final body = res.data;
-
-      // Backend bisa balikin data null (anggap kosong)
-      final raw = (body is Map) ? body['data'] : null;
-
-      if (raw == null) {
-        _memberships = [];
-      } else if (raw is List) {
-        _memberships = raw.map((e) => MembershipModel.fromJson(e)).toList();
-      } else {
-        // kalau bentuknya aneh, tetap jangan crash
-        _memberships = [];
-      }
-    } on DioException catch (e) {
-      final status = e.response?.statusCode;
-      final body = e.response?.data;
-
-      final msg = (body is Map && body['errors'] is Map)
-          ? (body['errors']['message']?.toString().toLowerCase())
-          : null;
-
-      // ✅ CASE KHUSUS: belum langganan -> bukan error, tapi empty state
-      if (status == 404 && msg == 'membership not found') {
-        _memberships = [];
-        _errorMessage = null;
-      } else {
-        // Error beneran
-        if (body is Map) {
-          _errorMessage =
-              body['errors']?['message']?.toString() ??
-              body['message']?.toString() ??
-              'Gagal memuat membership';
-        } else {
-          _errorMessage = 'Gagal memuat membership';
-        }
-      }
+      final List rawList = response.data['data'] ?? [];
+      _memberships = rawList.map((e) => MembershipModel.fromJson(e)).toList();
     } catch (e) {
-      _errorMessage = 'Terjadi kesalahan: $e';
+      if (_memberships.isEmpty) {
+        _errorMessage = "Gagal memuat data membership";
+      }
     } finally {
       _isLoading = false;
       _isRefetching = false;
       notifyListeners();
     }
+  }
+
+  Future<void> _loadFromDashboardCache() async {
+    try {
+      final cache = await _cacheService.getCache(ApiConstants.packageCacheKey);
+
+      if (cache != null) {
+        final List rawList = cache['data']['data'] ?? [];
+        _memberships = rawList.map((e) => MembershipModel.fromJson(e)).toList();
+      }
+    } catch (_) {}
   }
 }
