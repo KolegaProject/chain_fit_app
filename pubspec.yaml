@@ -39,6 +39,7 @@ dependencies:
   shadcn_flutter: ^0.0.44
   flutter_local_notifications: ^19.5.0
   http: ^1.6.0
+  youtube_player_flutter: ^9.0.0
   video_player: ^2.8.2
   chewie: ^1.7.1
   

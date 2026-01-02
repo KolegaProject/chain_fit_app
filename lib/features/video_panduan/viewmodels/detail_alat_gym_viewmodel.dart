@@ -1,70 +1,39 @@
-import 'package:chain_fit_app/features/video_panduan/model/equipment_model.dart';
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+
+import '../model/equipment_model.dart';
 
 class DetailAlatGymViewModel extends ChangeNotifier {
   final GymEquipment item;
   DetailAlatGymViewModel({required this.item});
 
+  YoutubePlayerController? _youtubeController;
   VideoPlayerController? _videoController;
   ChewieController? _chewieController;
 
   bool _ready = false;
   String? _videoError;
 
+  // ================= GETTERS =================
+  GymEquipment get equipment => item;
   bool get ready => _ready;
   String? get videoError => _videoError;
+
+  YoutubePlayerController? get youtubeController => _youtubeController;
   ChewieController? get chewieController => _chewieController;
 
   bool get hasVideo =>
-      (item.videoUrl != null && item.videoUrl!.trim().isNotEmpty);
+      item.videoUrl != null && item.videoUrl!.trim().isNotEmpty;
 
-  bool get isYoutube {
-    final url = item.videoUrl?.trim() ?? '';
-    final uri = Uri.tryParse(url);
-    final host = (uri?.host ?? '').toLowerCase();
-    return host.contains('youtube.com') ||
-        host.contains('youtu.be') ||
-        host.contains('m.youtube.com');
-  }
+  bool get isYoutube =>
+      YoutubePlayer.convertUrlToId(item.videoUrl ?? '') != null;
 
-  String? get youtubeId {
-    final url = item.videoUrl?.trim() ?? '';
-    final uri = Uri.tryParse(url);
-    if (uri == null) return null;
+  String? get youtubeId =>
+      YoutubePlayer.convertUrlToId(item.videoUrl ?? '');
 
-    final host = uri.host.toLowerCase();
-
-    // youtu.be/<id>
-    if (host.contains('youtu.be')) {
-      if (uri.pathSegments.isEmpty) return null;
-      return uri.pathSegments.first;
-    }
-
-    // youtube.com/shorts/<id>
-    if (uri.pathSegments.isNotEmpty && uri.pathSegments.first == 'shorts') {
-      if (uri.pathSegments.length < 2) return null;
-      return uri.pathSegments[1];
-    }
-
-    // youtube.com/watch?v=<id>
-    final v = uri.queryParameters['v'];
-    if (v != null && v.isNotEmpty) return v;
-
-    return null;
-  }
-
-  /// URL embed untuk WebView
-  Uri? get youtubeEmbedUri {
-    final id = youtubeId;
-    if (id == null || id.trim().isEmpty) return null;
-    // playsinline=1 biar ga maksa fullscreen, rel=0 biar ga random video lain
-    return Uri.parse(
-      'https://www.youtube.com/embed/$id?playsinline=1&rel=0&modestbranding=1',
-    );
-  }
-
+  // ================= INIT =================
   Future<void> init() async {
     _ready = false;
     _videoError = null;
@@ -76,37 +45,52 @@ class DetailAlatGymViewModel extends ChangeNotifier {
       return;
     }
 
-    // YouTube: gak perlu init apa-apa, WebView yang handle
+    // ===== YOUTUBE =====
     if (isYoutube) {
-      if (youtubeEmbedUri == null) {
+      final id = youtubeId;
+      if (id == null) {
         _videoError = 'Link YouTube tidak valid';
+      } else {
+        _youtubeController = YoutubePlayerController(
+          initialVideoId: id,
+          flags: const YoutubePlayerFlags(
+            autoPlay: false,
+            mute: false,
+            enableCaption: true,
+          ),
+        );
       }
+
       _ready = true;
       notifyListeners();
       return;
     }
 
-    // Direct video: mp4/hls -> Chewie
+    // ===== MP4 / HLS =====
     try {
-      final url = item.videoUrl!.trim();
-      _videoController = VideoPlayerController.networkUrl(Uri.parse(url));
+      _videoController = VideoPlayerController.networkUrl(
+        Uri.parse(item.videoUrl!.trim()),
+      );
       await _videoController!.initialize();
 
       _chewieController = ChewieController(
         videoPlayerController: _videoController!,
         autoPlay: false,
         looping: false,
+        allowFullScreen: true,
       );
     } catch (_) {
-      _videoError = 'Video tidak dapat diputar (link bukan mp4/hls)';
+      _videoError = 'Video tidak dapat diputar';
     }
 
     _ready = true;
     notifyListeners();
   }
 
+  // ================= DISPOSE =================
   @override
   void dispose() {
+    _youtubeController?.dispose();
     _chewieController?.dispose();
     _videoController?.dispose();
     super.dispose();

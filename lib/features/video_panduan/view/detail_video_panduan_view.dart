@@ -1,9 +1,10 @@
-import 'package:chain_fit_app/features/video_panduan/model/equipment_model.dart';
-import 'package:chain_fit_app/features/video_panduan/viewmodels/detail_alat_gym_viewmodel.dart';
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:chewie/chewie.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+
+import '../model/equipment_model.dart';
+import '../viewmodels/detail_alat_gym_viewmodel.dart';
 
 class DetailAlatGymPage extends StatelessWidget {
   final GymEquipment item;
@@ -24,7 +25,7 @@ class _DetailAlatGymView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<DetailAlatGymViewModel>();
-    final item = vm.item;
+    final item = vm.equipment;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -81,8 +82,9 @@ class _DetailAlatGymView extends StatelessWidget {
     );
   }
 
+  // ================= MEDIA =================
   Widget _buildMedia(DetailAlatGymViewModel vm) {
-    final item = vm.item;
+    final item = vm.equipment;
 
     if (!vm.ready) {
       return const SizedBox(
@@ -92,24 +94,19 @@ class _DetailAlatGymView extends StatelessWidget {
     }
 
     if (vm.hasVideo) {
-      // ===== YouTube in-app via WebView =====
-      if (vm.isYoutube) {
-        final uri = vm.youtubeEmbedUri;
-        if (uri == null) {
-          return SizedBox(
-            height: 220,
-            child: Center(
-              child: Text(vm.videoError ?? 'Link YouTube tidak valid'),
-            ),
-          );
-        }
+      // ===== YOUTUBE =====
+      if (vm.isYoutube && vm.youtubeController != null) {
         return AspectRatio(
           aspectRatio: 16 / 9,
-          child: _YoutubeWebView(url: uri),
+          child: YoutubePlayer(
+            controller: vm.youtubeController!,
+            showVideoProgressIndicator: true,
+            progressIndicatorColor: Colors.red,
+          ),
         );
       }
 
-      // ===== mp4/hls via Chewie =====
+      // ===== MP4 / HLS =====
       if (vm.chewieController != null) {
         return AspectRatio(
           aspectRatio: 16 / 9,
@@ -117,15 +114,13 @@ class _DetailAlatGymView extends StatelessWidget {
         );
       }
 
-      return SizedBox(
+      return const SizedBox(
         height: 220,
-        child: Center(
-          child: Text(vm.videoError ?? 'Video tidak dapat diputar'),
-        ),
+        child: Center(child: Text('Video tidak dapat diputar')),
       );
     }
 
-    // ===== Foto =====
+    // ===== FOTO =====
     final photo = item.photo;
     if (photo == null || photo.trim().isEmpty) {
       return const SizedBox(
@@ -139,44 +134,6 @@ class _DetailAlatGymView extends StatelessWidget {
       height: 220,
       width: double.infinity,
       fit: BoxFit.cover,
-    );
-  }
-}
-
-class _YoutubeWebView extends StatefulWidget {
-  final Uri url;
-  const _YoutubeWebView({required this.url});
-
-  @override
-  State<_YoutubeWebView> createState() => _YoutubeWebViewState();
-}
-
-class _YoutubeWebViewState extends State<_YoutubeWebView> {
-  late final WebViewController _controller;
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0xFF000000))
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageFinished: (_) => setState(() => _loading = false),
-          onWebResourceError: (_) => setState(() => _loading = false),
-        ),
-      )
-      ..loadRequest(widget.url);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        WebViewWidget(controller: _controller),
-        if (_loading) const Center(child: CircularProgressIndicator()),
-      ],
     );
   }
 }
