@@ -24,7 +24,16 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
     if (_handled) return;
     _handled = true;
 
-    Navigator.pop(context, result);
+    if (result == PaymentResult.success) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Pembayaran berhasil ✅")));
+        Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (_) => false);
+      }
+    } else {
+      Navigator.pop(context, result);
+    }
   }
 
   @override
