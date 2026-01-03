@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chain_fit_app/features/profile/service/logout_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -15,6 +16,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final ProfileService _service = ProfileService();
+  final AuthLogout _logut = AuthLogout();
   final ImagePicker _picker = ImagePicker();
 
   ProfileData? _data;
@@ -60,6 +62,44 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
     );
+  }
+
+  Future<void> _logout() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Keluar"),
+        content: const Text("Yakin ingin logout?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text("Batal"),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text("Logout"),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      // TODO: sesuaikan dengan service kamu
+      // misal: await AuthService().logout();
+      await _logut.logout(); // kalau kamu taruh logout di ProfileService
+
+      if (!mounted) return;
+
+      // ✅ arahkan ke login dan hapus semua halaman sebelumnya
+      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Gagal logout: $e")));
+    }
   }
 
   Future<void> _openEditProfileSheet() async {
@@ -265,12 +305,9 @@ class _ProfilePageState extends State<ProfilePage> {
         elevation: 0,
         backgroundColor: const Color(0xFFF5F6FA),
         foregroundColor: Colors.black,
-        // actions: [
-        //   IconButton(
-        //     icon: const Icon(Icons.edit),
-        //     onPressed: _data == null ? null : _openEditProfileSheet,
-        //   ),
-        // ],
+        actions: [
+          IconButton(icon: const Icon(Icons.logout), onPressed: _logout),
+        ],
       ),
       body: RefreshIndicator(onRefresh: _fetchProfile, child: _buildBody()),
     );

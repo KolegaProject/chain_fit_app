@@ -63,7 +63,7 @@ class AppRouter extends StatelessWidget {
           // '/': (context) => const LoginScreen(),
           '/': (context) => const Onboarding1Screen(),
           '/login': (context) => const LoginScreen(),
-          '/register': (context) => const RegisterScreen(),
+          '/register': (czontext) => const RegisterScreen(),
           '/dashboard': (context) => DashboardScreen(),
         },
       ),
