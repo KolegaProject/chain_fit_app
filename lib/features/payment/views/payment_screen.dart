@@ -10,6 +10,7 @@ class PaymentMethodPage extends StatelessWidget {
   final GymPackage selectedPackage;
 
   const PaymentMethodPage({
+    // Tambahkan const untuk performa lebih baik (opsional)
     super.key,
     required this.gymId,
     required this.selectedPackage,
@@ -29,21 +30,51 @@ class PaymentMethodPage extends StatelessWidget {
   }
 
   Future<void> _confirmAndPay(BuildContext context) async {
+    // Gunakan read karena kita berada di dalam callback event (onPressed)
     final vm = context.read<PaymentViewModel>();
 
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Konfirmasi Pembayaran"),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          "Konfirmasi Pembayaran",
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         content: const Text("Kamu yakin ingin melanjutkan pembayaran?"),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text("Batal"),
+          SizedBox(
+            width: 120,
+            height: 42,
+            child: OutlinedButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              style: OutlinedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text("Batal"),
+            ),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text("Lanjut"),
+          SizedBox(
+            width: 120,
+            height: 42,
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF636AE8),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                "Lanjut",
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
+            ),
           ),
         ],
       ),
@@ -57,7 +88,7 @@ class PaymentMethodPage extends StatelessWidget {
     );
 
     if (!success || vm.paymentData == null || !context.mounted) {
-      if (vm.errorMessage != null) {
+      if (vm.errorMessage != null && context.mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(vm.errorMessage!)));
@@ -86,7 +117,7 @@ class PaymentMethodPage extends StatelessWidget {
         context,
       ).showSnackBar(const SnackBar(content: Text("Pembayaran gagal ❌")));
     }
-  }
+  } // ✅ FIX: Kurung kurawal penutup ditambahkan di sini
 
   @override
   Widget build(BuildContext context) {
@@ -94,55 +125,219 @@ class PaymentMethodPage extends StatelessWidget {
     final price =
         int.tryParse(pkg.price.toString().replaceAll(RegExp(r'[^0-9]'), '')) ??
         0;
+    final discount = 0;
+    final total = price - discount;
 
     return ChangeNotifierProvider(
       create: (_) => PaymentViewModel(),
       child: Consumer<PaymentViewModel>(
         builder: (context, vm, _) {
           return Scaffold(
-            appBar: AppBar(title: const Text("Pembayaran Member")),
-            body: Padding(
+            backgroundColor: const Color(0xFFF8F8F8),
+            appBar: AppBar(
+              title: const Text("Pembayaran Member"),
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              elevation: 0,
+            ),
+            body: ListView(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    pkg.name,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade200),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 16,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Ringkasan Paket Anda",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        pkg.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Rp ${_formatRupiah(pkg.price)}/bulan",
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.grey.shade800,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        "Durasi: ${pkg.durationDays} hari",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Divider(color: Colors.grey.shade200, thickness: 1),
+                      const SizedBox(height: 12),
+                      _RowPrice(
+                        label: "Harga per bulan",
+                        value: "Rp ${_formatRupiah(price)}",
+                      ),
+                      const SizedBox(height: 10),
+                      _RowPrice(
+                        label: "Diskon",
+                        value: "Rp ${_formatRupiah(discount)}",
+                        valueColor: Colors.green,
+                      ),
+                      const SizedBox(height: 14),
+                      Divider(color: Colors.grey.shade200, thickness: 1),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Total Pembayaran",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          Text(
+                            "Rp ${_formatRupiah(total)}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Optional benefit
+                if (pkg.benefit.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Benefit Paket",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        ...pkg.benefit.map(
+                          (b) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.check_circle,
+                                  size: 18,
+                                  color: Colors.green,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    b,
+                                    style: const TextStyle(fontSize: 13.5),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Rp ${_formatRupiah(price)} / bulan",
-                    style: const TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w900,
+              ],
+            ),
+            bottomNavigationBar: Padding(
+              padding: const EdgeInsets.all(16),
+              child: SizedBox(
+                height: 48,
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF636AE8),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
+                    elevation: 0,
                   ),
-                  const Spacer(),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: vm.isPaying
-                          ? null
-                          : () => _confirmAndPay(context),
-                      child: vm.isPaying
-                          ? const CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            )
-                          : const Text("Lanjut Pembayaran"),
-                    ),
-                  ),
-                ],
+                  // Kita pass 'context' yang berasal dari builder Consumer,
+                  // agar Provider bisa ditemukan oleh _confirmAndPay
+                  onPressed: vm.isPaying ? null : () => _confirmAndPay(context),
+                  child: vm.isPaying
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          "Lanjut Pembayaran",
+                          style: TextStyle(fontWeight: FontWeight.w800),
+                        ),
+                ),
               ),
             ),
           );
         },
       ),
+    );
+  }
+}
+
+class _RowPrice extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color? valueColor;
+
+  const _RowPrice({required this.label, required this.value, this.valueColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: TextStyle(color: Colors.grey.shade700)),
+        Text(
+          value,
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: valueColor ?? Colors.black,
+          ),
+        ),
+      ],
     );
   }
 }
