@@ -1,4 +1,4 @@
-import 'package:chain_fit_app/features/status_membership/models/membership_models.dart';
+import 'package:chain_fit_app/features/status_membership/models/membership_model.dart';
 import 'package:flutter/material.dart';
 import 'package:chain_fit_app/core/services/api_service.dart';
 
@@ -11,6 +11,11 @@ class MembershipViewModel extends ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  void setMembership(Membership? data) {
+    _membership = data;
+    notifyListeners();
+  }
 
   Future<void> fetchMembershipData() async {
     _isLoading = true;

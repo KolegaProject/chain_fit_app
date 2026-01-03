@@ -16,21 +16,25 @@ class HomeTab extends StatelessWidget {
     // Ambil ViewModel
     final vm = context.watch<DashboardViewModel>();
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(vm),
-          const SizedBox(height: 24),
-          _buildPremiumCard(vm),
-          const SizedBox(height: 32),
-          const Text("Menu Utama", style: AppTextStyles.sectionTitle),
-          const SizedBox(height: 16),
-          _buildMenuGrid(context),
-          // Tambahkan padding bawah agar konten terbawah tidak tertutup FAB/Navbar
-          const SizedBox(height: 80),
-        ],
+    return RefreshIndicator(
+      onRefresh: () => vm.loadDashboardData(forceRefresh: true),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(vm),
+            const SizedBox(height: 24),
+            _buildPremiumCard(vm),
+            const SizedBox(height: 32),
+            const Text("Menu Utama", style: AppTextStyles.sectionTitle),
+            const SizedBox(height: 16),
+            _buildMenuGrid(context),
+            // Tambahkan padding bawah agar konten terbawah tidak tertutup FAB/Navbar
+            const SizedBox(height: 80),
+          ],
+        ),
       ),
     );
   }

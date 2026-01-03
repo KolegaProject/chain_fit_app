@@ -1,8 +1,8 @@
+import 'package:chain_fit_app/features/status_membership/views/membership_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/membership_list_viewmodel.dart';
-import '../models/membership_models.dart';
-import 'membership_detail_page.dart';
+import '../models/membership_model.dart';
 
 class MembershipListPage extends StatefulWidget {
   const MembershipListPage({super.key});
@@ -80,7 +80,9 @@ class _MembershipListPageState extends State<MembershipListPage> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const MembershipDetailPage()),
+          MaterialPageRoute(
+            builder: (context) => MembershipDetailPage(membershipData: item),
+          ),
         );
       },
       child: Container(

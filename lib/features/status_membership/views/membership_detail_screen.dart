@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/membership_viewmodel.dart';
-import '../models/membership_models.dart';
+import '../models/membership_model.dart';
 
 class MembershipDetailPage extends StatefulWidget {
-  const MembershipDetailPage({super.key});
+  final Membership? membershipData;
+
+  const MembershipDetailPage({super.key, this.membershipData});
 
   @override
   State<MembershipDetailPage> createState() => _MembershipDetailPageState();
@@ -15,12 +17,14 @@ class _MembershipDetailPageState extends State<MembershipDetailPage> {
   void initState() {
     super.initState();
     // 1. Panggil Data saat buka halaman
-    Future.microtask(
-      () => Provider.of<MembershipViewModel>(
-        context,
-        listen: false,
-      ).fetchMembershipData(),
-    );
+    Future.microtask(() {
+      final vm = Provider.of<MembershipViewModel>(context, listen: false);
+      if (widget.membershipData != null) {
+        vm.setMembership(widget.membershipData);
+      } else {
+        vm.fetchMembershipData();
+      }
+    });
   }
 
   @override

@@ -80,7 +80,6 @@ flutter:
   uses-material-design: true
   assets:
     - .env
-    - lib/assets/video_panduan/
     - lib/assets/image/
 
 
