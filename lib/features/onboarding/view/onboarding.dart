@@ -18,7 +18,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background image
           Positioned.fill(
             child: Image.asset(
               'lib/assets/image/gym_screen.png',
@@ -27,7 +26,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
 
-          // White overlay gradient (biar teks kebaca)
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
@@ -53,7 +51,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: [
                   const Spacer(),
 
-                  // Title
                   const Text(
                     'Mulai Perjalanan\nKebugaran Anda',
                     style: TextStyle(
@@ -65,7 +62,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Subtitle
                   Text(
                     'Bergabunglah dengan GymBro\nhari ini untuk mencapai tujuan\nkebugaran Anda. Mari bergerak\nmenuju versi terbaik diri Anda!',
                     style: TextStyle(
@@ -77,7 +73,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   const SizedBox(height: 22),
 
-                  // Buttons
                   _PrimaryButton(
                     text: 'Login',
                     onPressed: () {
