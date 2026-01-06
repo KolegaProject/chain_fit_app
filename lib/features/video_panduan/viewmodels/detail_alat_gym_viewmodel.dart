@@ -16,7 +16,7 @@ class DetailAlatGymViewModel extends ChangeNotifier {
   bool _ready = false;
   String? _videoError;
 
-  // ================= GETTERS =================
+  // Getters
   GymEquipment get equipment => item;
   bool get ready => _ready;
   String? get videoError => _videoError;
@@ -33,7 +33,7 @@ class DetailAlatGymViewModel extends ChangeNotifier {
   String? get youtubeId =>
       YoutubePlayer.convertUrlToId(item.videoUrl ?? '');
 
-  // ================= INIT =================
+  // Method untuk video controller
   Future<void> init() async {
     _ready = false;
     _videoError = null;
@@ -45,7 +45,7 @@ class DetailAlatGymViewModel extends ChangeNotifier {
       return;
     }
 
-    // ===== YOUTUBE =====
+    // YouTube
     if (isYoutube) {
       final id = youtubeId;
       if (id == null) {
@@ -66,7 +66,7 @@ class DetailAlatGymViewModel extends ChangeNotifier {
       return;
     }
 
-    // ===== MP4 / HLS =====
+    // MP4 / HLS
     try {
       _videoController = VideoPlayerController.networkUrl(
         Uri.parse(item.videoUrl!.trim()),
@@ -87,7 +87,7 @@ class DetailAlatGymViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ================= DISPOSE =================
+  // Dispose controllers
   @override
   void dispose() {
     _youtubeController?.dispose();

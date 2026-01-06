@@ -9,18 +9,22 @@ class PanduanAlatGymViewModel extends ChangeNotifier {
   bool _isLoading = true;
   String? _errorMessage;
 
+  // List equipment gym
   List<GymEquipment> _items = [];
   String _query = '';
 
+  // Getters untuk status loading
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
+  // Getters and setters
   String get query => _query;
   set query(String value) {
     _query = value;
     notifyListeners();
   }
 
+  // Mengembalikan list equipment gym yang sudah difilter berdasarkan query
   List<GymEquipment> get filteredItems {
     final q = _query.trim().toLowerCase();
     if (q.isEmpty) return _items;
@@ -32,6 +36,7 @@ class PanduanAlatGymViewModel extends ChangeNotifier {
     }).toList();
   }
 
+  // Untuk inisialisasi data
   Future<void> init() async {
     _isLoading = true;
     _errorMessage = null;
@@ -40,8 +45,10 @@ class PanduanAlatGymViewModel extends ChangeNotifier {
     await _fetchList();
   }
 
+  // Untuk fecth ulang data ketika retry
   Future<void> retry() async => init();
 
+  // Untuk fetch data list equipment gym
   Future<void> _fetchList() async {
     try {
       final res = await _apiService.client.get('/api/v1/equipment/me');

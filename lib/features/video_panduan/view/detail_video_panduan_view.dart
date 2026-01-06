@@ -82,10 +82,11 @@ class _DetailAlatGymView extends StatelessWidget {
     );
   }
 
-  // ================= MEDIA =================
+  // Data media
   Widget _buildMedia(DetailAlatGymViewModel vm) {
     final item = vm.equipment;
 
+    // Loading
     if (!vm.ready) {
       return const SizedBox(
         height: 220,
@@ -94,7 +95,7 @@ class _DetailAlatGymView extends StatelessWidget {
     }
 
     if (vm.hasVideo) {
-      // ===== YOUTUBE =====
+      // YouTube
       if (vm.isYoutube && vm.youtubeController != null) {
         return AspectRatio(
           aspectRatio: 16 / 9,
@@ -106,7 +107,7 @@ class _DetailAlatGymView extends StatelessWidget {
         );
       }
 
-      // ===== MP4 / HLS =====
+      // MP4 / HLS
       if (vm.chewieController != null) {
         return AspectRatio(
           aspectRatio: 16 / 9,
@@ -120,7 +121,7 @@ class _DetailAlatGymView extends StatelessWidget {
       );
     }
 
-    // ===== FOTO =====
+    // Foto
     final photo = item.photo;
     if (photo == null || photo.trim().isEmpty) {
       return const SizedBox(
