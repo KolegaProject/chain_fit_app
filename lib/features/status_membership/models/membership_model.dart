@@ -1,6 +1,6 @@
 class Membership {
   final String gymName;
-  final String type; // Nama Paket
+  final String type; 
   final DateTime startDate;
   final DateTime endDate;
   final bool isActive;
@@ -13,10 +13,8 @@ class Membership {
     required this.isActive,
   });
 
-  // Getter untuk menghitung sisa hari secara otomatis
   int get sisaHari {
     final now = DateTime.now();
-    // Menghitung selisih hari antara hari ini dan tanggal berakhir
     final difference = endDate.difference(now).inDays;
     return difference < 0 ? 0 : difference;
   }
