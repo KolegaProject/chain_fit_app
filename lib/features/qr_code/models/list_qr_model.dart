@@ -15,7 +15,6 @@ class MembershipModel {
     required this.package,
   });
 
-  // Fungsi untuk memetakan JSON ke Object Dart
   factory MembershipModel.fromJson(Map<String, dynamic> json) {
     return MembershipModel(
       id: int.tryParse(json['id'].toString()) ?? 0,
