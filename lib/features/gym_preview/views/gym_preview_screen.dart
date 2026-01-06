@@ -123,9 +123,14 @@ class _GymPreviewViewState extends State<GymPreviewView> {
                     gym.jamOperasional,
                     style: TextStyle(color: Colors.grey.shade700),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "Kapasitas",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
                   Text(
-                    "Kapasitas Maks: ${gym.maxCapacity}",
+                    "maksima ${gym.maxCapacity} orang",
                     style: TextStyle(color: Colors.grey.shade700),
                   ),
                   const SizedBox(height: 16),

@@ -31,6 +31,17 @@ class _RegisterGymScreenState extends State<RegisterGymScreen> {
     super.dispose();
   }
 
+  void _handleBack() {
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+      );
+    }
+  }
+
   Future<void> _handleRegisterAndLogin() async {
     final name = _nameController.text.trim();
     final username = _usernameController.text.trim();
@@ -45,7 +56,6 @@ class _RegisterGymScreenState extends State<RegisterGymScreen> {
     final registerVM = context.read<RegisterViewModel>();
     final loginVM = context.read<LoginViewModel>();
 
-    // 1) Register
     final regSuccess = await registerVM.register(
       name: name,
       username: username,
@@ -63,7 +73,6 @@ class _RegisterGymScreenState extends State<RegisterGymScreen> {
 
     if (!regSuccess) return;
 
-    // Optional: kasih info sukses register
     if (mounted) {
       AppAlerts.showSuccess(
         context,
@@ -71,7 +80,6 @@ class _RegisterGymScreenState extends State<RegisterGymScreen> {
       );
     }
 
-    // 2) Auto Login
     final loginSuccess = await loginVM.login(username, password);
 
     if (loginVM.errorMessage != null) {
@@ -83,7 +91,6 @@ class _RegisterGymScreenState extends State<RegisterGymScreen> {
     }
 
     if (loginSuccess && mounted) {
-      // 3) Redirect ke SearchGymView
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const SearchGymView()),
@@ -91,16 +98,16 @@ class _RegisterGymScreenState extends State<RegisterGymScreen> {
     }
   }
 
-  InputDecoration _fieldDecoration({
+  InputDecoration _inputDecoration({
     required String label,
     required String hint,
+    Widget? suffixIcon,
   }) {
     return InputDecoration(
       labelText: label,
       hintText: hint,
       filled: true,
       fillColor: const Color(0xFFF1F3F6),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide.none,
@@ -113,6 +120,7 @@ class _RegisterGymScreenState extends State<RegisterGymScreen> {
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide.none,
       ),
+      suffixIcon: suffixIcon,
     );
   }
 
@@ -120,186 +128,132 @@ class _RegisterGymScreenState extends State<RegisterGymScreen> {
   Widget build(BuildContext context) {
     final registerVM = context.watch<RegisterViewModel>();
     final loginVM = context.watch<LoginViewModel>();
-
     final isLoading = registerVM.isLoading || loginVM.isLoading;
 
     return Scaffold(
       backgroundColor: Colors.white,
+
+      // Back tetap di atas (pakai AppBar)
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: Colors.black,
-        centerTitle: true,
-
-        // ini biar kita kontrol tombol back sendiri
         automaticallyImplyLeading: false,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-          onPressed: () {
-            if (Navigator.canPop(context)) {
-              Navigator.pop(context);
-            } else {
-              // kalau sebelumnya kamu pake pushReplacement, biasanya stack kosong
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const OnboardingScreen()),
-              );
-            }
-          },
-        ),
-
-        title: const Text(
-          'Pendaftaran Gym',
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+          onPressed: _handleBack,
         ),
       ),
+
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 8),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Pendaftaran Gym',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Buat akun untuk melanjutkan',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+                const SizedBox(height: 32),
 
-              // Avatar Icon (seperti contoh)
-              Center(
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                        color: Colors.black.withOpacity(0.10),
-                      ),
-                    ],
+                TextField(
+                  controller: _nameController,
+                  textInputAction: TextInputAction.next,
+                  decoration: _inputDecoration(
+                    label: 'Nama Lengkap',
+                    hint: 'John Doe',
                   ),
-                  child: const Icon(Icons.person, color: Color(0xFF636AE8)),
                 ),
-              ),
+                const SizedBox(height: 16),
 
-              const SizedBox(height: 22),
-
-              // Nama
-              const Text(
-                'Nama Lengkap',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _nameController,
-                decoration: _fieldDecoration(
-                  label: '',
-                  hint: 'Masukkan nama lengkap Anda',
+                TextField(
+                  controller: _usernameController,
+                  textInputAction: TextInputAction.next,
+                  decoration: _inputDecoration(
+                    label: 'Username',
+                    hint: 'johnd0e',
+                  ),
                 ),
-              ),
+                const SizedBox(height: 16),
 
-              const SizedBox(height: 16),
-
-              // Username (karena register kamu butuh ini)
-              const Text(
-                'Username',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _usernameController,
-                decoration: _fieldDecoration(
-                  label: '',
-                  hint: 'Masukkan username Anda',
+                TextField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  decoration: _inputDecoration(
+                    label: 'Email',
+                    hint: 'john@email.com',
+                  ),
                 ),
-              ),
+                const SizedBox(height: 16),
 
-              const SizedBox(height: 16),
-
-              // Email
-              const Text(
-                'Alamat Email',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: _fieldDecoration(
-                  label: '',
-                  hint: 'Masukkan alamat email Anda',
+                TextField(
+                  controller: _passwordController,
+                  obscureText: _isPasswordHidden,
+                  textInputAction: TextInputAction.done,
+                  decoration: _inputDecoration(
+                    label: 'Password',
+                    hint: 'Enter your password',
+                    suffixIcon: IconButton(
+                      splashRadius: 20,
+                      tooltip: _isPasswordHidden
+                          ? 'Show password'
+                          : 'Hide password',
+                      icon: Icon(
+                        _isPasswordHidden
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() => _isPasswordHidden = !_isPasswordHidden);
+                      },
+                    ),
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 24),
 
-              // Password
-              const Text(
-                'Password',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _passwordController,
-                obscureText: _isPasswordHidden,
-                decoration:
-                    _fieldDecoration(
-                      label: '',
-                      hint: 'Masukkan password Anda',
-                    ).copyWith(
-                      suffixIcon: IconButton(
-                        splashRadius: 20,
-                        icon: Icon(
-                          _isPasswordHidden
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: Colors.black.withOpacity(0.55),
-                        ),
-                        onPressed: () {
-                          setState(
-                            () => _isPasswordHidden = !_isPasswordHidden,
-                          );
-                        },
+                SizedBox(
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: isLoading ? null : _handleRegisterAndLogin,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF636AE8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-              ),
-
-              const SizedBox(height: 140), // biar tombol kebawah mirip contoh
-            ],
-          ),
-        ),
-      ),
-
-      // Bottom button
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
-          child: SizedBox(
-            height: 52,
-            child: ElevatedButton(
-              onPressed: isLoading ? null : _handleRegisterAndLogin,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF636AE8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                    child: isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Daftar',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                  ),
                 ),
-              ),
-              child: isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Text(
-                      'Daftar Sekarang',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
+
+                const SizedBox(height: 16),
+              ],
             ),
           ),
         ),
