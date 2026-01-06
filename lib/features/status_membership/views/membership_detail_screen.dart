@@ -16,7 +16,6 @@ class _MembershipDetailPageState extends State<MembershipDetailPage> {
   @override
   void initState() {
     super.initState();
-    // 1. Panggil Data saat buka halaman
     Future.microtask(() {
       final vm = Provider.of<MembershipViewModel>(context, listen: false);
       if (widget.membershipData != null) {
@@ -31,8 +30,6 @@ class _MembershipDetailPageState extends State<MembershipDetailPage> {
   Widget build(BuildContext context) {
     return Consumer<MembershipViewModel>(
       builder: (context, vm, child) {
-        // --- LOGIC STATE (Loading, Error, Success) ---
-
         if (vm.isLoading) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
@@ -57,11 +54,8 @@ class _MembershipDetailPageState extends State<MembershipDetailPage> {
             ),
           );
         }
-
-        // Ambil data yang sudah siap
         final data = vm.membership!;
 
-        // --- TAMPILAN UTAMA (UI) ---
         return Scaffold(
           appBar: AppBar(
             leading: GestureDetector(
@@ -91,10 +85,6 @@ class _MembershipDetailPageState extends State<MembershipDetailPage> {
     );
   }
 }
-
-// ============================================================================
-// WIDGET UI DIPISAH DI BAWAH SINI BIAR KODINGAN DI ATAS BERSIH
-// ============================================================================
 
 class _MembershipStatusCard extends StatelessWidget {
   final Membership data;
@@ -163,7 +153,6 @@ class _MembershipDetailCard extends StatelessWidget {
   const _MembershipDetailCard({required this.data});
 
   String _formatDate(DateTime date) {
-    // Helper format tanggal simpel
     const bulan = [
       "Januari",
       "Februari",
