@@ -1,6 +1,7 @@
+import 'package:chain_fit_app/features/status_membership/models/membership_model.dart';
 import 'package:flutter/material.dart';
 import 'package:chain_fit_app/core/services/api_service.dart'; 
-import '../models/membership_models.dart';
+// import '../models/membership_models.dart';
 
 class MembershipListViewModel extends ChangeNotifier {
   final ApiService _apiService = ApiService();
