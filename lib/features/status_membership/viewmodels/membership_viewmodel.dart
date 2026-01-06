@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:chain_fit_app/core/services/api_service.dart';
 
 class MembershipViewModel extends ChangeNotifier {
-  // Inject ApiService
   final ApiService _apiService = ApiService();
 
   Membership? _membership;
@@ -31,7 +30,6 @@ class MembershipViewModel extends ChangeNotifier {
         final data = response.data['data'];
 
         if (data != null && data is List && data.isNotEmpty) {
-          // Ambil data pertama dari list
           _membership = Membership.fromJson(data[0]);
         } else if (data is Map<String, dynamic>) {
           _membership = Membership.fromJson(data);
