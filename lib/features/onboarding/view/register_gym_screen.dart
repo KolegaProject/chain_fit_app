@@ -133,7 +133,6 @@ class _RegisterGymScreenState extends State<RegisterGymScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
 
-      // Back tetap di atas (pakai AppBar)
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
