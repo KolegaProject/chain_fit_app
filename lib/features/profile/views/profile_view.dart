@@ -1,11 +1,11 @@
 import 'dart:io';
 
+import 'package:chain_fit_app/features/profile/service/logout_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../model/profile_model.dart';
 import '../service/profile_service.dart';
-import 'package:chain_fit_app/features/profile/service/logout_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -15,36 +15,53 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final _service = ProfileService();
-  final _logoutService = AuthLogout();
-  final _picker = ImagePicker();
+  final ProfileService _service = ProfileService();
+  final AuthLogout _logut = AuthLogout();
+  final ImagePicker _picker = ImagePicker();
 
-  Future<ProfileData>? _future;
+  ProfileData? _data;
+  bool _isLoading = true;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _future = _service.getProfile();
+    _fetchProfile();
   }
 
-  Future<void> _refresh() async {
-    setState(() => _future = _service.getProfile());
-    await _future;
+  Future<void> _fetchProfile() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+
+      final data = await _service.getProfile();
+
+      setState(() {
+        _data = data;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = e.toString();
+      });
+    }
   }
 
-  String _initialFrom(ProfileData data) {
-    final u = data.user;
-
-    final ini = (u.initial ?? '').trim();
-    if (ini.isNotEmpty) return ini;
-
-    final username = (u.username ?? '').trim();
-    if (username.isNotEmpty) return username[0].toUpperCase();
-
-    final name = (u.name ?? '').trim();
-    if (name.isNotEmpty) return name[0].toUpperCase();
-
-    return '?';
+  Widget _photoFallback(String initial, {double size = 64}) {
+    return Container(
+      width: size,
+      height: size,
+      color: Colors.grey.shade200,
+      child: Center(
+        child: Text(
+          initial,
+          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
+        ),
+      ),
+    );
   }
 
   Future<void> _logout() async {
@@ -69,9 +86,11 @@ class _ProfilePageState extends State<ProfilePage> {
     if (confirm != true) return;
 
     try {
-      await _logoutService.logout();
+      await _logut.logout();
+
       if (!mounted) return;
-      Navigator.of(context).pushNamedAndRemoveUntil('/login', (_) => false);
+
+      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
@@ -80,11 +99,12 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<void> _openEditProfileSheet(ProfileData data) async {
-    final user = data.user;
+  Future<void> _openEditProfileSheet() async {
+    if (_data == null) return;
+    final user = _data!.user;
 
-    final usernameC = TextEditingController(text: user.username ?? '');
-    final nameC = TextEditingController(text: user.name ?? '');
+    TextEditingController? usernameC;
+    TextEditingController? nameC;
 
     File? selectedImage;
     bool saving = false;
@@ -94,9 +114,8 @@ class _ProfilePageState extends State<ProfilePage> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
-        final bottomInset = MediaQuery.of(ctx).viewInsets.bottom;
-        final photoUrl = (user.profileImage ?? '').trim();
-        final initial = _initialFrom(data);
+        usernameC ??= TextEditingController(text: user.username);
+        nameC ??= TextEditingController(text: user.name);
 
         return StatefulBuilder(
           builder: (ctx, setModalState) {
@@ -106,17 +125,20 @@ class _ProfilePageState extends State<ProfilePage> {
                 imageQuality: 85,
               );
               if (x == null) return;
+
+              if (!ctx.mounted) return;
+              if (!Navigator.of(ctx).canPop()) return;
+
               setModalState(() => selectedImage = File(x.path));
             }
 
             Future<void> save() async {
               if (saving) return;
               setModalState(() => saving = true);
-
               try {
                 await _service.updateProfile(
-                  username: usernameC.text.trim(),
-                  name: nameC.text.trim(),
+                  username: usernameC!.text,
+                  name: nameC!.text,
                   imageFile: selectedImage,
                 );
 
@@ -124,7 +146,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Navigator.pop(ctx);
                 }
 
-                await _refresh();
+                await _fetchProfile();
 
                 if (!mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -139,45 +161,18 @@ class _ProfilePageState extends State<ProfilePage> {
               }
             }
 
-            Widget avatar() {
-              if (selectedImage != null) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.file(
-                    selectedImage!,
-                    width: 64,
-                    height: 64,
-                    fit: BoxFit.cover,
-                  ),
-                );
-              }
-
-              if (photoUrl.isNotEmpty) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.network(
-                    photoUrl,
-                    width: 64,
-                    height: 64,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) =>
-                        _photoFallback(initial, size: 64),
-                  ),
-                );
-              }
-
-              return _photoFallback(initial, size: 64);
-            }
+            final bottomInset = MediaQuery.of(ctx).viewInsets.bottom;
+            final photoUrl = (user.profileImage ?? '').trim();
 
             return Padding(
               padding: EdgeInsets.only(bottom: bottomInset),
               child: Container(
-                margin: const EdgeInsets.all(12),
-                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                 ),
+                margin: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -190,18 +185,39 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                     const SizedBox(height: 14),
-                    const Text(
-                      "Edit Profil",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
+                    const Center(
+                      child: Text(
+                        "Edit Profil",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
 
                     Row(
                       children: [
-                        avatar(),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: selectedImage != null
+                              ? Image.file(
+                                  selectedImage!,
+                                  width: 64,
+                                  height: 64,
+                                  fit: BoxFit.cover,
+                                )
+                              : (photoUrl.isNotEmpty
+                                    ? Image.network(
+                                        photoUrl,
+                                        width: 64,
+                                        height: 64,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) =>
+                                            _photoFallback(user.initial),
+                                      )
+                                    : _photoFallback(user.initial)),
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: OutlinedButton.icon(
@@ -260,35 +276,11 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       },
     ).whenComplete(() {
-      usernameC.dispose();
-      nameC.dispose();
+      usernameC?.dispose();
+      nameC?.dispose();
+      usernameC = null;
+      nameC = null;
     });
-  }
-
-  static BoxDecoration _softCard() => BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(18),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withOpacity(0.05),
-        blurRadius: 18,
-        offset: const Offset(0, 10),
-      ),
-    ],
-  );
-
-  static Widget _photoFallback(String initial, {double size = 64}) {
-    return Container(
-      width: size,
-      height: size,
-      color: Colors.grey.shade200,
-      child: Center(
-        child: Text(
-          initial,
-          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
-        ),
-      ),
-    );
   }
 
   @override
@@ -297,195 +289,135 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
         title: const Text("Profil"),
+        automaticallyImplyLeading: false,
+        leading: const SizedBox.shrink(),
         centerTitle: true,
         elevation: 0,
         backgroundColor: const Color(0xFFF5F6FA),
         foregroundColor: Colors.black,
-        automaticallyImplyLeading: false,
         actions: [
           IconButton(icon: const Icon(Icons.logout), onPressed: _logout),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: _refresh,
-        child: FutureBuilder<ProfileData>(
-          future: _future,
-          builder: (context, snap) {
-            // loading
-            if (snap.connectionState == ConnectionState.waiting) {
-              return ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: const [
-                  SizedBox(height: 180),
-                  Center(child: CircularProgressIndicator()),
-                  SizedBox(height: 24),
-                ],
-              );
-            }
+      body: RefreshIndicator(onRefresh: _fetchProfile, child: _buildBody()),
+    );
+  }
 
-            // error
-            if (snap.hasError) {
-              return ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16),
-                children: [
-                  _ErrorCard(
-                    message: "Gagal memuat profil:\n${snap.error}",
-                    onRetry: _refresh,
-                  ),
-                ],
-              );
-            }
+  Widget _buildBody() {
+    if (_isLoading) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: const [
+          SizedBox(height: 180),
+          Center(child: CircularProgressIndicator()),
+          SizedBox(height: 24),
+        ],
+      );
+    }
 
-            // empty
-            final data = snap.data;
-            if (data == null) {
-              return ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: const [
-                  SizedBox(height: 180),
-                  Center(child: Text("Data profil tidak tersedia.")),
-                ],
-              );
-            }
+    if (_errorMessage != null) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        children: [
+          _ErrorCard(
+            message: "Gagal memuat profil:\n$_errorMessage",
+            onRetry: _fetchProfile,
+          ),
+        ],
+      );
+    }
 
-            final user = data.user;
-            final initial = _initialFrom(data);
+    if (_data == null) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: const [
+          SizedBox(height: 180),
+          Center(child: Text("Data profil tidak tersedia.")),
+        ],
+      );
+    }
 
-            final title = (user.name ?? '').trim().isNotEmpty
-                ? (user.name ?? '')
-                : (user.username ?? '-');
+    final data = _data!;
+    final user = data.user;
+    final initial = (user.initial.isNotEmpty)
+        ? user.initial
+        : (user.username.isNotEmpty ? user.username[0].toUpperCase() : "?");
 
-            final email = (user.email ?? '-');
-            final role = (user.role ?? 'MEMBER');
-            final imageUrl = (user.profileImage ?? '').trim();
-
-            return ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
-              children: [
-                // ===== Profile Header Card (dipertahankan) =====
-                _ProfileHeaderCard(
-                  title: title,
-                  email: email,
-                  role: role,
-                  imageUrl: imageUrl.isEmpty ? null : imageUrl,
-                  initial: initial,
-                  onEdit: () => _openEditProfileSheet(data),
-                ),
-                const SizedBox(height: 14),
-
-                // ===== Gym Terdaftar =====
-                Row(
-                  children: [
-                    const Expanded(
-                      child: Text(
-                        "Gym Terdaftar",
-                        style: TextStyle(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
-                    if (data.gyms.isNotEmpty)
-                      Text(
-                        "${data.gyms.length}",
-                        style: const TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFF636AE8),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-
-                if (data.gyms.isEmpty)
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: _softCard(),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 38,
-                          height: 38,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF1F2F6),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.info_outline,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            "Belum ada gym terdaftar.",
-                            style: TextStyle(
-                              color: Colors.grey.shade700,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                ...data.gyms.map((g) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Container(
-                      decoration: _softCard(),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 16,
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 46,
-                            height: 46,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF4F5F7),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Icon(
-                              Icons.location_on_outlined,
-                              size: 22,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Text(
-                              g.name,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 14.5,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.black87,
-                                height: 1.2,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ],
-            );
-          },
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+      children: [
+        _ProfileHeaderCard(
+          title: user.name.isNotEmpty ? user.name : user.username,
+          email: user.email,
+          role: user.role,
+          imageUrl: user.profileImage,
+          initial: initial,
+          onEdit: _openEditProfileSheet,
         ),
-      ),
+        const SizedBox(height: 14),
+
+        _SectionTitle(
+          title: "Gym Terdaftar",
+          trailing: data.gyms.isNotEmpty ? "${data.gyms.length}" : null,
+        ),
+        const SizedBox(height: 10),
+
+        if (data.gyms.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: _softCard(),
+            child: Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F2F6),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.info_outline, color: Colors.grey),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    "Belum ada gym terdaftar.",
+                    style: TextStyle(
+                      color: Colors.grey.shade700,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+        ...data.gyms.map((g) {
+          final isDefault = data.defaultGymId == g.id;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _GymTileLarge(name: g.name, isDefault: isDefault),
+          );
+        }).toList(),
+      ],
     );
   }
 }
 
-// ===== Widgets (header card dipertahankan) =====
+// ===== Styles / Widgets =====
+
+BoxDecoration _softCard() => BoxDecoration(
+  color: Colors.white,
+  borderRadius: BorderRadius.circular(18),
+  boxShadow: [
+    BoxShadow(
+      color: Colors.black.withOpacity(0.05),
+      blurRadius: 18,
+      offset: const Offset(0, 10),
+    ),
+  ],
+);
 
 class _ProfileHeaderCard extends StatelessWidget {
   final String title;
@@ -563,6 +495,7 @@ class _ProfileHeaderCard extends StatelessWidget {
           ),
         ),
 
+        // ✅ tombol edit di dalam card (pojok kanan atas)
         Positioned(
           top: 10,
           right: 10,
@@ -689,6 +622,102 @@ class _RolePill extends StatelessWidget {
   }
 }
 
+class _SectionTitle extends StatelessWidget {
+  final String title;
+  final String? trailing;
+  const _SectionTitle({required this.title, this.trailing});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 14.5,
+              fontWeight: FontWeight.w900,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+        if (trailing != null)
+          Text(
+            trailing!,
+            style: const TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w900,
+              color: Color(0xFF636AE8),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// ✅ lebih besar + tanpa badge DEFAULT
+class _GymTileLarge extends StatelessWidget {
+  final String name;
+  final bool isDefault;
+
+  const _GymTileLarge({required this.name, required this.isDefault});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDefault ? const Color(0xFFF3F4FF) : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDefault ? const Color(0xFF636AE8) : Colors.grey.shade200,
+          width: isDefault ? 1.2 : 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+      child: Row(
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: isDefault
+                  ? const Color(0xFFE9EBFF)
+                  : const Color(0xFFF4F5F7),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(
+              Icons.location_on_outlined,
+              size: 22,
+              color: isDefault ? const Color(0xFF636AE8) : Colors.grey.shade600,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 14.5,
+                fontWeight: isDefault ? FontWeight.w900 : FontWeight.w800,
+                color: Colors.black87,
+                height: 1.2,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _ErrorCard extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
@@ -698,17 +727,7 @@ class _ErrorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
+      decoration: _softCard(),
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
