@@ -20,7 +20,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final List<Widget> _pages = [
     HomeTab(), // 0
     MembershipListPage(), // 1
-    MenuQrPage(), // 2 (QR List)
+    MenuQrPage(), // 2
     ProfilePage(), // 3
   ];
 

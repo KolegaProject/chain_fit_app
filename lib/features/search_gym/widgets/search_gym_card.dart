@@ -5,13 +5,13 @@ import 'package:geolocator/geolocator.dart';
 
 class SearchGymCard extends StatelessWidget {
   final GymSearchItem gym;
-  final Position? userPosition; // Add this
+  final Position? userPosition;
   final VoidCallback? onTap;
 
   const SearchGymCard({
     super.key,
     required this.gym,
-    this.userPosition, // Add this
+    this.userPosition,
     this.onTap,
   });
 
@@ -57,7 +57,7 @@ class SearchGymCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ===== IMAGE =====
+              // IMAGE
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(14),
@@ -82,13 +82,12 @@ class SearchGymCard extends StatelessWidget {
                 ),
               ),
 
-              // ===== CONTENT =====
+              // CONTENT
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Nama Gym
                     // Nama Gym
                     Text(
                       gym.name,

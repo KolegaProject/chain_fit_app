@@ -58,7 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (isSuccess && mounted) {
       AppAlerts.showSuccess(
         context,
-        viewModel.successMessage ?? 'Registrasi berhasil!',
+        'Registrasi berhasil!',
       );
       Future.delayed(const Duration(milliseconds: 800), () {
         Navigator.pushReplacement(

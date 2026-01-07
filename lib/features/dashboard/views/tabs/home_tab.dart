@@ -26,12 +26,11 @@ class HomeTab extends StatelessWidget {
           children: [
             _buildHeader(vm),
             const SizedBox(height: 24),
-            _buildPremiumCard(vm),
+            _buildPremiumCard(vm, context),
             const SizedBox(height: 32),
             const Text("Menu Utama", style: AppTextStyles.sectionTitle),
             const SizedBox(height: 16),
             _buildMenuGrid(context),
-            // Tambahkan padding bawah agar konten terbawah tidak tertutup FAB/Navbar
             const SizedBox(height: 80),
           ],
         ),
@@ -101,24 +100,23 @@ class HomeTab extends StatelessWidget {
     );
   }
 
-  Widget _buildPremiumCard(DashboardViewModel vm) {
+  Widget _buildPremiumCard(DashboardViewModel vm, BuildContext context) {
     // Skenario 1: Tidak punya paket sama sekali
     if (vm.packages.isEmpty) {
-      return _buildEmptyStateCard();
+      return _buildEmptyStateCard(context);
     }
 
     // Skenario 2: Punya paket (Tampilkan Carousel)
     return ColoredBox(
       color: AppColors.background,
       child: SizedBox(
-        height: 200, // Tentukan tinggi agar tidak error RenderFlex
+        height: 200,
         child: PageView.builder(
           controller: _pageController,
-          padEnds: false, // Agar item pertama mulai dari kiri (opsional)
+          padEnds: false,
           itemCount: vm.packages.length,
           itemBuilder: (context, index) {
             final package = vm.packages[index];
-            // Bungkus dengan padding agar ada jarak antar kartu saat digeser
             return Padding(
               padding: const EdgeInsets.only(right: 12.0),
               child: _buildSinglePackageCard(package),
@@ -159,15 +157,13 @@ class HomeTab extends StatelessWidget {
         final item = menuItems[index];
         return InkWell(
           onTap: () {
-            // Logic navigasi manual disini jika diperlukan
+            // Logic navigasi
             if (item['title'] == 'Cari Gym') {
-              // Navigator.push...
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => SearchGymView()),
               );
             } else if (item['title'] == 'Panduan') {
-              // Navigator.push...
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => PanduanAlatGymPage()),
@@ -220,12 +216,12 @@ class HomeTab extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyStateCard() {
+  Widget _buildEmptyStateCard(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF64748B), // Warna abu-abu
+        color: const Color(0xFF64748B),
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
@@ -247,8 +243,10 @@ class HomeTab extends StatelessWidget {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              // Navigasi ke halaman cari gym
-              //  Navigator.push(context, MaterialPageRoute(builder: (_) => SearchGymView()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => SearchGymView()),
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
@@ -270,13 +268,6 @@ class HomeTab extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: const Color(0xFF6366F1).withOpacity(0.3),
-        //     blurRadius: 15,
-        //     offset: const Offset(0, 8),
-        //   ),
-        // ],
       ),
       child: Stack(
         children: [
@@ -332,7 +323,7 @@ class HomeTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  package.gymName, // Menampilkan nama Gym
+                  package.gymName,
                   style: const TextStyle(color: Colors.white70, fontSize: 12),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
