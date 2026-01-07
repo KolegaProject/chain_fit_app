@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:http_parser/http_parser.dart';
 
 import '../../../core/services/api_service.dart';
 import '../model/profile_model.dart';
@@ -32,30 +31,12 @@ class ProfileService {
     }
   }
 
-  MediaType _guessImageMediaType(String path) {
-    final p = path.toLowerCase();
-    if (p.endsWith('.png')) return MediaType('image', 'png');
-    if (p.endsWith('.jpg') || p.endsWith('.jpeg'))
-      return MediaType('image', 'jpeg');
-    if (p.endsWith('.webp')) return MediaType('image', 'webp');
-    return MediaType('application', 'octet-stream');
-  }
-
   Future<UpdateProfileData> updateProfile({
     String? username,
     String? name,
     File? imageFile,
   }) async {
     try {
-      MediaType guessType(String path) {
-        final p = path.toLowerCase();
-        if (p.endsWith('.png')) return MediaType('image', 'png');
-        if (p.endsWith('.jpg') || p.endsWith('.jpeg'))
-          return MediaType('image', 'jpeg');
-        // fallback biar gak ditolak, tapi sebaiknya file valid jpg/png
-        return MediaType('application', 'octet-stream');
-      }
-
       final payload = <String, dynamic>{};
 
       if (name != null && name.trim().isNotEmpty) {
@@ -69,15 +50,12 @@ class ProfileService {
         payload['image'] = await MultipartFile.fromFile(
           imageFile.path,
           filename: imageFile.path.split(Platform.pathSeparator).last,
-          contentType: guessType(imageFile.path), // ✅ INI KUNCINYA
         );
       }
 
-      final formData = FormData.fromMap(payload);
-
       final res = await _apiService.client.put(
         '/api/v1/auth/me/update',
-        data: formData,
+        data: FormData.fromMap(payload),
         options: Options(headers: const {'Accept': 'application/json'}),
       );
 

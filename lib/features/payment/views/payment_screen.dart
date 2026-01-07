@@ -10,7 +10,6 @@ class PaymentMethodPage extends StatelessWidget {
   final GymPackage selectedPackage;
 
   const PaymentMethodPage({
-    // Tambahkan const untuk performa lebih baik (opsional)
     super.key,
     required this.gymId,
     required this.selectedPackage,

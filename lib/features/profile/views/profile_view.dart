@@ -86,13 +86,10 @@ class _ProfilePageState extends State<ProfilePage> {
     if (confirm != true) return;
 
     try {
-      // TODO: sesuaikan dengan service kamu
-      // misal: await AuthService().logout();
-      await _logut.logout(); // kalau kamu taruh logout di ProfileService
+      await _logut.logout();
 
       if (!mounted) return;
 
-      // ✅ arahkan ke login dan hapus semua halaman sebelumnya
       Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
     } catch (e) {
       if (!mounted) return;
@@ -117,12 +114,8 @@ class _ProfilePageState extends State<ProfilePage> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
-        // ✅ controller dibuat DI DALAM lifecycle bottomsheet
         usernameC ??= TextEditingController(text: user.username);
-        nameC ??= TextEditingController(
-          // kalau AppUser kamu punya field name, ganti ke: text: user.name
-          text: user.name,
-        );
+        nameC ??= TextEditingController(text: user.name);
 
         return StatefulBuilder(
           builder: (ctx, setModalState) {
@@ -133,7 +126,6 @@ class _ProfilePageState extends State<ProfilePage> {
               );
               if (x == null) return;
 
-              // ✅ FIX: bottomsheet bisa saja sudah ketutup karena swipe/back
               if (!ctx.mounted) return;
               if (!Navigator.of(ctx).canPop()) return;
 
@@ -150,7 +142,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   imageFile: selectedImage,
                 );
 
-                // ✅ tutup modal dengan aman
                 if (ctx.mounted && Navigator.of(ctx).canPop()) {
                   Navigator.pop(ctx);
                 }
@@ -285,7 +276,6 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       },
     ).whenComplete(() {
-      // ✅ dispose controller tepat waktu saat bottomsheet benar2 selesai (swipe/close)
       usernameC?.dispose();
       nameC?.dispose();
       usernameC = null;
@@ -435,7 +425,7 @@ class _ProfileHeaderCard extends StatelessWidget {
   final String role;
   final String? imageUrl;
   final String initial;
-  final VoidCallback onEdit; // ✅ tambah
+  final VoidCallback onEdit;
 
   const _ProfileHeaderCard({
     required this.title,
@@ -443,7 +433,7 @@ class _ProfileHeaderCard extends StatelessWidget {
     required this.role,
     required this.imageUrl,
     required this.initial,
-    required this.onEdit, // ✅ tambah
+    required this.onEdit,
   });
 
   @override

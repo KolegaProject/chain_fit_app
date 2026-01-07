@@ -226,42 +226,25 @@ class PackagePage extends StatelessWidget {
                             children:
                                 (pkg.benefit.isEmpty ? ['-'] : pkg.benefit)
                                     .map(
-                                      (b) => Container(
-                                        margin: const EdgeInsets.only(
-                                          bottom: 8,
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 10,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFF6F7FB),
-                                          borderRadius: BorderRadius.circular(
-                                            12,
+                                      (b) => Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.check_circle,
+                                            color: Colors.green,
+                                            size: 18,
                                           ),
-                                          border: Border.all(
-                                            color: Colors.grey.shade200,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.check_circle,
-                                              color: Colors.green,
-                                              size: 18,
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Expanded(
-                                              child: Text(
-                                                b,
-                                                style: const TextStyle(
-                                                  fontSize: 13.5,
-                                                  height: 1.25,
-                                                ),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: Text(
+                                              b,
+                                              style: const TextStyle(
+                                                fontSize: 13.5,
+                                                height: 1.25,
                                               ),
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                          const SizedBox(height: 20),
+                                        ],
                                       ),
                                     )
                                     .toList(),
