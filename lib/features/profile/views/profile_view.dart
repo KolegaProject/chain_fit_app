@@ -495,7 +495,6 @@ class _ProfileHeaderCard extends StatelessWidget {
           ),
         ),
 
-        // ✅ tombol edit di dalam card (pojok kanan atas)
         Positioned(
           top: 10,
           right: 10,
@@ -655,7 +654,6 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-/// ✅ lebih besar + tanpa badge DEFAULT
 class _GymTileLarge extends StatelessWidget {
   final String name;
   final bool isDefault;
