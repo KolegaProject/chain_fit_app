@@ -19,7 +19,7 @@ class SearchGymViewModel extends ChangeNotifier {
   String _query = '';
   Position? _userLocation;
 
-  // ===== GETTERS =====
+  // GETTERS
   bool get isLoading => _isLoading;
   bool get isRefetching => _isRefetching;
   String? get errorMessage => _errorMessage;
@@ -30,7 +30,7 @@ class SearchGymViewModel extends ChangeNotifier {
   bool get showFullScreenError => _errorMessage != null && _gyms.isEmpty;
   bool get showRefetchingIndicator => _isRefetching && _gyms.isNotEmpty;
 
-  // ===== PUBLIC API =====
+  // PUBLIC API
   Future<void> search({String query = '', bool forceRefresh = false}) async {
     _query = query.trim();
     _errorMessage = null;
@@ -75,7 +75,7 @@ class SearchGymViewModel extends ChangeNotifier {
     }
   }
 
-  // ===== CACHE =====
+  // CACHE
   String get _cacheKey => 'search_gym_${_query.isEmpty ? "all" : _query}';
 
   Future<void> _loadFromCache() async {
@@ -100,7 +100,7 @@ class SearchGymViewModel extends ChangeNotifier {
         _userLocation = Position(
           longitude: data['longitude'],
           latitude: data['latitude'],
-          timestamp: DateTime.now(), // approximation, not critical for distance
+          timestamp: DateTime.now(),
           accuracy: data['accuracy'],
           altitude: data['altitude'],
           heading: data['heading'],
