@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:chain_fit_app/features/profile/service/logout_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
+import '../viewmodels/profile_viewmodel.dart';
 import '../model/profile_model.dart';
-import '../service/profile_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -15,39 +15,16 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final ProfileService _service = ProfileService();
-  final AuthLogout _logut = AuthLogout();
   final ImagePicker _picker = ImagePicker();
-
-  ProfileData? _data;
-  bool _isLoading = true;
-  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _fetchProfile();
-  }
 
-  Future<void> _fetchProfile() async {
-    try {
-      setState(() {
-        _isLoading = true;
-        _errorMessage = null;
-      });
-
-      final data = await _service.getProfile();
-
-      setState(() {
-        _data = data;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-        _errorMessage = e.toString();
-      });
-    }
+    // Fetch sekali saat page dibuka
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ProfileViewModel>().fetchProfile();
+    });
   }
 
   Widget _photoFallback(String initial, {double size = 64}) {
@@ -64,7 +41,9 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future<void> _logout() async {
+  Future<void> _confirmLogout() async {
+    final vm = context.read<ProfileViewModel>();
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -85,129 +64,124 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (confirm != true) return;
 
-    try {
-      await _logut.logout();
+    final ok = await vm.logout();
 
-      if (!mounted) return;
+    if (!mounted) return;
 
-      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Gagal logout: $e")));
+    if (!ok && vm.errorMessage != null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(vm.errorMessage!)));
+      vm.clearError();
+      return;
     }
+
+    Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
   }
 
-  Future<void> _openEditProfileSheet() async {
-    if (_data == null) return;
-    final user = _data!.user;
+Future<void> _openEditProfileSheet() async {
+  final data = context.read<ProfileViewModel>().data;
+  if (data == null) return;
 
-    TextEditingController? usernameC;
-    TextEditingController? nameC;
+  final user = data.user;
 
-    File? selectedImage;
-    bool saving = false;
+  TextEditingController? usernameC;
+  TextEditingController? nameC;
 
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        usernameC ??= TextEditingController(text: user.username);
-        nameC ??= TextEditingController(text: user.name);
+  File? selectedImage;
 
-        return StatefulBuilder(
-          builder: (ctx, setModalState) {
-            Future<void> pickImage() async {
-              final x = await _picker.pickImage(
-                source: ImageSource.gallery,
-                imageQuality: 85,
-              );
-              if (x == null) return;
+  await showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (ctx) {
+      usernameC ??= TextEditingController(text: user.username);
+      nameC ??= TextEditingController(text: user.name);
 
-              if (!ctx.mounted) return;
-              if (!Navigator.of(ctx).canPop()) return;
+      return StatefulBuilder(
+        builder: (ctx, setModalState) {
+          Future<void> pickImage() async {
+            final x = await _picker.pickImage(
+              source: ImageSource.gallery,
+              imageQuality: 85,
+            );
+            if (x == null) return;
 
-              setModalState(() => selectedImage = File(x.path));
-            }
+            if (!ctx.mounted) return;
+            if (!Navigator.of(ctx).canPop()) return;
 
-            Future<void> save() async {
-              if (saving) return;
-              setModalState(() => saving = true);
-              try {
-                await _service.updateProfile(
+            setModalState(() => selectedImage = File(x.path));
+          }
+
+          return Consumer<ProfileViewModel>(
+            builder: (context, vm, _) {
+              Future<void> save() async {
+                final ok = await vm.updateProfile(
                   username: usernameC!.text,
                   name: nameC!.text,
                   imageFile: selectedImage,
                 );
 
-                if (ctx.mounted && Navigator.of(ctx).canPop()) {
-                  Navigator.pop(ctx);
+                if (!ctx.mounted) return;
+
+                if (!ok && vm.errorMessage != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(vm.errorMessage!)),
+                  );
+                  vm.clearError();
+                  return;
                 }
 
-                await _fetchProfile();
+                if (Navigator.of(ctx).canPop()) Navigator.pop(ctx);
 
-                if (!mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("Profil berhasil diperbarui")),
                 );
-              } catch (e) {
-                if (ctx.mounted) setModalState(() => saving = false);
-                if (!mounted) return;
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text(e.toString())));
               }
-            }
 
-            final bottomInset = MediaQuery.of(ctx).viewInsets.bottom;
-            final photoUrl = (user.profileImage ?? '').trim();
+              final bottomInset = MediaQuery.of(ctx).viewInsets.bottom;
+              final photoUrl = (user.profileImage ?? '').trim();
 
-            return Padding(
-              padding: EdgeInsets.only(bottom: bottomInset),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                margin: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: Colors.black12,
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    const Center(
-                      child: Text(
-                        "Edit Profil",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
+              return Padding(
+                padding: EdgeInsets.only(bottom: bottomInset),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  margin: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: Colors.black12,
+                          borderRadius: BorderRadius.circular(999),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
+                      const SizedBox(height: 14),
+                      const Center(
+                        child: Text(
+                          "Edit Profil",
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
 
-                    Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: selectedImage != null
-                              ? Image.file(
-                                  selectedImage!,
-                                  width: 64,
-                                  height: 64,
-                                  fit: BoxFit.cover,
-                                )
-                              : (photoUrl.isNotEmpty
+                      Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: selectedImage != null
+                                ? Image.file(
+                                    selectedImage!,
+                                    width: 64,
+                                    height: 64,
+                                    fit: BoxFit.cover,
+                                  )
+                                : (photoUrl.isNotEmpty
                                     ? Image.network(
                                         photoUrl,
                                         width: 64,
@@ -217,74 +191,87 @@ class _ProfilePageState extends State<ProfilePage> {
                                             _photoFallback(user.initial),
                                       )
                                     : _photoFallback(user.initial)),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: saving ? null : pickImage,
-                            icon: const Icon(Icons.photo),
-                            label: const Text("Ganti Foto"),
                           ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: vm.isSaving ? null : pickImage,
+                              icon: const Icon(Icons.photo),
+                              label: const Text("Ganti Foto"),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      TextField(
+                        controller: usernameC,
+                        enabled: !vm.isSaving,
+                        decoration: const InputDecoration(
+                          labelText: "Username",
+                          border: OutlineInputBorder(),
                         ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    TextField(
-                      controller: usernameC,
-                      enabled: !saving,
-                      decoration: const InputDecoration(
-                        labelText: "Username",
-                        border: OutlineInputBorder(),
                       ),
-                    ),
-                    const SizedBox(height: 12),
+                      const SizedBox(height: 12),
 
-                    TextField(
-                      controller: nameC,
-                      enabled: !saving,
-                      decoration: const InputDecoration(
-                        labelText: "Name",
-                        border: OutlineInputBorder(),
+                      TextField(
+                        controller: nameC,
+                        enabled: !vm.isSaving,
+                        decoration: const InputDecoration(
+                          labelText: "Name",
+                          border: OutlineInputBorder(),
+                        ),
                       ),
-                    ),
 
-                    const SizedBox(height: 14),
+                      const SizedBox(height: 14),
 
-                    SizedBox(
-                      width: double.infinity,
-                      height: 46,
-                      child: ElevatedButton(
-                        onPressed: saving ? null : save,
-                        child: saving
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Text("Simpan"),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 46,
+                        child: ElevatedButton(
+                          onPressed: vm.isSaving ? null : save,
+                          child: vm.isSaving
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const Text("Simpan"),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
-        );
-      },
-    ).whenComplete(() {
-      usernameC?.dispose();
-      nameC?.dispose();
-      usernameC = null;
-      nameC = null;
-    });
-  }
+              );
+            },
+          );
+        },
+      );
+    },
+  ).whenComplete(() {
+    usernameC?.dispose();
+    nameC?.dispose();
+    usernameC = null;
+    nameC = null;
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.watch<ProfileViewModel>();
+
+    // tampilkan error 1x (opsional)
+    if (vm.errorMessage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(vm.errorMessage!)));
+        vm.clearError();
+      });
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
@@ -296,15 +283,27 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: const Color(0xFFF5F6FA),
         foregroundColor: Colors.black,
         actions: [
-          IconButton(icon: const Icon(Icons.logout), onPressed: _logout),
+          IconButton(
+            icon: vm.isLoggingOut
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.logout),
+            onPressed: vm.isLoggingOut ? null : _confirmLogout,
+          ),
         ],
       ),
-      body: RefreshIndicator(onRefresh: _fetchProfile, child: _buildBody()),
+      body: RefreshIndicator(
+        onRefresh: vm.fetchProfile,
+        child: _buildBody(vm),
+      ),
     );
   }
 
-  Widget _buildBody() {
-    if (_isLoading) {
+  Widget _buildBody(ProfileViewModel vm) {
+    if (vm.isLoading) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: const [
@@ -315,20 +314,8 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
 
-    if (_errorMessage != null) {
-      return ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
-        children: [
-          _ErrorCard(
-            message: "Gagal memuat profil:\n$_errorMessage",
-            onRetry: _fetchProfile,
-          ),
-        ],
-      );
-    }
-
-    if (_data == null) {
+    final data = vm.data;
+    if (data == null) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: const [
@@ -338,7 +325,6 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
 
-    final data = _data!;
     final user = data.user;
     final initial = (user.initial.isNotEmpty)
         ? user.initial
@@ -394,10 +380,9 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
 
         ...data.gyms.map((g) {
-          final isDefault = data.defaultGymId == g.id;
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: _GymTileLarge(name: g.name, isDefault: isDefault),
+            child: _GymTileLarge(name: g.name),
           );
         }).toList(),
       ],
@@ -405,19 +390,20 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-// ===== Styles / Widgets =====
+// ===== Styles / Widgets (tetap sama punyamu) =====
 
 BoxDecoration _softCard() => BoxDecoration(
-  color: Colors.white,
-  borderRadius: BorderRadius.circular(18),
-  boxShadow: [
-    BoxShadow(
-      color: Colors.black.withOpacity(0.05),
-      blurRadius: 18,
-      offset: const Offset(0, 10),
-    ),
-  ],
-);
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 18,
+          offset: const Offset(0, 10),
+        ),
+      ],
+    );
+
 
 class _ProfileHeaderCard extends StatelessWidget {
   final String title;
@@ -494,7 +480,6 @@ class _ProfileHeaderCard extends StatelessWidget {
             ],
           ),
         ),
-
         Positioned(
           top: 10,
           right: 10,
@@ -656,20 +641,16 @@ class _SectionTitle extends StatelessWidget {
 
 class _GymTileLarge extends StatelessWidget {
   final String name;
-  final bool isDefault;
 
-  const _GymTileLarge({required this.name, required this.isDefault});
+  const _GymTileLarge({required this.name});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: isDefault ? const Color(0xFFF3F4FF) : Colors.white,
+        color: const Color(0xFFF3F4FF),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDefault ? const Color(0xFF636AE8) : Colors.grey.shade200,
-          width: isDefault ? 1.2 : 1,
-        ),
+        border: Border.all(color: const Color(0xFF636AE8), width: 1.2),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -685,15 +666,13 @@ class _GymTileLarge extends StatelessWidget {
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: isDefault
-                  ? const Color(0xFFE9EBFF)
-                  : const Color(0xFFF4F5F7),
+              color: const Color(0xFFE9EBFF),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.location_on_outlined,
               size: 22,
-              color: isDefault ? const Color(0xFF636AE8) : Colors.grey.shade600,
+              color: Color(0xFF636AE8),
             ),
           ),
           const SizedBox(width: 14),
@@ -702,38 +681,14 @@ class _GymTileLarge extends StatelessWidget {
               name,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14.5,
-                fontWeight: isDefault ? FontWeight.w900 : FontWeight.w800,
+                fontWeight: FontWeight.w900,
                 color: Colors.black87,
                 height: 1.2,
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ErrorCard extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-
-  const _ErrorCard({required this.message, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: _softCard(),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          const Icon(Icons.error_outline, color: Colors.red, size: 44),
-          const SizedBox(height: 10),
-          Text(message, textAlign: TextAlign.center),
-          const SizedBox(height: 12),
-          ElevatedButton(onPressed: onRetry, child: const Text("Coba Lagi")),
         ],
       ),
     );

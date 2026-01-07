@@ -2,6 +2,7 @@ import 'package:chain_fit_app/features/auth/viewmodels/register_viewmodel.dart';
 import 'package:chain_fit_app/features/dashboard/viewmodels/dashboard_viewmodel.dart';
 import 'package:chain_fit_app/features/auth/views/register_screen.dart';
 import 'package:chain_fit_app/features/gym_preview/viewmodels/gym_preview_viewmodel.dart';
+import 'package:chain_fit_app/features/profile/viewmodels/profile_viewmodel.dart';
 import 'package:chain_fit_app/features/qr_code/viewmodels/detail_qr_viewmodel.dart';
 import 'package:chain_fit_app/features/screen/onboarding/onboarding_1_screen.dart';
 import 'package:chain_fit_app/features/search_gym/viewmodels/search_gym_viewmodel.dart';
@@ -56,6 +57,7 @@ class AppRouter extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => DetailQrViewModel()),
         ChangeNotifierProvider(create: (_) => MembershipViewModel()),
         ChangeNotifierProvider(create: (_) => MembershipListViewModel()),
+        ChangeNotifierProvider(create: (_) => ProfileViewModel()),
       ],
       child: m.MaterialApp(
         debugShowCheckedModeBanner: false,
