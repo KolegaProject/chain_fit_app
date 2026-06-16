@@ -14,7 +14,7 @@ class SplashViewModel extends ChangeNotifier {
       if (token != null && token.isNotEmpty) {
         Navigator.pushReplacementNamed(context, '/dashboard');
       } else {
-        Navigator.pushReplacementNamed(context, '/'); // Onboarding
+        Navigator.pushReplacementNamed(context, '/onboarding'); // Onboarding
       }
     }
   }

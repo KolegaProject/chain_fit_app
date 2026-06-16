@@ -1,6 +1,5 @@
 import 'package:chain_fit_app/features/onboarding/view/onboarding.dart';
 import 'package:flutter/material.dart';
-import 'onboarding_4_screen.dart';
 
 class Onboarding3Screen extends StatelessWidget {
   const Onboarding3Screen({super.key});

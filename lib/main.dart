@@ -11,7 +11,7 @@ import 'package:chain_fit_app/features/status_membership/viewmodels/membership_v
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
+import 'package:chain_fit_app/core/services/storage_service.dart';
 import 'package:chain_fit_app/features/dashboard/views/dashboard_screen.dart';
 import 'features/auth/viewmodels/login_viewmodel.dart';
 import 'features/auth/views/login_screen.dart';
@@ -20,22 +20,29 @@ import 'features/splash/views/splash_screen.dart';
 import 'features/notification/viewmodels/notification_viewmodel.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  runApp(const MyApp());
+
+  final storageService = StorageService();
+  final token = await storageService.getAccessToken();
+  final bool isLoggedIn = token != null && token.isNotEmpty;
+
+  runApp(MyApp(isLoggedIn: isLoggedIn));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+  const MyApp({super.key, required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
-    return const AppRouter();
+    return AppRouter(isLoggedIn: isLoggedIn);
   }
 }
 
-// TAMBAHKAN INI
 class AppRouter extends StatelessWidget {
-  const AppRouter({super.key});
+  final bool isLoggedIn;
+  const AppRouter({super.key, required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
@@ -60,8 +67,9 @@ class AppRouter extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
         ),
-        home: const Onboarding1Screen(),
+        home: isLoggedIn ? const DashboardScreen() : const SplashScreen(),
         routes: {
+          '/splash': (context) => const SplashScreen(),
           '/onboarding': (context) => const Onboarding1Screen(),
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),

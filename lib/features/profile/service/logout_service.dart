@@ -1,7 +1,6 @@
 import 'package:chain_fit_app/core/constants/api_constants.dart';
 import 'package:chain_fit_app/core/services/cache_service.dart';
 import 'package:chain_fit_app/core/services/storage_service.dart';
-import 'package:flutter/material.dart';
 
 class AuthLogout {
   final StorageService _storage = StorageService();
