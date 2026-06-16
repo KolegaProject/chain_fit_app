@@ -28,6 +28,14 @@ jobs:
       - name: 📦 Install Dependencies
         run: flutter pub get
 
+      - name: 🔐 Create .env file
+        run: |
+          touch .env
+          echo "SECRET_KEY=${{ secrets.BASE_URL }}" >> .env
+
+      - name: 🏗️ Build APK
+        run: flutter build apk --release
+
       # (Opsional) Unit Test
       # - name: 🧪 Run Tests
       #   run: flutter test
