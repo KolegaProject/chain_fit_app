@@ -2,6 +2,7 @@ import 'package:chain_fit_app/core/constants/app_colors.dart';
 import 'package:chain_fit_app/core/constants/app_text_styles.dart';
 import 'package:chain_fit_app/features/search_gym/views/search_gym_screen.dart';
 import 'package:chain_fit_app/features/video_panduan/view/panduan_alat_gym_view.dart';
+import 'package:chain_fit_app/features/notification/views/notification_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/dashboard_viewmodel.dart';
@@ -24,7 +25,7 @@ class HomeTab extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(vm),
+            _buildHeader(vm, context),
             const SizedBox(height: 24),
             _buildPremiumCard(vm, context),
             const SizedBox(height: 32),
@@ -38,7 +39,7 @@ class HomeTab extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(DashboardViewModel vm) {
+  Widget _buildHeader(DashboardViewModel vm, BuildContext context) {
     return Row(
       children: [
         CircleAvatar(
@@ -77,9 +78,17 @@ class HomeTab extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.grey.shade200),
               ),
-              child: const Icon(
-                Icons.notifications_outlined,
-                color: Colors.black87,
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const NotificationPage()),
+                  );
+                },
+                child: const Icon(
+                  Icons.notifications_outlined,
+                  color: Colors.black87,
+                ),
               ),
             ),
             Positioned(

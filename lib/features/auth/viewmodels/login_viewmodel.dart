@@ -7,8 +7,14 @@ import '../models/login_model.dart';
 
 class LoginViewModel extends ChangeNotifier {
   // Dependency
-  final ApiService _apiService = ApiService();
-  final StorageService _storageService = StorageService();
+  final ApiService _apiService;
+  final StorageService _storageService;
+
+  LoginViewModel({
+    ApiService? apiService,
+    StorageService? storageService,
+  })  : _apiService = apiService ?? ApiService(),
+        _storageService = storageService ?? StorageService();
 
   // State
   bool _isLoading = false;

@@ -16,6 +16,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:chain_fit_app/features/dashboard/views/dashboard_screen.dart';
 import 'features/auth/viewmodels/login_viewmodel.dart';
 import 'features/auth/views/login_screen.dart';
+import 'features/splash/viewmodels/splash_viewmodel.dart';
+import 'features/splash/views/splash_screen.dart';
+import 'features/notification/viewmodels/notification_viewmodel.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -47,6 +50,7 @@ class AppRouter extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => SplashViewModel()),
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
         ChangeNotifierProvider(create: (_) => RegisterViewModel()),
         ChangeNotifierProvider(create: (_) => DashboardViewModel()),
@@ -56,15 +60,16 @@ class AppRouter extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => DetailQrViewModel()),
         ChangeNotifierProvider(create: (_) => MembershipViewModel()),
         ChangeNotifierProvider(create: (_) => MembershipListViewModel()),
+        ChangeNotifierProvider(create: (_) => NotificationViewModel()),
       ],
       child: m.MaterialApp(
         debugShowCheckedModeBanner: false,
+        home: const Onboarding1Screen(),
         routes: {
-          // '/': (context) => const LoginScreen(),
-          '/': (context) => const Onboarding1Screen(),
+          '/onboarding': (context) => const Onboarding1Screen(),
           '/login': (context) => const LoginScreen(),
-          '/register': (czontext) => const RegisterScreen(),
-          '/dashboard': (context) => DashboardScreen(),
+          '/register': (context) => const RegisterScreen(),
+          '/dashboard': (context) => const DashboardScreen(),
         },
       ),
     );
