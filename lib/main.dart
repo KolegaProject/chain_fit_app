@@ -8,8 +8,7 @@ import 'package:chain_fit_app/features/search_gym/viewmodels/search_gym_viewmode
 import 'package:chain_fit_app/features/qr_code/viewmodels/list_qr_viewmodel.dart';
 import 'package:chain_fit_app/features/status_membership/viewmodels/membership_list_viewmodel.dart';
 import 'package:chain_fit_app/features/status_membership/viewmodels/membership_viewmodel.dart';
-import 'package:flutter/material.dart' as m;
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -30,15 +29,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ShadcnApp(
-      title: 'Chain Fit App',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: LegacyColorSchemes.lightGray(),
-        radius: 0.7,
-      ),
-      home: const AppRouter(),
-    );
+    return const AppRouter();
   }
 }
 
@@ -62,8 +53,13 @@ class AppRouter extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => MembershipListViewModel()),
         ChangeNotifierProvider(create: (_) => NotificationViewModel()),
       ],
-      child: m.MaterialApp(
+      child: MaterialApp(
+        title: 'Chain Fit App',
         debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          useMaterial3: true,
+        ),
         home: const Onboarding1Screen(),
         routes: {
           '/onboarding': (context) => const Onboarding1Screen(),

@@ -1,6 +1,5 @@
 import 'package:chain_fit_app/features/search_gym/models/gym_search_model.dart';
 import 'package:flutter/material.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart' as shadcn;
 import 'package:geolocator/geolocator.dart';
 
 class SearchGymCard extends StatelessWidget {
@@ -52,8 +51,13 @@ class SearchGymCard extends StatelessWidget {
             ),
           ],
         ),
-        child: shadcn.Card(
-          padding: EdgeInsets.zero,
+        child: Card(
+          elevation: 0,
+          margin: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          clipBehavior: Clip.antiAlias,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
