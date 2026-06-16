@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*.*.*'
 
+permissions:
+  contents: write
+
 jobs:
   build-and-release:
     name: Build & Create Release
@@ -32,9 +35,6 @@ jobs:
         run: |
           touch .env
           echo "SECRET_KEY=${{ secrets.BASE_URL }}" >> .env
-
-      - name: 🏗️ Build APK
-        run: flutter build apk --release
 
       # (Opsional) Unit Test
       # - name: 🧪 Run Tests
