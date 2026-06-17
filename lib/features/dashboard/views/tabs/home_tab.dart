@@ -11,6 +11,7 @@ import '../../models/gym_capacity_model.dart';
 
 class HomeTab extends StatelessWidget {
   final PageController _pageController = PageController(viewportFraction: 0.9);
+  final PageController _capacityPageController = PageController(viewportFraction: 0.9);
   HomeTab({super.key});
 
   @override
@@ -29,7 +30,7 @@ class HomeTab extends StatelessWidget {
             _buildHeader(vm, context),
             const SizedBox(height: 24),
             _buildPremiumCard(vm, context),
-            if (vm.packages.isNotEmpty) ...[
+            if (vm.packages.any((pkg) => pkg.gymId != 0)) ...[
               const SizedBox(height: 24),
               _buildGymCapacityCard(vm, context),
             ],
@@ -142,20 +143,40 @@ class HomeTab extends StatelessWidget {
   }
 
   Widget _buildGymCapacityCard(DashboardViewModel vm, BuildContext context) {
-    if (vm.packages.isEmpty) {
+    final validPackages = vm.packages.where((pkg) => pkg.gymId != 0).toList();
+
+    if (validPackages.isEmpty) {
       return const SizedBox.shrink();
     }
 
-    final activePackage = vm.packages.firstWhere(
-      (pkg) => pkg.status == 'AKTIF',
-      orElse: () => vm.packages.first,
+    if (validPackages.length == 1) {
+      return _buildIndividualGymCapacityCard(vm, validPackages.first);
+    }
+
+    return ColoredBox(
+      color: AppColors.background,
+      child: SizedBox(
+        height: 195,
+        child: PageView.builder(
+          controller: _capacityPageController,
+          padEnds: false,
+          itemCount: validPackages.length,
+          itemBuilder: (context, index) {
+            final package = validPackages[index];
+            return Padding(
+              padding: const EdgeInsets.only(right: 12.0),
+              child: _buildIndividualGymCapacityCard(vm, package),
+            );
+          },
+        ),
+      ),
     );
+  }
 
-    if (activePackage.gymId == 0) {
-      return const SizedBox.shrink();
-    }
-
-    final capacity = vm.gymCapacity;
+  Widget _buildIndividualGymCapacityCard(DashboardViewModel vm, ActivePackageModel package) {
+    final gymId = package.gymId;
+    final capacity = vm.gymCapacities[gymId];
+    final isLoading = vm.isGymCapacityLoading(gymId);
 
     return Container(
       width: double.infinity,
@@ -192,7 +213,7 @@ class HomeTab extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      activePackage.gymName,
+                      package.gymName,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -209,9 +230,9 @@ class HomeTab extends StatelessWidget {
                   if (capacity != null) _buildStatusBadge(capacity.status),
                   const SizedBox(width: 8),
                   GestureDetector(
-                    onTap: vm.isLoadingCapacity
+                    onTap: isLoading
                         ? null
-                        : () => vm.fetchGymCapacity(activePackage.gymId),
+                        : () => vm.fetchGymCapacity(gymId),
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
@@ -219,7 +240,7 @@ class HomeTab extends StatelessWidget {
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.grey.shade200),
                       ),
-                      child: vm.isLoadingCapacity
+                      child: isLoading
                           ? const SizedBox(
                               width: 16,
                               height: 16,
@@ -242,7 +263,7 @@ class HomeTab extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          if (vm.isLoadingCapacity && capacity == null)
+          if (isLoading && capacity == null)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 16),
               child: Center(
@@ -258,7 +279,7 @@ class HomeTab extends StatelessWidget {
                   style: TextStyle(color: Colors.red, fontSize: 13),
                 ),
                 TextButton(
-                  onPressed: () => vm.fetchGymCapacity(activePackage.gymId),
+                  onPressed: () => vm.fetchGymCapacity(gymId),
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,
                     minimumSize: const Size(50, 30),

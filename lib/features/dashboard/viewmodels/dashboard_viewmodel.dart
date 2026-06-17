@@ -22,8 +22,8 @@ class DashboardViewModel extends ChangeNotifier {
   UserProfileModel? _userProfile;
   List<ActivePackageModel> _activePackages = [];
   Position? _currentPosition;
-  GymCapacityModel? _gymCapacity;
-  bool _isLoadingCapacity = false;
+  final Map<int, GymCapacityModel> _gymCapacities = {};
+  final Map<int, bool> _loadingCapacities = {};
 
   // Getters
   bool get isLoading => _isLoading;
@@ -32,8 +32,8 @@ class DashboardViewModel extends ChangeNotifier {
   UserProfileModel? get user => _userProfile;
   List<ActivePackageModel> get packages => _activePackages;
   Position? get currentPosition => _currentPosition;
-  GymCapacityModel? get gymCapacity => _gymCapacity;
-  bool get isLoadingCapacity => _isLoadingCapacity;
+  Map<int, GymCapacityModel> get gymCapacities => _gymCapacities;
+  bool isGymCapacityLoading(int gymId) => _loadingCapacities[gymId] ?? false;
 
   // Logic: User dianggap premium jika ada paket aktif
   bool get isPremium => _activePackages.isNotEmpty;
@@ -79,18 +79,20 @@ class DashboardViewModel extends ChangeNotifier {
       _cacheService.saveCache(ApiConstants.profileCacheKey, profileData);
       _cacheService.saveCache(ApiConstants.packageCacheKey, packageData);
 
+      _gymCapacities.clear();
+      _loadingCapacities.clear();
+
       if (_activePackages.isNotEmpty) {
-        final activePackage = _activePackages.firstWhere(
-          (pkg) => pkg.status == 'AKTIF',
-          orElse: () => _activePackages.first,
-        );
-        if (activePackage.gymId != 0) {
-          await _fetchGymCapacityBackground(activePackage.gymId);
-        } else {
-          _gymCapacity = null;
+        final gymIds = _activePackages
+            .map((pkg) => pkg.gymId)
+            .where((id) => id != 0)
+            .toSet();
+
+        if (gymIds.isNotEmpty) {
+          await Future.wait(
+            gymIds.map((gymId) => _fetchGymCapacityBackground(gymId)),
+          );
         }
-      } else {
-        _gymCapacity = null;
       }
     } on DioException catch (e) {
       if (_userProfile == null) {
@@ -112,28 +114,28 @@ class DashboardViewModel extends ChangeNotifier {
       final response = await _apiService.client.get(ApiConstants.gymCapacityEndpoint(gymId));
       final data = response.data['data'];
       if (data != null) {
-        _gymCapacity = GymCapacityModel.fromJson(data);
+        _gymCapacities[gymId] = GymCapacityModel.fromJson(data);
       }
     } catch (e) {
-      debugPrint("Gagal memuat kapasitas gym di background: $e");
+      debugPrint("Gagal memuat kapasitas gym $gymId di background: $e");
     }
   }
 
   Future<void> fetchGymCapacity(int gymId) async {
-    _isLoadingCapacity = true;
+    _loadingCapacities[gymId] = true;
     notifyListeners();
     try {
       final response = await _apiService.client.get(ApiConstants.gymCapacityEndpoint(gymId));
       final data = response.data['data'];
       if (data != null) {
-        _gymCapacity = GymCapacityModel.fromJson(data);
+        _gymCapacities[gymId] = GymCapacityModel.fromJson(data);
       }
     } on DioException catch (e) {
-      debugPrint("Gagal mengambil kapasitas gym: ${e.message}");
+      debugPrint("Gagal mengambil kapasitas gym $gymId: ${e.message}");
     } catch (e) {
-      debugPrint("Gagal mengambil kapasitas gym: $e");
+      debugPrint("Gagal mengambil kapasitas gym $gymId: $e");
     } finally {
-      _isLoadingCapacity = false;
+      _loadingCapacities[gymId] = false;
       notifyListeners();
     }
   }
