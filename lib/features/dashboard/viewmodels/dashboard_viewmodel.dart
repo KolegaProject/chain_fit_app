@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import '../../../core/services/api_service.dart';
 import '../models/user_profile_model.dart';
 import '../models/active_package_model.dart';
+import '../models/gym_capacity_model.dart';
 
 class DashboardViewModel extends ChangeNotifier {
   final ApiService _apiService = ApiService();
@@ -21,6 +22,8 @@ class DashboardViewModel extends ChangeNotifier {
   UserProfileModel? _userProfile;
   List<ActivePackageModel> _activePackages = [];
   Position? _currentPosition;
+  GymCapacityModel? _gymCapacity;
+  bool _isLoadingCapacity = false;
 
   // Getters
   bool get isLoading => _isLoading;
@@ -29,6 +32,8 @@ class DashboardViewModel extends ChangeNotifier {
   UserProfileModel? get user => _userProfile;
   List<ActivePackageModel> get packages => _activePackages;
   Position? get currentPosition => _currentPosition;
+  GymCapacityModel? get gymCapacity => _gymCapacity;
+  bool get isLoadingCapacity => _isLoadingCapacity;
 
   // Logic: User dianggap premium jika ada paket aktif
   bool get isPremium => _activePackages.isNotEmpty;
@@ -73,6 +78,20 @@ class DashboardViewModel extends ChangeNotifier {
 
       _cacheService.saveCache(ApiConstants.profileCacheKey, profileData);
       _cacheService.saveCache(ApiConstants.packageCacheKey, packageData);
+
+      if (_activePackages.isNotEmpty) {
+        final activePackage = _activePackages.firstWhere(
+          (pkg) => pkg.status == 'AKTIF',
+          orElse: () => _activePackages.first,
+        );
+        if (activePackage.gymId != 0) {
+          await _fetchGymCapacityBackground(activePackage.gymId);
+        } else {
+          _gymCapacity = null;
+        }
+      } else {
+        _gymCapacity = null;
+      }
     } on DioException catch (e) {
       if (_userProfile == null) {
         _errorMessage = e.response?.data['message'] ?? "Gagal memuat data";
@@ -84,6 +103,37 @@ class DashboardViewModel extends ChangeNotifier {
     } finally {
       _isLoading = false;
       _isRefetching = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> _fetchGymCapacityBackground(int gymId) async {
+    try {
+      final response = await _apiService.client.get(ApiConstants.gymCapacityEndpoint(gymId));
+      final data = response.data['data'];
+      if (data != null) {
+        _gymCapacity = GymCapacityModel.fromJson(data);
+      }
+    } catch (e) {
+      debugPrint("Gagal memuat kapasitas gym di background: $e");
+    }
+  }
+
+  Future<void> fetchGymCapacity(int gymId) async {
+    _isLoadingCapacity = true;
+    notifyListeners();
+    try {
+      final response = await _apiService.client.get(ApiConstants.gymCapacityEndpoint(gymId));
+      final data = response.data['data'];
+      if (data != null) {
+        _gymCapacity = GymCapacityModel.fromJson(data);
+      }
+    } on DioException catch (e) {
+      debugPrint("Gagal mengambil kapasitas gym: ${e.message}");
+    } catch (e) {
+      debugPrint("Gagal mengambil kapasitas gym: $e");
+    } finally {
+      _isLoadingCapacity = false;
       notifyListeners();
     }
   }

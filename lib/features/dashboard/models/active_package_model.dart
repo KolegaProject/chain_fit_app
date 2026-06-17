@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 
 class ActivePackageModel {
   final int id;
+  final int gymId;
   final String packageName;
   final String gymName;
   final DateTime endDate;
@@ -9,6 +10,7 @@ class ActivePackageModel {
 
   ActivePackageModel({
     required this.id,
+    required this.gymId,
     required this.packageName,
     required this.gymName,
     required this.endDate,
@@ -21,6 +23,7 @@ class ActivePackageModel {
 
     return ActivePackageModel(
       id: json['id'] ?? 0,
+      gymId: int.tryParse(gymData['id']?.toString() ?? '') ?? 0,
       packageName: packageData['name'] ?? 'Unknown Package',
       gymName: gymData['name'] ?? 'Unknown Gym',
       endDate: json['endDate'] != null 

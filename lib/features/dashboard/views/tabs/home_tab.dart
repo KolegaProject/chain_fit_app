@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/dashboard_viewmodel.dart';
 import '../../models/active_package_model.dart';
+import '../../models/gym_capacity_model.dart';
 
 class HomeTab extends StatelessWidget {
   final PageController _pageController = PageController(viewportFraction: 0.9);
@@ -28,6 +29,10 @@ class HomeTab extends StatelessWidget {
             _buildHeader(vm, context),
             const SizedBox(height: 24),
             _buildPremiumCard(vm, context),
+            if (vm.packages.isNotEmpty) ...[
+              const SizedBox(height: 24),
+              _buildGymCapacityCard(vm, context),
+            ],
             const SizedBox(height: 32),
             const Text("Menu Utama", style: AppTextStyles.sectionTitle),
             const SizedBox(height: 16),
@@ -133,6 +138,281 @@ class HomeTab extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildGymCapacityCard(DashboardViewModel vm, BuildContext context) {
+    if (vm.packages.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final activePackage = vm.packages.firstWhere(
+      (pkg) => pkg.status == 'AKTIF',
+      orElse: () => vm.packages.first,
+    );
+
+    if (activePackage.gymId == 0) {
+      return const SizedBox.shrink();
+    }
+
+    final capacity = vm.gymCapacity;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.grey.shade100),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Kepadatan Gym",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      activePackage.gymName,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1F2937),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                children: [
+                  if (capacity != null) _buildStatusBadge(capacity.status),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: vm.isLoadingCapacity
+                        ? null
+                        : () => vm.fetchGymCapacity(activePackage.gymId),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF3F4F6),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: vm.isLoadingCapacity
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Color(0xFF6366F1),
+                                ),
+                              ),
+                            )
+                          : const Icon(
+                              Icons.refresh_rounded,
+                              size: 16,
+                              color: Color(0xFF6366F1),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (vm.isLoadingCapacity && capacity == null)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          else if (capacity == null)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Gagal memuat data kepadatan",
+                  style: TextStyle(color: Colors.red, fontSize: 13),
+                ),
+                TextButton(
+                  onPressed: () => vm.fetchGymCapacity(activePackage.gymId),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: const Size(50, 30),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Text(
+                    "Coba Lagi",
+                    style: TextStyle(color: Color(0xFF6366F1), fontSize: 13),
+                  ),
+                ),
+              ],
+            )
+          else
+            _buildCapacityDetails(capacity),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge(String status) {
+    Color bgColor;
+    Color textColor;
+    String label;
+
+    switch (status.toUpperCase()) {
+      case 'AVAILABLE':
+        bgColor = const Color(0xFFDCFCE7);
+        textColor = const Color(0xFF15803D);
+        label = "Tersedia";
+        break;
+      case 'CROWDED':
+        bgColor = const Color(0xFFFEF9C3);
+        textColor = const Color(0xFF854D0E);
+        label = "Ramai";
+        break;
+      case 'FULL':
+        bgColor = const Color(0xFFFEE2E2);
+        textColor = const Color(0xFF991B1B);
+        label = "Penuh";
+        break;
+      default:
+        bgColor = const Color(0xFFF3F4F6);
+        textColor = const Color(0xFF4B5563);
+        label = status;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: textColor,
+          fontWeight: FontWeight.bold,
+          fontSize: 10,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCapacityDetails(GymCapacityModel capacity) {
+    final double percentage = capacity.maxCapacity > 0
+        ? capacity.currentUsers / capacity.maxCapacity
+        : 0.0;
+    final displayPercentage = (percentage * 100).toInt();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "$displayPercentage% terisi",
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1F2937),
+              ),
+            ),
+            Text(
+              "${capacity.currentUsers}/${capacity.maxCapacity} Orang",
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 8,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF3F4F6),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: FractionallySizedBox(
+            alignment: Alignment.centerLeft,
+            widthFactor: percentage.clamp(0.0, 1.0),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF6366F1), Color(0xFF818CF8)],
+                ),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildInfoItem("Tersedia", "${capacity.availableSpace} Slot", Icons.event_seat_rounded),
+            _buildInfoItem("Pengguna", "${capacity.currentUsers} Orang", Icons.people_rounded),
+            _buildInfoItem("Kapasitas", "${capacity.maxCapacity} Slot", Icons.fitness_center_rounded),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoItem(String label, String value, IconData icon) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 14, color: Colors.grey.shade400),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                color: Colors.grey.shade500,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1F2937),
+          ),
+        ),
+      ],
     );
   }
 
