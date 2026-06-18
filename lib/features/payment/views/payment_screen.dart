@@ -43,35 +43,49 @@ class PaymentMethodPage extends StatelessWidget {
         content: const Text("Kamu yakin ingin melanjutkan pembayaran?"),
         actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         actions: [
-          SizedBox(
-            width: 120,
-            height: 42,
-            child: OutlinedButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              style: OutlinedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          Semantics(
+            label: 'payment_dialog_cancel_button',
+            identifier: 'payment_dialog_cancel_button',
+            button: true,
+            container: true,
+            child: SizedBox(
+              key: const Key('payment_dialog_cancel_button'),
+              width: 120,
+              height: 42,
+              child: OutlinedButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
+                child: const Text("Batal"),
               ),
-              child: const Text("Batal"),
             ),
           ),
-          SizedBox(
-            width: 120,
-            height: 42,
-            child: ElevatedButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF636AE8),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          Semantics(
+            label: 'payment_dialog_confirm_button',
+            identifier: 'payment_dialog_confirm_button',
+            button: true,
+            container: true,
+            child: SizedBox(
+              key: const Key('payment_dialog_confirm_button'),
+              width: 120,
+              height: 42,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF636AE8),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-              ),
-              child: const Text(
-                "Lanjut",
-                style: TextStyle(fontWeight: FontWeight.w800),
+                child: const Text(
+                  "Lanjut",
+                  style: TextStyle(fontWeight: FontWeight.w800),
+                ),
               ),
             ),
           ),
@@ -278,34 +292,41 @@ class PaymentMethodPage extends StatelessWidget {
             ),
             bottomNavigationBar: Padding(
               padding: const EdgeInsets.all(16),
-              child: SizedBox(
-                height: 48,
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF636AE8),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              child: Semantics(
+                label: 'payment_confirm_button',
+                identifier: 'payment_confirm_button',
+                button: true,
+                container: true,
+                child: SizedBox(
+                  key: const Key('payment_confirm_button'),
+                  height: 48,
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF636AE8),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
                     ),
-                    elevation: 0,
-                  ),
-                  // Kita pass 'context' yang berasal dari builder Consumer,
-                  // agar Provider bisa ditemukan oleh _confirmAndPay
-                  onPressed: vm.isPaying ? null : () => _confirmAndPay(context),
-                  child: vm.isPaying
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
+                    // Kita pass 'context' yang berasal dari builder Consumer,
+                    // agar Provider bisa ditemukan oleh _confirmAndPay
+                    onPressed: vm.isPaying ? null : () => _confirmAndPay(context),
+                    child: vm.isPaying
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            "Lanjut Pembayaran",
+                            style: TextStyle(fontWeight: FontWeight.w800),
                           ),
-                        )
-                      : const Text(
-                          "Lanjut Pembayaran",
-                          style: TextStyle(fontWeight: FontWeight.w800),
-                        ),
+                  ),
                 ),
               ),
             ),

@@ -3,7 +3,10 @@ import '../../../core/services/api_service.dart';
 import '../models/detail_qr_model.dart';
 
 class DetailQrViewModel extends ChangeNotifier {
-  final ApiService _apiService = ApiService();
+  final ApiService _apiService;
+
+  DetailQrViewModel({ApiService? apiService})
+      : _apiService = apiService ?? ApiService();
 
   QrTokenResponse? _qrToken;
   bool _isLoading = false;

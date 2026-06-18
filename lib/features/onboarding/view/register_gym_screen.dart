@@ -138,9 +138,15 @@ class _RegisterGymScreenState extends State<RegisterGymScreen> {
         elevation: 0,
         foregroundColor: Colors.black,
         automaticallyImplyLeading: false,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-          onPressed: _handleBack,
+        leading: Semantics(
+          label: 'register_gym_back_button',
+          identifier: 'register_gym_back_button',
+          button: true,
+          child: IconButton(
+            key: const Key('register_gym_back_button'),
+            icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+            onPressed: _handleBack,
+          ),
         ),
       ),
 
@@ -164,90 +170,126 @@ class _RegisterGymScreenState extends State<RegisterGymScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                TextField(
-                  controller: _nameController,
-                  textInputAction: TextInputAction.next,
-                  decoration: _inputDecoration(
-                    label: 'Nama Lengkap',
-                    hint: 'John Doe',
+                Semantics(
+                  label: 'register_gym_name_field',
+                  identifier: 'register_gym_name_field',
+                  container: true,
+                  child: TextField(
+                    key: const Key('register_gym_name_field'),
+                    controller: _nameController,
+                    textInputAction: TextInputAction.next,
+                    decoration: _inputDecoration(
+                      label: 'Nama Lengkap',
+                      hint: 'John Doe',
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                TextField(
-                  controller: _usernameController,
-                  textInputAction: TextInputAction.next,
-                  decoration: _inputDecoration(
-                    label: 'Username',
-                    hint: 'johnd0e',
+                Semantics(
+                  label: 'register_gym_username_field',
+                  identifier: 'register_gym_username_field',
+                  container: true,
+                  child: TextField(
+                    key: const Key('register_gym_username_field'),
+                    controller: _usernameController,
+                    textInputAction: TextInputAction.next,
+                    decoration: _inputDecoration(
+                      label: 'Username',
+                      hint: 'johnd0e',
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                TextField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.next,
-                  decoration: _inputDecoration(
-                    label: 'Email',
-                    hint: 'john@email.com',
+                Semantics(
+                  label: 'register_gym_email_field',
+                  identifier: 'register_gym_email_field',
+                  container: true,
+                  child: TextField(
+                    key: const Key('register_gym_email_field'),
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    decoration: _inputDecoration(
+                      label: 'Email',
+                      hint: 'john@email.com',
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                TextField(
-                  controller: _passwordController,
-                  obscureText: _isPasswordHidden,
-                  textInputAction: TextInputAction.done,
-                  decoration: _inputDecoration(
-                    label: 'Password',
-                    hint: 'Enter your password',
-                    suffixIcon: IconButton(
-                      splashRadius: 20,
-                      tooltip: _isPasswordHidden
-                          ? 'Show password'
-                          : 'Hide password',
-                      icon: Icon(
-                        _isPasswordHidden
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                Semantics(
+                  label: 'register_gym_password_field',
+                  identifier: 'register_gym_password_field',
+                  container: true,
+                  child: TextField(
+                    key: const Key('register_gym_password_field'),
+                    controller: _passwordController,
+                    obscureText: _isPasswordHidden,
+                    textInputAction: TextInputAction.done,
+                    decoration: _inputDecoration(
+                      label: 'Password',
+                      hint: 'Enter your password',
+                      suffixIcon: Semantics(
+                        label: 'register_gym_password_visibility_button',
+                        identifier: 'register_gym_password_visibility_button',
+                        button: true,
+                        child: IconButton(
+                          key: const Key('register_gym_password_visibility_button'),
+                          splashRadius: 20,
+                          tooltip: _isPasswordHidden
+                              ? 'Show password'
+                              : 'Hide password',
+                          icon: Icon(
+                            _isPasswordHidden
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() => _isPasswordHidden = !_isPasswordHidden);
+                          },
+                        ),
                       ),
-                      onPressed: () {
-                        setState(() => _isPasswordHidden = !_isPasswordHidden);
-                      },
                     ),
                   ),
                 ),
 
                 const SizedBox(height: 24),
 
-                SizedBox(
-                  height: 48,
-                  child: ElevatedButton(
-                    onPressed: isLoading ? null : _handleRegisterAndLogin,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF636AE8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                Semantics(
+                  label: 'register_gym_submit_button',
+                  identifier: 'register_gym_submit_button',
+                  button: true,
+                  container: true,
+                  child: SizedBox(
+                    key: const Key('register_gym_submit_button'),
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : _handleRegisterAndLogin,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF636AE8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
+                      child: isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              'Daftar',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white),
+                            ),
                     ),
-                    child: isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Text(
-                            'Daftar',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
                   ),
                 ),
 

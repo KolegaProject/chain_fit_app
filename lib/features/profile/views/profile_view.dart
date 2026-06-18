@@ -220,10 +220,16 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: saving ? null : pickImage,
-                            icon: const Icon(Icons.photo),
-                            label: const Text("Ganti Foto"),
+                          child: Semantics(
+                            label: 'sheet_change_photo_button',
+                            identifier: 'sheet_change_photo_button',
+                            button: true,
+                            child: OutlinedButton.icon(
+                              key: const Key('sheet_change_photo_button'),
+                              onPressed: saving ? null : pickImage,
+                              icon: const Icon(Icons.photo),
+                              label: const Text("Ganti Foto"),
+                            ),
                           ),
                         ),
                       ],
@@ -231,41 +237,60 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     const SizedBox(height: 12),
 
-                    TextField(
-                      controller: usernameC,
-                      enabled: !saving,
-                      decoration: const InputDecoration(
-                        labelText: "Username",
-                        border: OutlineInputBorder(),
+                    Semantics(
+                      label: 'sheet_username_field',
+                      identifier: 'sheet_username_field',
+                      container: true,
+                      child: TextField(
+                        key: const Key('sheet_username_field'),
+                        controller: usernameC,
+                        enabled: !saving,
+                        decoration: const InputDecoration(
+                          labelText: "Username",
+                          border: OutlineInputBorder(),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
 
-                    TextField(
-                      controller: nameC,
-                      enabled: !saving,
-                      decoration: const InputDecoration(
-                        labelText: "Name",
-                        border: OutlineInputBorder(),
+                    Semantics(
+                      label: 'sheet_name_field',
+                      identifier: 'sheet_name_field',
+                      container: true,
+                      child: TextField(
+                        key: const Key('sheet_name_field'),
+                        controller: nameC,
+                        enabled: !saving,
+                        decoration: const InputDecoration(
+                          labelText: "Name",
+                          border: OutlineInputBorder(),
+                        ),
                       ),
                     ),
 
                     const SizedBox(height: 14),
 
-                    SizedBox(
-                      width: double.infinity,
-                      height: 46,
-                      child: ElevatedButton(
-                        onPressed: saving ? null : save,
-                        child: saving
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Text("Simpan"),
+                    Semantics(
+                      label: 'sheet_save_button',
+                      identifier: 'sheet_save_button',
+                      button: true,
+                      container: true,
+                      child: SizedBox(
+                        key: const Key('sheet_save_button'),
+                        width: double.infinity,
+                        height: 46,
+                        child: ElevatedButton(
+                          onPressed: saving ? null : save,
+                          child: saving
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text("Simpan"),
+                        ),
                       ),
                     ),
                   ],
@@ -296,7 +321,16 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: const Color(0xFFF5F6FA),
         foregroundColor: Colors.black,
         actions: [
-          IconButton(icon: const Icon(Icons.logout), onPressed: _logout),
+          Semantics(
+            label: 'logout_button',
+            identifier: 'logout_button',
+            button: true,
+            child: IconButton(
+              key: const Key('logout_button'),
+              icon: const Icon(Icons.logout),
+              onPressed: _logout,
+            ),
+          ),
         ],
       ),
       body: RefreshIndicator(onRefresh: _fetchProfile, child: _buildBody()),
@@ -500,17 +534,23 @@ class _ProfileHeaderCard extends StatelessWidget {
           right: 10,
           child: Material(
             color: Colors.transparent,
-            child: InkWell(
-              onTap: onEdit,
-              borderRadius: BorderRadius.circular(999),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.18),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: Colors.white.withOpacity(0.22)),
+            child: Semantics(
+              label: 'edit_profile_button',
+              identifier: 'edit_profile_button',
+              button: true,
+              child: InkWell(
+                key: const Key('edit_profile_button'),
+                onTap: onEdit,
+                borderRadius: BorderRadius.circular(999),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.18),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: Colors.white.withOpacity(0.22)),
+                  ),
+                  child: const Icon(Icons.edit, size: 18, color: Colors.white),
                 ),
-                child: const Icon(Icons.edit, size: 18, color: Colors.white),
               ),
             ),
           ),
@@ -733,7 +773,16 @@ class _ErrorCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(message, textAlign: TextAlign.center),
           const SizedBox(height: 12),
-          ElevatedButton(onPressed: onRetry, child: const Text("Coba Lagi")),
+          Semantics(
+            label: 'retry_profile_button',
+            identifier: 'retry_profile_button',
+            button: true,
+            child: ElevatedButton(
+              key: const Key('retry_profile_button'),
+              onPressed: onRetry,
+              child: const Text("Coba Lagi"),
+            ),
+          ),
         ],
       ),
     );

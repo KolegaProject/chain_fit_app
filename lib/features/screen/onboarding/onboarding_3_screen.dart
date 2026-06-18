@@ -62,25 +62,31 @@ class Onboarding3Screen extends StatelessWidget {
                   // Page Indicator
 
                   // Next Button
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const OnboardingScreen(),
+                  Semantics(
+                    label: 'onboarding_3_next_button',
+                    identifier: 'onboarding_3_next_button',
+                    button: true,
+                    child: GestureDetector(
+                      key: const Key('onboarding_3_next_button'),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const OnboardingScreen(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 56,
+                        height: 56,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF5B6EF5),
+                          shape: BoxShape.circle,
                         ),
-                      );
-                    },
-                    child: Container(
-                      width: 56,
-                      height: 56,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF5B6EF5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.arrow_forward,
-                        color: Colors.white,
+                        child: const Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),

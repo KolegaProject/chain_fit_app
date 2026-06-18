@@ -157,35 +157,42 @@ class _GymPreviewViewState extends State<GymPreviewView> {
           const Divider(height: 1, thickness: 1, color: Colors.grey),
           Padding(
             padding: const EdgeInsets.all(16),
-            child: SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF636AE8),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+            child: Semantics(
+              label: 'gym_select_package_button',
+              identifier: 'gym_select_package_button',
+              button: true,
+              container: true,
+              child: SizedBox(
+                key: const Key('gym_select_package_button'),
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF636AE8),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
                   ),
-                  elevation: 0,
-                ),
-                onPressed: vm.packages.isEmpty || vm.gym == null
-                    ? null
-                    : () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => PackagePage(
-                              gymId: vm.gym!.id,
-                              gymName: vm.gym!.name,
-                              packages: vm.packages,
+                  onPressed: vm.packages.isEmpty || vm.gym == null
+                      ? null
+                      : () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => PackagePage(
+                                gymId: vm.gym!.id,
+                                gymName: vm.gym!.name,
+                                packages: vm.packages,
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                child: const Text(
-                  "Pilih Paket",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          );
+                        },
+                  child: const Text(
+                    "Pilih Paket",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
             ),

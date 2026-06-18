@@ -84,16 +84,22 @@ class HomeTab extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.grey.shade200),
               ),
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const NotificationPage()),
-                  );
-                },
-                child: const Icon(
-                  Icons.notifications_outlined,
-                  color: Colors.black87,
+              child: Semantics(
+                label: 'notification_button',
+                identifier: 'notification_button',
+                button: true,
+                child: InkWell(
+                  key: const Key('notification_button'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const NotificationPage()),
+                    );
+                  },
+                  child: const Icon(
+                    Icons.notifications_outlined,
+                    color: Colors.black87,
+                  ),
                 ),
               ),
             ),
@@ -229,33 +235,39 @@ class HomeTab extends StatelessWidget {
                 children: [
                   if (capacity != null) _buildStatusBadge(capacity.status),
                   const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: isLoading
-                        ? null
-                        : () => vm.fetchGymCapacity(gymId),
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF3F4F6),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.grey.shade200),
-                      ),
-                      child: isLoading
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Color(0xFF6366F1),
+                  Semantics(
+                    label: 'refresh_capacity_button',
+                    identifier: 'refresh_capacity_button',
+                    button: true,
+                    child: GestureDetector(
+                      key: const Key('refresh_capacity_button'),
+                      onTap: isLoading
+                          ? null
+                          : () => vm.fetchGymCapacity(gymId),
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF3F4F6),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.grey.shade200),
+                        ),
+                        child: isLoading
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Color(0xFF6366F1),
+                                  ),
                                 ),
+                              )
+                            : const Icon(
+                                Icons.refresh_rounded,
+                                size: 16,
+                                color: Color(0xFF6366F1),
                               ),
-                            )
-                          : const Icon(
-                              Icons.refresh_rounded,
-                              size: 16,
-                              color: Color(0xFF6366F1),
-                            ),
+                      ),
                     ),
                   ),
                 ],
@@ -278,16 +290,22 @@ class HomeTab extends StatelessWidget {
                   "Gagal memuat data kepadatan",
                   style: TextStyle(color: Colors.red, fontSize: 13),
                 ),
-                TextButton(
-                  onPressed: () => vm.fetchGymCapacity(gymId),
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    minimumSize: const Size(50, 30),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: const Text(
-                    "Coba Lagi",
-                    style: TextStyle(color: Color(0xFF6366F1), fontSize: 13),
+                Semantics(
+                  label: 'retry_capacity_button',
+                  identifier: 'retry_capacity_button',
+                  button: true,
+                  child: TextButton(
+                    key: const Key('retry_capacity_button'),
+                    onPressed: () => vm.fetchGymCapacity(gymId),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: const Size(50, 30),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: const Text(
+                      "Coba Lagi",
+                      style: TextStyle(color: Color(0xFF6366F1), fontSize: 13),
+                    ),
                   ),
                 ),
               ],
@@ -465,22 +483,28 @@ class HomeTab extends StatelessWidget {
       itemCount: menuItems.length,
       itemBuilder: (context, index) {
         final item = menuItems[index];
-        return InkWell(
-          onTap: () {
-            // Logic navigasi
-            if (item['title'] == 'Cari Gym') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => SearchGymView()),
-              );
-            } else if (item['title'] == 'Panduan') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => PanduanAlatGymPage()),
-              );
-            }
-          },
-          borderRadius: BorderRadius.circular(20),
+        final String keyName = item['title'] == 'Cari Gym' ? 'menu_cari_gym' : 'menu_panduan';
+        return Semantics(
+          label: keyName,
+          identifier: keyName,
+          button: true,
+          child: InkWell(
+            key: Key(keyName),
+            onTap: () {
+              // Logic navigasi
+              if (item['title'] == 'Cari Gym') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => SearchGymView()),
+                );
+              } else if (item['title'] == 'Panduan') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => PanduanAlatGymPage()),
+                );
+              }
+            },
+            borderRadius: BorderRadius.circular(20),
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -521,8 +545,9 @@ class HomeTab extends StatelessWidget {
               ],
             ),
           ),
-        );
-      },
+        ),
+      );
+    },
     );
   }
 
@@ -551,18 +576,24 @@ class HomeTab extends StatelessWidget {
             style: TextStyle(color: Colors.white70, fontSize: 14),
           ),
           const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => SearchGymView()),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black87,
+          Semantics(
+            label: 'empty_search_gym_button',
+            identifier: 'empty_search_gym_button',
+            button: true,
+            child: ElevatedButton(
+              key: const Key('empty_search_gym_button'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => SearchGymView()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black87,
+              ),
+              child: const Text("Cari Gym Sekarang"),
             ),
-            child: const Text("Cari Gym Sekarang"),
           ),
         ],
       ),

@@ -55,27 +55,34 @@ class Onboarding4Screen extends StatelessWidget {
               const SizedBox(height: 40),
 
               // Login Button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Navigate to login or home screen
-                    // Navigator.pushReplacement(...);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5B6EF5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+              Semantics(
+                label: 'onboarding_4_login_button',
+                identifier: 'onboarding_4_login_button',
+                button: true,
+                container: true,
+                child: SizedBox(
+                  key: const Key('onboarding_4_login_button'),
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Navigate to login or home screen
+                      // Navigator.pushReplacement(...);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF5B6EF5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
                     ),
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    'Login',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -84,16 +91,22 @@ class Onboarding4Screen extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Register Account Button
-              TextButton(
-                onPressed: () {
-                  // Navigate to register screen
-                },
-                child: const Text(
-                  'Daftar Akun',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF5B6EF5),
+              Semantics(
+                label: 'onboarding_4_register_button',
+                identifier: 'onboarding_4_register_button',
+                button: true,
+                child: TextButton(
+                  key: const Key('onboarding_4_register_button'),
+                  onPressed: () {
+                    // Navigate to register screen
+                  },
+                  child: const Text(
+                    'Daftar Akun',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF5B6EF5),
+                    ),
                   ),
                 ),
               ),
@@ -101,16 +114,22 @@ class Onboarding4Screen extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Register Gym Button
-              TextButton(
-                onPressed: () {
-                  // Navigate to gym registration
-                },
-                child: const Text(
-                  'Daftar Gym',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF5B6EF5),
+              Semantics(
+                label: 'onboarding_4_register_gym_button',
+                identifier: 'onboarding_4_register_gym_button',
+                button: true,
+                child: TextButton(
+                  key: const Key('onboarding_4_register_gym_button'),
+                  onPressed: () {
+                    // Navigate to gym registration
+                  },
+                  child: const Text(
+                    'Daftar Gym',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF5B6EF5),
+                    ),
                   ),
                 ),
               ),

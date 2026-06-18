@@ -78,35 +78,59 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildNavIcon(IconData icon, String label, int index) {
     final isSelected = _selectedIndex == index;
+    final String keyName;
+    switch (index) {
+      case 0:
+        keyName = 'nav_home';
+        break;
+      case 1:
+        keyName = 'nav_progress';
+        break;
+      case 2:
+        keyName = 'nav_qr';
+        break;
+      case 3:
+        keyName = 'nav_profile';
+        break;
+      default:
+        keyName = 'nav_$index';
+    }
 
-    return InkWell(
-      onTap: () => _onItemTapped(index),
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: isSelected
-                  ? const Color(0xFF6366F1)
-                  : Colors.grey.shade400,
-              size: 26,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
+    return Semantics(
+      label: keyName,
+      identifier: keyName,
+      selected: isSelected,
+      button: true,
+      child: InkWell(
+        key: Key(keyName),
+        onTap: () => _onItemTapped(index),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
                 color: isSelected
                     ? const Color(0xFF6366F1)
                     : Colors.grey.shade400,
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                size: 26,
               ),
-            ),
-          ],
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected
+                      ? const Color(0xFF6366F1)
+                      : Colors.grey.shade400,
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -40,11 +40,17 @@ class _SearchGymViewState extends State<SearchGymView> {
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: SearchGymInput(
-              controller: _searchController,
-              onChanged: (value) {
-                vm.search(query: value);
-              },
+            child: Semantics(
+              label: 'search_gym_input',
+              identifier: 'search_gym_input',
+              container: true,
+              child: SearchGymInput(
+                key: const Key('search_gym_input'),
+                controller: _searchController,
+                onChanged: (value) {
+                  vm.search(query: value);
+                },
+              ),
             ),
           ),
           Expanded(child: _buildBody(vm)),
@@ -73,17 +79,24 @@ class _SearchGymViewState extends State<SearchGymView> {
           itemCount: vm.gyms.length,
           itemBuilder: (_, index) {
             final gym = vm.gyms[index];
-            return SearchGymCard(
-              gym: gym,
-              userPosition: vm.userLocation,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => GymPreviewView(gymId: gym.id),
-                  ),
-                );
-              },
+            final String keyName = 'gym_card_item_${gym.id}';
+            return Semantics(
+              label: keyName,
+              identifier: keyName,
+              button: true,
+              child: SearchGymCard(
+                key: Key(keyName),
+                gym: gym,
+                userPosition: vm.userLocation,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => GymPreviewView(gymId: gym.id),
+                    ),
+                  );
+                },
+              ),
             );
           },
         ),

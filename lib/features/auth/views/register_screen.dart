@@ -94,164 +94,207 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
                 const SizedBox(height: 32),
-                TextField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    labelText: 'Nama Lengkap',
-                    hintText: 'John Doe',
-                    filled: true,
-                    fillColor: const Color(0xFFF1F3F6),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _usernameController,
-                  decoration: InputDecoration(
-                    labelText: 'Username',
-                    hintText: 'johnd0e',
-                    filled: true,
-                    fillColor: const Color(0xFFF1F3F6),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'john@email.com',
-                    filled: true,
-                    fillColor: const Color(0xFFF1F3F6),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: _isPasswordHidden,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Enter your password',
-                    filled: true,
-                    fillColor: const Color(0xFFF1F3F6),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    suffixIcon: IconButton(
-                      splashRadius: 20,
-                      tooltip: _isPasswordHidden
-                          ? 'Show password'
-                          : 'Hide password',
-                      icon: Icon(
-                        _isPasswordHidden
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                Semantics(
+                  label: 'register_name_field',
+                  identifier: 'register_name_field',
+                  container: true,
+                  child: TextField(
+                    key: const Key('register_name_field'),
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Nama Lengkap',
+                      hintText: 'John Doe',
+                      filled: true,
+                      fillColor: const Color(0xFFF1F3F6),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _isPasswordHidden = !_isPasswordHidden;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  height: 48,
-                  child: ElevatedButton(
-                    onPressed: viewModel.isLoading ? null : _handleRegister,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF636AE8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
                       ),
                     ),
-                    child: viewModel.isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Text(
-                            'Register',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
                   ),
                 ),
-                const SizedBox(height: 24),
-                Center(
-                  child: RichText(
-                    text: TextSpan(
-                      text: 'Sudah punya akun? ',
-                      style: const TextStyle(color: Colors.grey, fontSize: 14),
-                      children: [
-                        TextSpan(
-                          text: 'Login',
-                          style: const TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.w600,
+                const SizedBox(height: 16),
+                Semantics(
+                  label: 'register_username_field',
+                  identifier: 'register_username_field',
+                  container: true,
+                  child: TextField(
+                    key: const Key('register_username_field'),
+                    controller: _usernameController,
+                    decoration: InputDecoration(
+                      labelText: 'Username',
+                      hintText: 'johnd0e',
+                      filled: true,
+                      fillColor: const Color(0xFFF1F3F6),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Semantics(
+                  label: 'register_email_field',
+                  identifier: 'register_email_field',
+                  container: true,
+                  child: TextField(
+                    key: const Key('register_email_field'),
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      hintText: 'john@email.com',
+                      filled: true,
+                      fillColor: const Color(0xFFF1F3F6),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Semantics(
+                  label: 'register_password_field',
+                  identifier: 'register_password_field',
+                  container: true,
+                  child: TextField(
+                    key: const Key('register_password_field'),
+                    controller: _passwordController,
+                    obscureText: _isPasswordHidden,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      hintText: 'Enter your password',
+                      filled: true,
+                      fillColor: const Color(0xFFF1F3F6),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      suffixIcon: Semantics(
+                        label: 'register_password_visibility_button',
+                        identifier: 'register_password_visibility_button',
+                        button: true,
+                        child: IconButton(
+                          key: const Key('register_password_visibility_button'),
+                          splashRadius: 20,
+                          tooltip: _isPasswordHidden
+                              ? 'Show password'
+                              : 'Hide password',
+                          icon: Icon(
+                            _isPasswordHidden
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                           ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const LoginScreen(),
-                                ),
-                              );
-                            },
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordHidden = !_isPasswordHidden;
+                            });
+                          },
                         ),
-                      ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Semantics(
+                  label: 'register_button',
+                  identifier: 'register_button',
+                  button: true,
+                  container: true,
+                  child: SizedBox(
+                    key: const Key('register_button'),
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: viewModel.isLoading ? null : _handleRegister,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF636AE8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: viewModel.isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              'Register',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Semantics(
+                  label: 'login_link',
+                  identifier: 'login_link',
+                  link: true,
+                  child: Center(
+                    key: const Key('login_link'),
+                    child: RichText(
+                      text: TextSpan(
+                        text: 'Sudah punya akun? ',
+                        style: const TextStyle(color: Colors.grey, fontSize: 14),
+                        children: [
+                          TextSpan(
+                            text: 'Login',
+                            style: const TextStyle(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const LoginScreen(),
+                                  ),
+                                );
+                              },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

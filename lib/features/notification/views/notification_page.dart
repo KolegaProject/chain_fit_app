@@ -33,12 +33,18 @@ class _NotificationPageState extends State<NotificationPage> {
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: AppColors.textPrimary,
+        leading: Semantics(
+          label: 'notification_back_button',
+          identifier: 'notification_back_button',
+          button: true,
+          child: IconButton(
+            key: const Key('notification_back_button'),
+            icon: const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: AppColors.textPrimary,
+            ),
+            onPressed: () => Navigator.pop(context),
           ),
-          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: vm.isLoading
@@ -90,50 +96,56 @@ class _NotificationPageState extends State<NotificationPage> {
               : Colors.blue.shade100,
         ),
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: notification.isRead
-                ? Colors.grey.shade100
-                : Colors.blue.shade100,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.notifications,
-            color: notification.isRead ? Colors.grey : Colors.blue,
-            size: 24,
-          ),
-        ),
-        title: Text(
-          notification.title,
-          style: TextStyle(
-            fontWeight: notification.isRead
-                ? FontWeight.normal
-                : FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Text(
-              notification.message,
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+      child: Semantics(
+        label: 'notification_item_${notification.id}',
+        identifier: 'notification_item_${notification.id}',
+        button: true,
+        child: ListTile(
+          key: Key('notification_item_${notification.id}'),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          leading: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: notification.isRead
+                  ? Colors.grey.shade100
+                  : Colors.blue.shade100,
+              shape: BoxShape.circle,
             ),
-            const SizedBox(height: 8),
-            Text(
-              DateFormat('dd MMM yyyy, HH:mm').format(notification.date),
-              style: TextStyle(color: Colors.grey.shade400, fontSize: 11),
+            child: Icon(
+              Icons.notifications,
+              color: notification.isRead ? Colors.grey : Colors.blue,
+              size: 24,
             ),
-          ],
+          ),
+          title: Text(
+            notification.title,
+            style: TextStyle(
+              fontWeight: notification.isRead
+                  ? FontWeight.normal
+                  : FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 4),
+              Text(
+                notification.message,
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                DateFormat('dd MMM yyyy, HH:mm').format(notification.date),
+                style: TextStyle(color: Colors.grey.shade400, fontSize: 11),
+              ),
+            ],
+          ),
+          onTap: () {
+            // Tandai sudah dibaca viewmodel
+            context.read<NotificationViewModel>().markAsRead(notification.id);
+          },
         ),
-        onTap: () {
-          // Tandai sudah dibaca viewmodel
-          context.read<NotificationViewModel>().markAsRead(notification.id);
-        },
       ),
     );
   }

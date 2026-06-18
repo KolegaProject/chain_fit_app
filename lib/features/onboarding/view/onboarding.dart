@@ -6,8 +6,6 @@ import 'package:chain_fit_app/features/auth/views/register_screen.dart';
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
-  static const _primaryColor = Color(0xFF636AE8);
-
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
@@ -73,40 +71,58 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   const SizedBox(height: 22),
 
-                  _PrimaryButton(
-                    text: 'Login',
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      );
-                    },
+                  Semantics(
+                    label: 'onboarding_login_button',
+                    identifier: 'onboarding_login_button',
+                    button: true,
+                    child: _PrimaryButton(
+                      key: const Key('onboarding_login_button'),
+                      text: 'Login',
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        );
+                      },
+                    ),
                   ),
                   const SizedBox(height: 12),
 
-                  _SecondaryButton(
-                    text: 'Daftar Akun',
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const RegisterScreen(),
-                        ),
-                      );
-                    },
+                  Semantics(
+                    label: 'onboarding_register_button',
+                    identifier: 'onboarding_register_button',
+                    button: true,
+                    child: _SecondaryButton(
+                      key: const Key('onboarding_register_button'),
+                      text: 'Daftar Akun',
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const RegisterScreen(),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                   const SizedBox(height: 12),
 
-                  _SecondaryButton(
-                    text: 'Daftar Gym',
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const RegisterGymScreen(),
-                        ),
-                      );
-                    },
+                  Semantics(
+                    label: 'onboarding_register_gym_button',
+                    identifier: 'onboarding_register_gym_button',
+                    button: true,
+                    child: _SecondaryButton(
+                      key: const Key('onboarding_register_gym_button'),
+                      text: 'Daftar Gym',
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const RegisterGymScreen(),
+                          ),
+                        );
+                      },
+                    ),
                   ),
 
                   const SizedBox(height: 28),
@@ -121,7 +137,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 }
 
 class _PrimaryButton extends StatelessWidget {
-  const _PrimaryButton({required this.text, required this.onPressed});
+  const _PrimaryButton({super.key, required this.text, required this.onPressed});
 
   final String text;
   final VoidCallback onPressed;
@@ -155,7 +171,7 @@ class _PrimaryButton extends StatelessWidget {
 }
 
 class _SecondaryButton extends StatelessWidget {
-  const _SecondaryButton({required this.text, required this.onPressed});
+  const _SecondaryButton({super.key, required this.text, required this.onPressed});
 
   final String text;
   final VoidCallback onPressed;

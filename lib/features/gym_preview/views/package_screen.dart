@@ -253,34 +253,41 @@ class PackagePage extends StatelessWidget {
                           const SizedBox(height: 6),
 
                           // ===== BUTTON =====
-                          SizedBox(
-                            width: double.infinity,
-                            height: 46,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primary,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 0,
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => PaymentMethodPage(
-                                      gymId: gymId,
-                                      selectedPackage: pkg,
-                                    ),
+                          Semantics(
+                            label: 'package_select_button_${pkg.id}',
+                            identifier: 'package_select_button_${pkg.id}',
+                            button: true,
+                            container: true,
+                            child: SizedBox(
+                              key: Key('package_select_button_${pkg.id}'),
+                              width: double.infinity,
+                              height: 46,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: primary,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                );
-                              },
-                              child: const Text(
-                                "Pilih Paket",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w800,
+                                  elevation: 0,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => PaymentMethodPage(
+                                        gymId: gymId,
+                                        selectedPackage: pkg,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  "Pilih Paket",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                                 ),
                               ),
                             ),
