@@ -1,4 +1,5 @@
 import 'package:chain_fit_app/core/constants/api_constants.dart';
+import 'package:chain_fit_app/core/enums/view_state.dart';
 import 'package:chain_fit_app/core/services/api_service.dart';
 import 'package:chain_fit_app/core/services/cache_service.dart';
 import 'package:chain_fit_app/features/qr_code/models/list_qr_model.dart';
@@ -16,7 +17,20 @@ class ListQrViewModel extends ChangeNotifier {
   List<MembershipModel> get memberships => _memberships;
   bool get isRefetching => _isRefetching;
   bool get showFullScreenLoader => _isLoading && _memberships.isEmpty;
-  bool get showFullScreenError => _errorMessage != null && _memberships.isEmpty;
+  bool get showFullScreenError => _errorMessage != null;
+  String? get errorMessage => _errorMessage;
+
+  ViewState get state {
+    if (showFullScreenLoader) {
+      return ViewState.loading;
+    } else if (showFullScreenError) {
+      return ViewState.error;
+    } else if (_memberships.isEmpty) {
+      return ViewState.empty;
+    } else {
+      return ViewState.success;
+    }
+  }
 
   Future<void> loadMemberships({bool forceRefresh = false}) async {
     _errorMessage = null;
@@ -42,8 +56,12 @@ class ListQrViewModel extends ChangeNotifier {
       final List rawList = response.data['data'] ?? [];
       _memberships = rawList.map((e) => MembershipModel.fromJson(e)).toList();
     } catch (e) {
-      if (_memberships.isEmpty) {
-        _errorMessage = "Gagal memuat data membership";
+      if (_apiService.isNotFoundError(e)) {
+        _memberships = [];
+      } else {
+        if (_memberships.isEmpty) {
+          _errorMessage = "Gagal memuat data membership";
+        }
       }
     } finally {
       _isLoading = false;

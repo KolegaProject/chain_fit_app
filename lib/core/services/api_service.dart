@@ -47,6 +47,12 @@ class ApiService {
     );
   }
 
-  // Getter agar bisa diakses public
   Dio get client => _dio;
+
+  bool isNotFoundError(Object exception) {
+    if (exception is DioException) {
+      return exception.response?.statusCode == 404;
+    }
+    return false;
+  }
 }

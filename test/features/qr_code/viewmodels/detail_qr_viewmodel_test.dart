@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:dio/dio.dart';
+import 'package:chain_fit_app/core/enums/view_state.dart';
 import 'package:chain_fit_app/features/qr_code/viewmodels/detail_qr_viewmodel.dart';
 import 'package:chain_fit_app/core/services/api_service.dart';
 
@@ -52,9 +53,14 @@ void main() {
       );
 
       final List<bool> loadingStates = [];
+      final List<ViewState> viewStates = [];
       detailQrViewModel.addListener(() {
         loadingStates.add(detailQrViewModel.isLoading);
+        viewStates.add(detailQrViewModel.state);
       });
+
+      // Initial state
+      expect(detailQrViewModel.state, equals(ViewState.empty));
 
       // Act
       await detailQrViewModel.generateQrToken(tMembershipId);
@@ -67,10 +73,13 @@ void main() {
       expect(detailQrViewModel.qrToken, isNotNull);
       expect(detailQrViewModel.qrToken!.token, equals('mock_qr_token_abcd1234'));
       expect(detailQrViewModel.qrToken!.memberId, equals('mock_member_id_999'));
+      expect(detailQrViewModel.state, equals(ViewState.success));
 
       // Check state transitions
       expect(loadingStates, contains(true));
       expect(loadingStates.last, isFalse);
+      expect(viewStates, contains(ViewState.loading));
+      expect(viewStates.last, equals(ViewState.success));
 
       verify(() => mockDio.post(tEndpoint)).called(1);
     });
@@ -91,6 +100,14 @@ void main() {
         ),
       );
 
+      final List<ViewState> viewStates = [];
+      detailQrViewModel.addListener(() {
+        viewStates.add(detailQrViewModel.state);
+      });
+
+      // Initial state
+      expect(detailQrViewModel.state, equals(ViewState.empty));
+
       // Act
       await detailQrViewModel.generateQrToken(tMembershipId);
 
@@ -100,6 +117,11 @@ void main() {
       expect(detailQrViewModel.hasData, isFalse);
       expect(detailQrViewModel.qrToken, isNull);
       expect(detailQrViewModel.errorMessage, isNotNull);
+      expect(detailQrViewModel.state, equals(ViewState.error));
+
+      // Check state transitions
+      expect(viewStates, contains(ViewState.loading));
+      expect(viewStates.last, equals(ViewState.error));
 
       verify(() => mockDio.post(tEndpoint)).called(1);
     });
@@ -110,6 +132,14 @@ void main() {
         () => mockDio.post(tEndpoint),
       ).thenThrow(Exception('Unexpected error'));
 
+      final List<ViewState> viewStates = [];
+      detailQrViewModel.addListener(() {
+        viewStates.add(detailQrViewModel.state);
+      });
+
+      // Initial state
+      expect(detailQrViewModel.state, equals(ViewState.empty));
+
       // Act
       await detailQrViewModel.generateQrToken(tMembershipId);
 
@@ -119,6 +149,11 @@ void main() {
       expect(detailQrViewModel.hasData, isFalse);
       expect(detailQrViewModel.qrToken, isNull);
       expect(detailQrViewModel.errorMessage, contains('Unexpected error'));
+      expect(detailQrViewModel.state, equals(ViewState.error));
+
+      // Check state transitions
+      expect(viewStates, contains(ViewState.loading));
+      expect(viewStates.last, equals(ViewState.error));
 
       verify(() => mockDio.post(tEndpoint)).called(1);
     });
@@ -136,6 +171,7 @@ void main() {
       expect(detailQrViewModel.isLoading, isFalse);
       expect(detailQrViewModel.hasError, isFalse);
       expect(detailQrViewModel.hasData, isFalse);
+      expect(detailQrViewModel.state, equals(ViewState.empty));
     });
   });
 }

@@ -1,4 +1,6 @@
+import 'package:chain_fit_app/core/constants/api_constants.dart';
 import 'package:flutter/material.dart';
+import '../../../core/enums/view_state.dart';
 import '../../../core/services/api_service.dart';
 import '../models/detail_qr_model.dart';
 
@@ -6,7 +8,7 @@ class DetailQrViewModel extends ChangeNotifier {
   final ApiService _apiService;
 
   DetailQrViewModel({ApiService? apiService})
-      : _apiService = apiService ?? ApiService();
+    : _apiService = apiService ?? ApiService();
 
   QrTokenResponse? _qrToken;
   bool _isLoading = false;
@@ -20,6 +22,18 @@ class DetailQrViewModel extends ChangeNotifier {
   bool get hasError => _errorMessage != null;
   bool get hasData => _qrToken != null;
 
+  ViewState get state {
+    if (_isLoading) {
+      return ViewState.loading;
+    } else if (_errorMessage != null) {
+      return ViewState.error;
+    } else if (_qrToken == null) {
+      return ViewState.empty;
+    } else {
+      return ViewState.success;
+    }
+  }
+
   // ===== ACTION =====
   Future<void> generateQrToken(int membershipId) async {
     _isLoading = true;
@@ -28,7 +42,7 @@ class DetailQrViewModel extends ChangeNotifier {
 
     try {
       final response = await _apiService.client.post(
-        '/api/v1/attendance/$membershipId/qr/me',
+        ApiConstants.qrEndpoint(membershipId),
       );
       _qrToken = QrTokenResponse.fromJson(response.data['data']['token']);
     } catch (e) {

@@ -18,6 +18,7 @@ class ApiConstants {
   static String gymDetailEndpoint(int gymId) => '/api/v1/gym/$gymId';
   static String gymPackageEndpoint(int gymId) =>
       '/api/v1/gym/$gymId/paket-member';
-  static String gymCapacityEndpoint(int gymId) =>
-      '/api/v1/gym/$gymId/capacity';
+  static String gymCapacityEndpoint(int gymId) => '/api/v1/gym/$gymId/capacity';
+  static String qrEndpoint(int membershipId) =>
+      '/api/v1/attendance/$membershipId/qr/me';
 }
