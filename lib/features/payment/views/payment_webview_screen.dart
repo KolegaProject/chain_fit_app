@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -19,19 +20,15 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
 
   bool _loading = true;
   bool _handled = false;
+  Timer? _timer;
 
   void _handleResult(PaymentResult result) {
     if (_handled) return;
     _handled = true;
 
-    if (result == PaymentResult.success) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Pembayaran berhasil ✅")));
-        Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (_) => false);
-      }
-    } else {
+    _timer?.cancel();
+
+    if (mounted) {
       Navigator.pop(context, result);
     }
   }
@@ -55,6 +52,15 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
               _handleResult(result);
             }
           },
+          onUrlChange: (UrlChange change) {
+            final url = change.url;
+            if (url != null) {
+              final result = _redirectHandler.resolve(url);
+              if (result != null) {
+                _handleResult(result);
+              }
+            }
+          },
           onNavigationRequest: (request) {
             final result = _redirectHandler.resolve(request.url);
             if (result != null) {
@@ -66,6 +72,30 @@ class _PaymentWebViewPageState extends State<PaymentWebViewPage> {
         ),
       )
       ..loadRequest(Uri.parse(widget.url));
+
+    // Polling URL every 1 second for SPA changes that might not trigger callbacks
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      if (!mounted || _handled) {
+        timer.cancel();
+        return;
+      }
+      try {
+        final currentUrl = await _controller.currentUrl();
+        if (currentUrl != null) {
+          final result = _redirectHandler.resolve(currentUrl);
+          if (result != null) {
+            _handleResult(result);
+            timer.cancel();
+          }
+        }
+      } catch (_) {}
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override

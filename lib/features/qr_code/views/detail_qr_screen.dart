@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:chain_fit_app/core/widgets/app_error_state.dart';
+import 'package:chain_fit_app/core/widgets/app_loading_state.dart';
 
 import '../models/list_qr_model.dart';
 import '../viewmodels/detail_qr_viewmodel.dart';
@@ -47,35 +49,52 @@ class _AksesGymPageState extends State<AksesGymPage> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 22),
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
-            Text(
-              "Pindai untuk Masuk $gymName",
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+      body: Consumer<DetailQrViewModel>(
+        builder: (context, vm, child) {
+          if (vm.isLoading && !vm.hasData) {
+            return const AppLoadingState();
+          }
+
+          if (vm.hasError) {
+            return AppErrorState(
+              errorMessage: vm.errorMessage ?? "Gagal memuat QR Code. Silakan periksa koneksi internet Anda dan coba lagi.",
+              onRetry: () => vm.generateQrToken(widget.membership.gym.id),
+              retryButtonSemanticsLabel: 'retry_qr_detail_button',
+              retryButtonKey: const Key('retry_qr_detail_button'),
+            );
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 22),
+            child: Column(
+              children: [
+                const SizedBox(height: 10),
+                Text(
+                  "Pindai untuk Masuk $gymName",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                ),
+                const SizedBox(height: 20),
+
+                _QrSection(gymId: widget.membership.gym.id),
+
+                const SizedBox(height: 15),
+                const Text(
+                  "Pindai kode QR ini di pintu masuk gym.",
+                  style: TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+
+                const SizedBox(height: 20),
+
+                _RefreshButton(gymId: widget.membership.gym.id),
+
+                const SizedBox(height: 30),
+                _TipsBox(),
+                const SizedBox(height: 40),
+              ],
             ),
-            const SizedBox(height: 20),
-
-            _QrSection(gymId: widget.membership.gym.id),
-
-            const SizedBox(height: 15),
-            const Text(
-              "Pindai kode QR ini di pintu masuk gym.",
-              style: TextStyle(fontSize: 14, color: Colors.black54),
-            ),
-
-            const SizedBox(height: 20),
-
-            _RefreshButton(gymId: widget.membership.gym.id),
-
-            const SizedBox(height: 30),
-            _TipsBox(),
-            const SizedBox(height: 40),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -93,24 +112,6 @@ class _QrSection extends StatelessWidget {
           return const SizedBox(
             height: 240,
             child: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        if (vm.hasError) {
-          return SizedBox(
-            height: 240,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, color: Colors.red, size: 40),
-                const SizedBox(height: 8),
-                const Text("Gagal memuat QR"),
-                TextButton(
-                  onPressed: () => vm.generateQrToken(gymId),
-                  child: const Text("Coba Lagi"),
-                ),
-              ],
-            ),
           );
         }
 

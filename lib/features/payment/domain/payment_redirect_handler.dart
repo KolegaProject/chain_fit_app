@@ -19,11 +19,24 @@ class PaymentRedirectHandler {
       return PaymentResult.success;
     }
 
-    if (url.toLowerCase().contains('/finish')) {
+    final urlLower = url.toLowerCase();
+    if (urlLower.contains('/finish') ||
+        urlLower.contains('pdf-download') ||
+        urlLower.contains('pdf-instruction') ||
+        urlLower.contains('status_code=200') ||
+        urlLower.contains('transaction_status=settlement') ||
+        urlLower.contains('transaction_status=capture') ||
+        urlLower.contains('success')) {
       return PaymentResult.success;
     }
 
-    if (status == 'cancel' || status == 'deny' || status == 'expire') {
+    if (status == 'cancel' || status == 'deny' || status == 'expire' ||
+        urlLower.contains('/unfinish') ||
+        urlLower.contains('/error') ||
+        urlLower.contains('status_code=202') ||
+        urlLower.contains('transaction_status=cancel') ||
+        urlLower.contains('transaction_status=deny') ||
+        urlLower.contains('transaction_status=expire')) {
       return PaymentResult.failed;
     }
 

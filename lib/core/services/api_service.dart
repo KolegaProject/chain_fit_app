@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'storage_service.dart';
+import 'package:chain_fit_app/features/profile/service/logout_service.dart';
+import 'package:chain_fit_app/core/navigation/navigation_service.dart';
 
 class ApiService {
   late Dio _dio;
@@ -28,8 +30,18 @@ class ApiService {
           print('➡️ query: ${options.queryParameters}');
           return handler.next(options);
         },
-        onError: (DioException e, handler) {
+        onError: (DioException e, handler) async {
           // Handle error global, misal 401 Unauthorized -> Logout otomatis
+          if (e.response?.statusCode == 401) {
+            final authLogout = AuthLogout();
+            await authLogout.logout();
+            
+            // Redirect to login screen
+            NavigationService.navigatorKey.currentState?.pushNamedAndRemoveUntil(
+              '/login',
+              (route) => false,
+            );
+          }
           print("API Error: ${e.message}");
           return handler.next(e);
         },

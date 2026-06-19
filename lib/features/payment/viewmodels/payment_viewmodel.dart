@@ -1,11 +1,9 @@
-import 'package:chain_fit_app/core/constants/api_constants.dart';
-import 'package:chain_fit_app/core/services/api_service.dart';
 import 'package:chain_fit_app/features/payment/models/payment_model.dart';
+import 'package:chain_fit_app/features/payment/service/payment_service.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 
 class PaymentViewModel extends ChangeNotifier {
-  final ApiService _apiService = ApiService();
+  final PaymentService _paymentService = PaymentService();
 
   bool _isPaying = false;
   String? _errorMessage;
@@ -26,34 +24,22 @@ class PaymentViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _apiService.client.post(
-        ApiConstants.paymentEndpoint,
-        data: {
-          'gymId': gymId,
-          'packageId': packageId,
-        },
+      _paymentData = await _paymentService.initiatePayment(
+        gymId: gymId,
+        packageId: packageId,
       );
-
-      final parsed = PaymentResponse.fromJson(response.data);
-
-      if (parsed.code != 200 && parsed.code != 201) {
-        throw Exception(parsed.status);
-      }
-
-      _paymentData = parsed.data;
       return true;
-    } on DioException catch (e) {
-      _errorMessage =
-          (e.response?.data is Map && e.response?.data['message'] != null)
-              ? e.response?.data['message']
-              : 'Gagal membuat pembayaran';
-      return false;
     } catch (e) {
-      _errorMessage = 'Terjadi kesalahan sistem';
+      final displayMessage = e.toString().replaceFirst('Exception: ', '');
+      _errorMessage = displayMessage.isNotEmpty ? displayMessage : 'Terjadi kesalahan sistem';
       return false;
     } finally {
       _isPaying = false;
       notifyListeners();
     }
+  }
+
+  Future<bool> verifyActiveMembership(int gymId) async {
+    return await _paymentService.checkActiveMembership(gymId);
   }
 }

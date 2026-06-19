@@ -18,6 +18,7 @@ import 'features/auth/views/login_screen.dart';
 import 'features/splash/viewmodels/splash_viewmodel.dart';
 import 'features/splash/views/splash_screen.dart';
 import 'features/notification/viewmodels/notification_viewmodel.dart';
+import 'package:chain_fit_app/core/navigation/navigation_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -61,6 +62,7 @@ class AppRouter extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => NotificationViewModel()),
       ],
       child: MaterialApp(
+        navigatorKey: NavigationService.navigatorKey,
         title: 'Chain Fit App',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(

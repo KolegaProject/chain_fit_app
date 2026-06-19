@@ -118,17 +118,41 @@ class PaymentMethodPage extends StatelessWidget {
 
     if (!context.mounted) return;
 
-    // result bisa null (user keluar dari webview tanpa selesai)
     if (result == PaymentResult.success) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Pembayaran berhasil ✅")));
 
       Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (_) => false);
-    } else if (result == PaymentResult.failed) {
+      return;
+    }
+
+    // Tampilkan loading overlay sederhana selagi melakukan pengecekan status membership terakhir di backend
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    final bool hasActiveMembership = await vm.verifyActiveMembership(gymId);
+
+    if (context.mounted) {
+      Navigator.pop(context); // Tutup loading overlay
+    }
+
+    if (!context.mounted) return;
+
+    if (hasActiveMembership) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Pembayaran gagal ❌")));
+      ).showSnackBar(const SnackBar(content: Text("Pembayaran berhasil ✅")));
+      Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (_) => false);
+    } else {
+      if (result == PaymentResult.failed) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Pembayaran gagal ❌")));
+      }
     }
   } // ✅ FIX: Kurung kurawal penutup ditambahkan di sini
 

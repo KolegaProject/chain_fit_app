@@ -3,6 +3,7 @@ import 'package:chain_fit_app/features/profile/views/profile_view.dart';
 import 'package:chain_fit_app/features/status_membership/views/membership_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:chain_fit_app/core/widgets/app_error_state.dart';
 
 import '../viewmodels/dashboard_viewmodel.dart';
 import 'tabs/home_tab.dart';
@@ -40,13 +41,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final vm = context.watch<DashboardViewModel>();
 
+    Widget bodyWidget;
+    if (vm.isLoading) {
+      bodyWidget = const Center(child: CircularProgressIndicator());
+    } else if (vm.errorMessage != null && vm.user == null) {
+      bodyWidget = AppErrorState(
+        errorMessage: vm.errorMessage!,
+        onRetry: () => vm.loadDashboardData(forceRefresh: true),
+      );
+    } else {
+      bodyWidget = SafeArea(
+        child: IndexedStack(index: _selectedIndex, children: _pages),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FE),
-      body: vm.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SafeArea(
-              child: IndexedStack(index: _selectedIndex, children: _pages),
-            ),
+      body: bodyWidget,
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 8.0,
